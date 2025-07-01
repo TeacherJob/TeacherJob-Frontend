@@ -25,6 +25,7 @@ import {
   Star,
   BookOpenCheck,
   LogOut as LogOutIcon,
+  Clapperboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -65,6 +66,7 @@ const AdminDashboard = () => {
       label: "Manage Resources",
       icon: BookOpenCheck,
     },
+    { path: "/dashboard/admin/carousel", label: "Manage Carousel", icon: Clapperboard },
     { path: "/dashboard/admin/control", label: "Control Panel", icon: Monitor },
     { path: "/dashboard/admin/settings", label: "Settings", icon: Settings },
   ];
@@ -80,7 +82,7 @@ const AdminDashboard = () => {
     const loadingToast = toast.loading("Signing out..."); // Loading message dikhayein
     try {
       // 1. Backend API ko call karein logout ke liye
-      await logoutUser({}).unwrap();
+      await logoutUser().unwrap();
 
       // 2. Redux auth state ko clear karein
       dispatch(logOut());
