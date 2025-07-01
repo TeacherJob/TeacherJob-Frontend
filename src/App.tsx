@@ -86,6 +86,7 @@ import SecurityPage from "./pages/SecurityPage";
 import AboutPage from "./pages/AboutPage";
 import VerifyOtp from "./features/auth/VerifyOtp";
 import ResetPassword from "./pages/ResetPassword";
+import ManageCarousel from "./pages/dashboard/admin/ManageCarousel";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -227,6 +228,7 @@ const AppContent = () => {
             <Route path="resources" element={<ManageResource />} />
             <Route path="salary-guides" element={<ManageSalaryGuides />} />
             <Route path="press-articles" element={<ManagePressArticles />} />
+            <Route path="carousel" element={<ManageCarousel />} />
           </Route>
         </Route>
 
