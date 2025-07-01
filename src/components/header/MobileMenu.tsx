@@ -46,7 +46,7 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
 
   const navItems = [
     { label: t("header.nav.home"), path: "/" },
-    { labke: t("header.nav.aboutUs"), path: "/about-us" },
+    { labke: t("header.nav.aboutUs"), path: "/about" },
     { label: t("header.nav.companyReviews"), path: "/company-reviews" },
     { label: t("header.nav.salaryGuide"), path: "/salary-guide" },
     { label: t("header.nav.careerGuide"), path: "/career-guide" },
