@@ -514,7 +514,7 @@ const CareerGuidePage = () => {
               </div>
 
               {/* --- FIX: Nav items now have justify-end --- */}
-              <nav className="hidden md:flex flex-grow items-center justify-end">
+              <nav className="hidden md:flex flex-grow items-center justify-start">
                 {mainNav.map((tab) => (
                   <div key={tab.id} className="relative">
                     <button
