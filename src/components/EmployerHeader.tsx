@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import logo from "@/assets/logo.png"; // Logo import is correct
+import logo from "@/assets/logo.png"; // Assuming logo has a transparent background
 
 const navLinks = [
   { href: "/post-job", label: "Post a Job" },
@@ -18,13 +18,18 @@ const EmployerHeader = () => {
 
   return (
     <>
-      <header className="bg-[#2d2d2d] text-white sticky top-0 z-50">
+      {/* [MODIFIED] Changed background to white, text to black, and added border/shadow */}
+      <header className="bg-white text-gray-900 sticky top-0 z-50 border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             <div className="flex-shrink-0">
-              {/* [CHANGED] Replaced text with logo image */}
               <Link to="/">
-                <img src={logo} alt="TeacherJob Logo" className="h-[180px] w-auto" />
+                {/* [MODIFIED] Adjusted logo size for a standard header height */}
+                <img
+                  src={logo}
+                  alt="TeacherJob Logo"
+                  className="h-12 w-auto"
+                />
               </Link>
             </div>
 
@@ -34,10 +39,11 @@ const EmployerHeader = () => {
                 <Link
                   key={link.href}
                   to={link.href}
-                  className={`px-4 py-2 text-sm rounded-full transition-colors ${
+                  // [MODIFIED] Updated link styles for light theme
+                  className={`px-4 py-2 text-sm rounded-md transition-colors ${
                     currentPath === link.href
-                      ? "font-semibold text-white bg-white/10"
-                      : "font-medium text-gray-300 hover:bg-white/10"
+                      ? "font-semibold text-primary bg-primary/10"
+                      : "font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                 >
                   {link.label}
@@ -46,9 +52,10 @@ const EmployerHeader = () => {
             </nav>
 
             <div className="hidden md:flex items-center">
+              {/* [MODIFIED] Updated link style for light theme */}
               <Link
                 to="/"
-                className="text-sm font-medium text-gray-300 hover:text-white"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900"
               >
                 For Jobseekers
               </Link>
@@ -56,9 +63,10 @@ const EmployerHeader = () => {
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
+              {/* [MODIFIED] Updated button color */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-300 hover:text-white p-2"
+                className="text-gray-600 hover:text-gray-900 p-2"
               >
                 {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
@@ -69,27 +77,30 @@ const EmployerHeader = () => {
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-[#2d2d2d] z-40 flex flex-col items-center justify-center pt-16">
-          <nav className="flex flex-col items-center gap-6">
+        // [MODIFIED] Changed overlay to white background
+        <div className="md:hidden fixed inset-0 bg-white z-40 flex flex-col items-center justify-center pt-20">
+          <nav className="flex flex-col items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`text-2xl rounded-full transition-colors ${
+                // [MODIFIED] Updated text colors for light theme
+                className={`text-2xl transition-colors ${
                   currentPath === link.href
-                    ? "font-bold text-white"
-                    : "font-medium text-gray-400 hover:text-white"
+                    ? "font-bold text-primary"
+                    : "font-medium text-gray-700 hover:text-gray-900"
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-            <hr className="w-24 border-gray-700 my-4" />
+            <hr className="w-24 border-gray-200 my-4" />
             <Link
               to="/"
               onClick={() => setIsMenuOpen(false)}
-              className="text-lg font-medium text-gray-300 hover:text-white"
+              // [MODIFIED] Updated text colors for light theme
+              className="text-lg font-medium text-gray-600 hover:text-gray-900"
             >
               For Jobseekers
             </Link>
