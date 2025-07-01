@@ -177,31 +177,23 @@ const CareerGuidePage = () => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
-  // START: ADDED REFS AND STATE FOR DYNAMIC STICKY BEHAVIOR
+  const [isScrollingUp, setIsScrollingUp] = useState(true);
+  const lastScrollY = useRef(0);
   const headerRef = useRef<HTMLDivElement>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
 
-  const [isScrollingUp, setIsScrollingUp] = useState(true);
-  const lastScrollY = useRef(0);
-
-  // Effect to measure header height
   useEffect(() => {
     if (headerRef.current) {
-      setHeaderHeight(headerRef.current.offsetHeight);
+        setHeaderHeight(headerRef.current.offsetHeight);
     }
-  }, []);
-
-  useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setIsScrollingUp(
-        currentScrollY < headerHeight || currentScrollY < lastScrollY.current
-      );
+      setIsScrollingUp(currentScrollY < lastScrollY.current || currentScrollY < 100);
       lastScrollY.current = currentScrollY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [headerHeight]);
+  }, []);
 
   const { data: response, isLoading, isError } = useGetAllCareerArticlesQuery();
   const articlesByCategory = useMemo(() => {
@@ -318,90 +310,88 @@ const CareerGuidePage = () => {
 
   return (
     <div className="bg-main min-h-screen font-sans flex flex-col">
-      {/* --- START: CORRECTED STRUCTURE --- */}
+      {/* START: CORRECTED STRUCTURE */}
       <div
         ref={headerRef}
-        className={`sticky top-0 z-50 transition-transform duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
           isScrollingUp ? "translate-y-0" : "-translate-y-full"
         }`}
       >
         <Header />
       </div>
 
-      <div
-        ref={navRef}
-        className={`sticky z-40 border-b border-border transition-all duration-300 bg-white shadow-sm`}
-        style={{
-          top: isScrollingUp && headerHeight > 0 ? `${headerHeight}px` : "0px",
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center">
-            <a href="#" onClick={handleLogoClick} className="mr-8 py-4">
-              <span className="font-bold text-main text-lg">
-                Career Essentials
-              </span>
-            </a>
-            <nav className="hidden md:flex items-center space-x-2">
-              {mainNav.map((tab) => (
-                <div key={tab.id} className="relative">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (tab.subTabs && tab.subTabs.length > 0) {
-                        handleDropdownToggle(tab.id);
-                      } else {
-                         handleTabClick(tab.id);
-                      }
-                    }}
-                    className={`flex items-center text-sm font-semibold px-4 py-5 transition-colors duration-200 relative ${
-                      activeTab === tab.id
-                        ? "text-orange-600"
-                        : "text-gray-600 hover:text-gray-900"
-                    }`}
-                  >
-                    {tab.label}
-                    {tab.subTabs && tab.subTabs.length > 0 && (
-                      <ChevronDown
-                        className={`w-5 h-5 ml-1.5 transition-transform duration-200 ${openDropdown === tab.id ? "rotate-180" : ""}`}
-                      />
+      <div className="flex-grow" style={{ paddingTop: `${headerHeight}px` }}>
+        <div
+          ref={navRef}
+          className={`sticky z-40 border-b border-border transition-all duration-300 bg-white shadow-sm`}
+          style={{ top: isScrollingUp ? `${headerHeight}px` : "0px" }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center">
+              <a href="#" onClick={handleLogoClick} className="mr-8 py-4">
+                <span className="font-bold text-main text-lg">
+                  Career Essentials
+                </span>
+              </a>
+              <nav className="hidden md:flex items-center space-x-2">
+                {mainNav.map((tab) => (
+                  <div key={tab.id} className="relative">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (tab.subTabs && tab.subTabs.length > 0) {
+                          handleDropdownToggle(tab.id);
+                        } else {
+                           handleTabClick(tab.id);
+                        }
+                      }}
+                      className={`flex items-center text-sm font-semibold px-4 py-5 transition-colors duration-200 relative ${
+                        activeTab === tab.id
+                          ? "text-orange-600"
+                          : "text-gray-600 hover:text-gray-900"
+                      }`}
+                    >
+                      {tab.label}
+                      {tab.subTabs && tab.subTabs.length > 0 && (
+                        <ChevronDown
+                          className={`w-5 h-5 ml-1.5 transition-transform duration-200 ${openDropdown === tab.id ? "rotate-180" : ""}`}
+                        />
+                      )}
+                      {activeTab === tab.id && !openDropdown && (
+                        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-orange-500 rounded-full"></span>
+                      )}
+                    </button>
+                    {tab.subTabs && openDropdown === tab.id && (
+                      <div className="absolute left-0 mt-1 w-64 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200 animate-in fade-in-20 zoom-in-95">
+                        {tab.subTabs.map((subTab) => (
+                          <a
+                            key={subTab.id}
+                            href="#"
+                            onClick={(e) => {
+                              handleSubTabClick(e, tab.id, subTab.id);
+                            }}
+                            className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                              activeSubTab === subTab.id
+                                ? "font-semibold text-orange-600 bg-orange-50"
+                                : "text-gray-700"
+                            } hover:bg-gray-100`}
+                          >
+                            {subTab.label}
+                          </a>
+                        ))}
+                      </div>
                     )}
-                    {activeTab === tab.id && !openDropdown && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-orange-500 rounded-full"></span>
-                    )}
-                  </button>
-                  {tab.subTabs && openDropdown === tab.id && (
-                    <div className="absolute left-0 mt-1 w-64 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200 animate-in fade-in-20 zoom-in-95">
-                      {tab.subTabs.map((subTab) => (
-                        <a
-                          key={subTab.id}
-                          href="#"
-                          onClick={(e) => {
-                            handleSubTabClick(e, tab.id, subTab.id);
-                          }}
-                          className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                            activeSubTab === subTab.id
-                              ? "font-semibold text-orange-600 bg-orange-50"
-                              : "text-gray-700"
-                          } hover:bg-gray-100`}
-                        >
-                          {subTab.label}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </nav>
+                  </div>
+                ))}
+              </nav>
+            </div>
           </div>
         </div>
-      </div>
-      {/* --- END: CORRECTED STRUCTURE --- */}
 
-      <div className="flex-grow">
         {activeTab === "career-guide" ? renderHomePage() : renderContentPage()}
       </div>
       <Footer />
+      {/* --- END: CORRECTED STRUCTURE --- */}
     </div>
   );
 };
