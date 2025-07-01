@@ -221,21 +221,22 @@ const CareerGuidePage = () => {
 
   // START: UPDATED NAVIGATION DATA
   const mainNav = [
-    { id: "finding-a-job", label: "Finding a Job" }, // Dropdown removed
+    { id: "finding-a-job", label: "Search strategies kriye
+" }, // Dropdown removed
     {
       id: "resumes-cover-letters",
-      label: "Resumes & Letters",
+      label: "Resume toolkit ",
       subTabs: [
         { id: "resumes-cover-letters", label: "Resume & Cover Letter Advice" },
         { id: "resume-samples", label: "Resume Samples" },
         { id: "cover-letter-samples", label: "Cover Letter Samples" },
       ],
     },
-    { id: "interviewing", label: "Interviewing" }, // Dropdown removed
-    { id: "pay-salary", label: "Pay & Salary" }, // Dropdown removed
+    { id: "interviewing", label: "Nail the interview" }, // Dropdown removed
+    { id: "pay-salary", label: "Know your worth" }, // Dropdown removed
     {
       id: "career-development",
-      label: "Career Development",
+      label: "Upskilling & advancement",
       subTabs: [
         { id: "career-development", label: "Career Development Advice" },
         { id: "starting-a-new-job", label: "Starting a New Job" },
