@@ -1,3 +1,5 @@
+// src/pages/CareerGuidePage.tsx
+
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -8,7 +10,8 @@ import {
   MessageSquare,
   ArrowRight,
   Rocket,
-  Newspaper, // Added for the News tab
+  Newspaper,
+  Menu,
 } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -16,11 +19,11 @@ import { useGetAllCareerArticlesQuery } from "@/features/admin/adminApiService";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// --- Components (ArticleCard, Skeleton, etc.) remain the same ---
+// --- Components (ArticleCard, Skeleton, etc. No changes needed here) ---
 const ArticleCard = ({ article }: { article: any }) => (
   <Link
     to={`/career-guide/${article.slug}`}
-    className="group bg-subtle rounded-2xl overflow-hidden shadow-md border border-border hover:border-primary/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+    className="group bg-white rounded-2xl overflow-hidden shadow-md border border-gray-200 hover:border-indigo-500/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
   >
     <div className="relative overflow-hidden">
       <img
@@ -30,16 +33,16 @@ const ArticleCard = ({ article }: { article: any }) => (
       />
     </div>
     <div className="p-6 flex flex-col flex-grow">
-      <p className="text-sm font-semibold text-primary mb-2">
+      <p className="text-sm font-semibold text-indigo-600 mb-2">
         {article.category}
       </p>
-      <h3 className="text-lg font-bold text-main mb-2 text-left">
+      <h3 className="text-lg font-bold text-gray-900 mb-2 text-left">
         {article.title}
       </h3>
-      <p className="text-sm text-secondary leading-relaxed line-clamp-3 mb-4 text-left flex-grow">
+      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 mb-4 text-left flex-grow">
         {article.summary}
       </p>
-      <div className="font-semibold text-primary flex items-center justify-start gap-1.5 text-sm transition-colors group-hover:text-primary/80">
+      <div className="font-semibold text-indigo-600 flex items-center justify-start gap-1.5 text-sm transition-colors group-hover:text-indigo-700">
         Read Article
         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
       </div>
@@ -48,7 +51,7 @@ const ArticleCard = ({ article }: { article: any }) => (
 );
 
 const ArticleCardSkeleton = () => (
-  <div className="bg-subtle rounded-2xl overflow-hidden shadow-md border border-border">
+  <div className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-200">
     <Skeleton className="h-48 w-full" />
     <div className="p-6">
       <Skeleton className="h-4 w-24 mb-3" />
@@ -77,21 +80,21 @@ const CategorySection = ({
   theme: any;
   onExploreClick: (categoryId: string) => void;
 }) => (
-  <div className="py-16 sm:py-20 relative overflow-hidden bg-main">
+  <div className="py-16 sm:py-20 relative overflow-hidden bg-gray-50">
     <div
       className="absolute -inset-x-32 -top-48 -bottom-32 transform-gpu overflow-hidden blur-3xl"
       aria-hidden="true"
     >
       <div
-        className={`relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] ${theme.bgGradient} opacity-10 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]`}
+        className={`relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] ${theme.bgGradient} opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]`}
       ></div>
     </div>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
       <div className="text-left md:text-center max-w-3xl mx-auto">
-        <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-main">
+        <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-gray-900">
           {title}
         </h2>
-        <p className="mt-4 text-lg max-w-2xl mx-auto text-secondary">
+        <p className="mt-4 text-lg max-w-2xl mx-auto text-gray-600">
           {subtitle}
         </p>
       </div>
@@ -103,7 +106,7 @@ const CategorySection = ({
               <ArticleCard key={article._id} article={article} />
             ))
         ) : (
-          <div className="col-span-full mt-16 text-center text-secondary italic">
+          <div className="col-span-full mt-16 text-center text-gray-500 italic">
             No articles yet for this category.
           </div>
         )}
@@ -111,7 +114,7 @@ const CategorySection = ({
       <div className="mt-16 text-center">
         <button
           onClick={() => onExploreClick(categoryId)}
-          className="inline-block bg-primary text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+          className="inline-block bg-indigo-600 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:bg-indigo-700"
         >
           Explore All {title} Articles
         </button>
@@ -146,10 +149,10 @@ const CareerGuideHero = ({
       </p>
       <form className="mt-8 max-w-xl mx-auto">
         <div className="relative">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-secondary w-5 h-5" />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             placeholder="Search for articles..."
-            className="h-14 pl-14 w-full text-md bg-subtle text-main rounded-full border-2 border-border shadow-lg focus:ring-2 focus:ring-primary/40"
+            className="h-14 pl-14 w-full text-md bg-white text-gray-900 rounded-full border-2 border-gray-300 shadow-lg focus:ring-2 focus:ring-indigo-500/40"
           />
         </div>
       </form>
@@ -158,10 +161,10 @@ const CareerGuideHero = ({
           <button
             key={theme.id}
             onClick={() => onExploreClick(theme.id)}
-            className="group flex items-center justify-center gap-2 bg-subtle px-4 py-3 rounded-full border border-border shadow-sm hover:shadow-lg hover:border-primary/60 transition-all"
+            className="group flex items-center justify-center gap-2 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-full border border-gray-300 shadow-sm hover:shadow-lg hover:border-indigo-500/60 transition-all"
           >
             {theme.icon}
-            <span className="font-semibold text-secondary group-hover:text-main text-sm">
+            <span className="font-semibold text-gray-600 group-hover:text-gray-900 text-sm">
               {theme.title}
             </span>
           </button>
@@ -171,11 +174,12 @@ const CareerGuideHero = ({
   </section>
 );
 
-
+// --- MAIN PAGE COMPONENT ---
 const CareerGuidePage = () => {
   const [activeTab, setActiveTab] = useState("career-guide");
   const [activeSubTab, setActiveSubTab] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
 
   const [isScrollingUp, setIsScrollingUp] = useState(true);
@@ -185,16 +189,29 @@ const CareerGuidePage = () => {
 
   useEffect(() => {
     if (headerRef.current) {
-        setHeaderHeight(headerRef.current.offsetHeight);
+      setHeaderHeight(headerRef.current.offsetHeight);
     }
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setIsScrollingUp(currentScrollY < lastScrollY.current || currentScrollY < 100);
+      setIsScrollingUp(
+        currentScrollY < lastScrollY.current || currentScrollY < 100
+      );
       lastScrollY.current = currentScrollY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isMobileMenuOpen]);
 
   const { data: response, isLoading, isError } = useGetAllCareerArticlesQuery();
   const articlesByCategory = useMemo(() => {
@@ -212,40 +229,41 @@ const CareerGuidePage = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(event.target as Node))
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
         setOpenDropdown(null);
+        setIsMobileMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // START: UPDATED NAVIGATION DATA
+  // --- Nav Data (No changes needed here) ---
   const mainNav = [
-    { id: "finding-a-job", label: "Search strategies kriye
-" }, // Dropdown removed
+    { id: "finding-a-job", label: "Search Strategies" },
     {
       id: "resumes-cover-letters",
-      label: "Resume toolkit ",
+      label: "Resume Toolkit",
       subTabs: [
         { id: "resumes-cover-letters", label: "Resume & Cover Letter Advice" },
         { id: "resume-samples", label: "Resume Samples" },
         { id: "cover-letter-samples", label: "Cover Letter Samples" },
       ],
     },
-    { id: "interviewing", label: "Nail the interview" }, // Dropdown removed
-    { id: "pay-salary", label: "Know your worth" }, // Dropdown removed
+    { id: "interviewing", label: "Nail the Interview" },
+    { id: "pay-salary", label: "Know Your Worth" },
     {
       id: "career-development",
-      label: "Upskilling & advancement",
+      label: "Upskilling & Advancement",
       subTabs: [
         { id: "career-development", label: "Career Development Advice" },
         { id: "starting-a-new-job", label: "Starting a New Job" },
       ],
     },
-    { id: "news", label: "News" }, // New item added
+    { id: "news", label: "News" },
   ];
-  // END: UPDATED NAVIGATION DATA
 
+  // --- YAHAN BADLAV KIYA GAYA HAI ---
   const pageData: {
     [key: string]: { title: string; subtitle: string; categoryKey?: string };
   } = {
@@ -254,8 +272,9 @@ const CareerGuidePage = () => {
       subtitle: "Your one-stop resource for career advice.",
     },
     "finding-a-job": {
-      title: "Finding a Job",
+      title: "Search Strategies",
       subtitle: "Career ideas and guidance to pick the right role for you.",
+      categoryKey: "Finding a Job",
     },
     "resumes-cover-letters": {
       title: "Resumes & Cover Letters",
@@ -274,12 +293,14 @@ const CareerGuidePage = () => {
       categoryKey: "Cover Letter Sample",
     },
     interviewing: {
-      title: "Interviewing",
+      title: "Nail the Interview",
       subtitle: "Common questions, answers and advice to help you prepare.",
+      categoryKey: "Interviewing",
     },
     "pay-salary": {
-      title: "Pay & Salary",
+      title: "Know Your Worth",
       subtitle: "Data and tips for talking about money at work.",
+      categoryKey: "Pay & Salary",
     },
     "career-development": {
       title: "Career Development",
@@ -290,14 +311,14 @@ const CareerGuidePage = () => {
       subtitle:
         "Best practices to make a strong impression and transition smoothly.",
     },
-    // START: ADDED DATA FOR NEWS
     news: {
-        title: "Latest News & Updates",
-        subtitle: "Stay informed with the latest happenings in the education sector.",
-        categoryKey: "News" // Assuming articles with this category exist
-    }
-    // END: ADDED DATA FOR NEWS
+      title: "Latest News & Updates",
+      subtitle:
+        "Stay informed with the latest happenings in the education sector.",
+      categoryKey: "News",
+    },
   };
+  // --- END OF CHANGE ---
 
   const handleTabClick = (tabId: string, subTabId: string | null = null) => {
     setActiveTab(tabId);
@@ -310,6 +331,7 @@ const CareerGuidePage = () => {
       setActiveSubTab(null);
     }
     setOpenDropdown(null);
+    setIsMobileMenuOpen(false);
   };
 
   const handleLogoClick = (e: React.MouseEvent) => {
@@ -319,7 +341,7 @@ const CareerGuidePage = () => {
 
   const handleDropdownToggle = (tabId: string) =>
     setOpenDropdown(openDropdown === tabId ? null : tabId);
-    
+
   const handleSubTabClick = (
     e: React.MouseEvent,
     tabId: string,
@@ -330,14 +352,15 @@ const CareerGuidePage = () => {
     handleTabClick(tabId, subTabId);
   };
 
+  // --- YAHAN BHI BADLAV KIYA GAYA HAI ---
   const homePageThemes = [
     {
       id: "finding-a-job",
-      title: "Job Hunting",
+      title: "Search Strategies",
       icon: (
         <Briefcase
           size={20}
-          className="text-secondary group-hover:text-primary"
+          className="text-gray-500 group-hover:text-indigo-600"
         />
       ),
     },
@@ -347,17 +370,17 @@ const CareerGuidePage = () => {
       icon: (
         <FileText
           size={20}
-          className="text-secondary group-hover:text-emerald-500"
+          className="text-gray-500 group-hover:text-emerald-500"
         />
       ),
     },
     {
       id: "interviewing",
-      title: "Interviewing",
+      title: "Nail the Interview",
       icon: (
         <MessageSquare
           size={20}
-          className="text-secondary group-hover:text-sky-500"
+          className="text-gray-500 group-hover:text-sky-500"
         />
       ),
     },
@@ -367,20 +390,20 @@ const CareerGuidePage = () => {
       icon: (
         <Rocket
           size={20}
-          className="text-secondary group-hover:text-indigo-500"
+          className="text-gray-500 group-hover:text-indigo-500"
         />
       ),
     },
     {
-        id: "news",
-        title: "News",
-        icon: (
-            <Newspaper
-            size={20}
-            className="text-secondary group-hover:text-red-500"
-            />
-        )
-    }
+      id: "news",
+      title: "News",
+      icon: (
+        <Newspaper
+          size={20}
+          className="text-gray-500 group-hover:text-red-500"
+        />
+      ),
+    },
   ];
 
   const renderHomePage = () => {
@@ -388,7 +411,9 @@ const CareerGuidePage = () => {
       {
         id: "finding-a-job",
         categoryName: "Finding a Job",
-        theme: { bgGradient: "bg-gradient-to-r from-primary/10 to-primary/5" },
+        theme: {
+          bgGradient: "bg-gradient-to-r from-indigo-200/30 to-indigo-100/10",
+        },
       },
       {
         id: "resumes-cover-letters",
@@ -403,13 +428,14 @@ const CareerGuidePage = () => {
         theme: { bgGradient: "bg-gradient-to-r from-sky-200/30 to-sky-100/10" },
       },
     ];
+    // --- END OF CHANGE ---
     return (
       <>
         <CareerGuideHero
           themes={homePageThemes}
           onExploreClick={handleTabClick}
         />
-        <div className="bg-main">
+        <div className="bg-white">
           {homePageCategories.map((cat) => {
             const categoryData = pageData[cat.id] || {
               title: "",
@@ -421,7 +447,11 @@ const CareerGuidePage = () => {
                   title={categoryData.title}
                   subtitle={categoryData.subtitle}
                   articles={
-                    isLoading ? [] : articlesByCategory[cat.categoryName] || []
+                    isLoading
+                      ? []
+                      : articlesByCategory[
+                          categoryData.categoryKey || categoryData.title
+                        ] || []
                   }
                   categoryId={cat.id}
                   theme={cat.theme}
@@ -445,14 +475,14 @@ const CareerGuidePage = () => {
       currentContentData.categoryKey || currentContentData.title;
     const articlesForCurrentTab = articlesByCategory[categoryToFilter] || [];
     return (
-      <div className="bg-main min-h-[60vh]">
-        <div className="bg-subtle border-b border-border">
+      <div className="bg-white min-h-[60vh]">
+        <div className="bg-gray-50 border-b border-gray-200">
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <h1 className="text-4xl font-extrabold text-main tracking-tight mt-3">
+            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mt-3">
               {currentContentData.title}
             </h1>
             {currentContentData.subtitle && (
-              <p className="text-lg text-secondary max-w-4xl mt-2">
+              <p className="text-lg text-gray-600 max-w-4xl mt-2">
                 {currentContentData.subtitle}
               </p>
             )}
@@ -466,7 +496,7 @@ const CareerGuidePage = () => {
               ))}
             </div>
           ) : isError ? (
-            <p className="text-center text-error py-20 font-semibold">
+            <p className="text-center text-red-600 py-20 font-semibold">
               Failed to load articles.
             </p>
           ) : articlesForCurrentTab.length > 0 ? (
@@ -476,7 +506,7 @@ const CareerGuidePage = () => {
               ))}
             </div>
           ) : (
-            <p className="text-secondary md:col-span-3 text-center h-40 flex items-center justify-center">
+            <p className="text-gray-500 md:col-span-3 text-center h-40 flex items-center justify-center">
               No articles found for this category yet.
             </p>
           )}
@@ -486,7 +516,7 @@ const CareerGuidePage = () => {
   };
 
   return (
-    <div className="bg-main min-h-screen font-sans flex flex-col">
+    <div className="bg-white min-h-screen font-sans flex flex-col">
       <div
         ref={headerRef}
         className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
@@ -499,34 +529,27 @@ const CareerGuidePage = () => {
       <div className="flex-grow" style={{ paddingTop: `${headerHeight}px` }}>
         <div
           ref={navRef}
-          className={`sticky z-40 border-b border-border transition-all duration-300 bg-white shadow-sm`}
+          className="sticky z-40 border-b border-gray-200 bg-white shadow-sm"
           style={{ top: isScrollingUp ? `${headerHeight}px` : "0px" }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between">
-              
-              <div className="flex items-center">
-                 {/* --- FIX: Added whitespace-nowrap and shifted to the left --- */}
-                <a href="#" onClick={handleLogoClick} className="py-4 flex-shrink-0 -ml-4">
-                  <span className="font-bold text-main text-lg whitespace-nowrap">
-                    Career Essentials
-                  </span>
-                </a>
-              </div>
+            <div className="flex items-center justify-between h-16">
+              <a href="#" onClick={handleLogoClick} className="flex-shrink-0">
+                <span className="font-bold text-gray-900 text-lg whitespace-nowrap ml-8">
+                  Career Essentials
+                </span>
+              </a>
 
-              {/* --- FIX: Nav items now have justify-end --- */}
-              <nav className="hidden md:flex flex-grow items-center justify-start">
+              {/* Desktop Navigation */}
+              <nav className="hidden md:flex flex-grow items-center justify-center">
                 {mainNav.map((tab) => (
                   <div key={tab.id} className="relative">
                     <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (tab.subTabs && tab.subTabs.length > 0) {
-                          handleDropdownToggle(tab.id);
-                        } else {
-                           handleTabClick(tab.id);
-                        }
-                      }}
+                      onClick={(e) =>
+                        tab.subTabs
+                          ? handleDropdownToggle(tab.id)
+                          : handleTabClick(tab.id)
+                      }
                       className={`flex items-center text-sm font-semibold px-4 py-5 transition-colors duration-200 relative whitespace-nowrap ${
                         activeTab === tab.id
                           ? "text-orange-600"
@@ -534,7 +557,7 @@ const CareerGuidePage = () => {
                       }`}
                     >
                       {tab.label}
-                      {tab.subTabs && tab.subTabs.length > 0 && (
+                      {tab.subTabs && (
                         <ChevronDown
                           className={`w-5 h-5 ml-1.5 transition-transform duration-200 ${openDropdown === tab.id ? "rotate-180" : ""}`}
                         />
@@ -544,19 +567,19 @@ const CareerGuidePage = () => {
                       )}
                     </button>
                     {tab.subTabs && openDropdown === tab.id && (
-                      <div className="absolute right-0 mt-1 w-64 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200 animate-in fade-in-20 zoom-in-95">
+                      <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-64 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200 animate-in fade-in-20 zoom-in-95">
                         {tab.subTabs.map((subTab) => (
                           <a
                             key={subTab.id}
                             href="#"
-                            onClick={(e) => {
-                              handleSubTabClick(e, tab.id, subTab.id);
-                            }}
+                            onClick={(e) =>
+                              handleSubTabClick(e, tab.id, subTab.id)
+                            }
                             className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
                               activeSubTab === subTab.id
                                 ? "font-semibold text-orange-600 bg-orange-50"
-                                : "text-gray-700"
-                            } hover:bg-gray-100`}
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
                           >
                             {subTab.label}
                           </a>
@@ -566,9 +589,80 @@ const CareerGuidePage = () => {
                   </div>
                 ))}
               </nav>
+
+              {/* Mobile Menu Button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="p-2 rounded-md text-gray-600 hover:bg-gray-100"
+                  aria-label="Open career menu"
+                >
+                  <span className="font-semibold text-sm mr-2">Menu</span>
+                  <Menu className="w-6 h-6 inline-block" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* --- Slide-out Sidebar Menu */}
+        {isMobileMenuOpen && (
+          <>
+            {/* Overlay */}
+            <div
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            {/* Sidebar */}
+            <div
+              ref={navRef}
+              className={`fixed top-0 left-0 h-full w-4/5 max-w-xs bg-white z-50 shadow-xl flex flex-col transform transition-transform duration-300 ease-in-out md:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
+            >
+              <div className="p-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
+              </div>
+              <div className="flex-grow overflow-y-auto">
+                <div className="px-2 pt-2 pb-3 space-y-1">
+                  {mainNav.map((tab) => (
+                    <div key={tab.id}>
+                      <button
+                        onClick={() =>
+                          tab.subTabs
+                            ? handleDropdownToggle(tab.id)
+                            : handleTabClick(tab.id)
+                        }
+                        className={`w-full flex justify-between items-center px-3 py-3 rounded-md text-base font-medium ${activeTab === tab.id && !openDropdown ? "text-orange-600 bg-orange-50" : "text-gray-700 hover:bg-gray-100"}`}
+                      >
+                        <span>{tab.label}</span>
+                        {tab.subTabs && (
+                          <ChevronDown
+                            className={`w-5 h-5 transition-transform ${openDropdown === tab.id ? "rotate-180" : ""}`}
+                          />
+                        )}
+                      </button>
+                      {tab.subTabs && openDropdown === tab.id && (
+                        <div className="pl-4 mt-1 space-y-1">
+                          {tab.subTabs.map((subTab) => (
+                            <a
+                              href="#"
+                              key={subTab.id}
+                              onClick={(e) =>
+                                handleSubTabClick(e, tab.id, subTab.id)
+                              }
+                              className={`block px-3 py-2 rounded-md text-base font-medium ${activeSubTab === subTab.id ? "text-orange-600 bg-orange-50" : "text-gray-600 hover:bg-gray-100"}`}
+                            >
+                              {subTab.label}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {activeTab === "career-guide" ? renderHomePage() : renderContentPage()}
       </div>
