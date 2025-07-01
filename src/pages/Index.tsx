@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import CountUp from "react-countup";
 import { useAppSelector } from "@/app/hooks";
 import {
   selectIsAuthenticated,
@@ -48,6 +49,7 @@ import {
   ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 
+// --- Interface Definitions (No changes here) ---
 interface Job {
   _id: string;
   title: string;
@@ -86,6 +88,7 @@ interface Testimonial {
   avatar: string;
 }
 
+// --- Data & Components (No changes here) ---
 const testimonials: Testimonial[] = [
   {
     id: 1,
@@ -125,7 +128,6 @@ const testimonials: Testimonial[] = [
 const HeroCarousel = () => {
   const { data: slidesResponse, isLoading } = useGetPublishedSlidesQuery();
   const slides = slidesResponse?.data || [];
-  console.log("this is slides", slides);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
@@ -177,12 +179,16 @@ const HeroCarousel = () => {
                     "path/to/your/default-fallback-image.jpg"
                   }
                   alt="slide background fallback"
-                  className={`absolute top-0 left-0 w-full h-full object-cover z-0 transition-opacity duration-1000 ${isVideoLoaded ? "opacity-0" : "opacity-100"}`}
+                  className={`absolute top-0 left-0 w-full h-full object-cover z-0 transition-opacity duration-1000 ${
+                    isVideoLoaded ? "opacity-0" : "opacity-100"
+                  }`}
                   style={{ filter: "brightness(0.7)" }}
                 />
                 <video
                   key={currentSlideData._id}
-                  className={`absolute top-0 left-0 w-full h-full object-cover z-10 transition-opacity duration-1000 ${isVideoLoaded ? "opacity-40" : "opacity-0"}`}
+                  className={`absolute top-0 left-0 w-full h-full object-cover z-10 transition-opacity duration-1000 ${
+                    isVideoLoaded ? "opacity-40" : "opacity-0"
+                  }`}
                   src={currentSlideData.backgroundMedia.url}
                   autoPlay
                   loop
@@ -228,7 +234,11 @@ const HeroCarousel = () => {
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-200 ${index === currentSlide ? "bg-primary scale-125" : "bg-primary bg-opacity-40 hover:bg-opacity-70"}`}
+            className={`w-3 h-3 rounded-full transition-all duration-200 ${
+              index === currentSlide
+                ? "bg-primary scale-125"
+                : "bg-primary bg-opacity-40 hover:bg-opacity-70"
+            }`}
           />
         ))}
       </div>
@@ -294,7 +304,6 @@ const NewJobDetails = ({
         </Button>
       );
     }
-    // The "Apply Now" button is now orange as per the image
     return (
       <Button
         onClick={() => handleAction("apply")}
@@ -336,7 +345,6 @@ const NewJobDetails = ({
         <div className="mt-6">{renderActionButtons()}</div>
       </div>
 
-      {/* This info bar now matches the image layout (no individual boxes) */}
       <div className="px-6 py-5 border-y border-gray-200 flex flex-wrap gap-x-8 gap-y-4">
         {[
           { icon: <Wallet size={16} />, label: job.salary },
@@ -397,7 +405,6 @@ const JobListItem = (props: {
 }) => {
   const { job, isSelected, onClick, applicationStatus } = props;
   return (
-    // Updated the selected state to have an orange border, as per the image
     <div
       onClick={onClick}
       className={`bg-white rounded-lg border cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md hover:border-gray-300 ${
@@ -573,7 +580,6 @@ const JobSearchSection = () => {
           </p>
         </div>
 
-        {/* Search and Filter Section - Filters have been re-added */}
         <div className="max-w-4xl mx-auto mb-10 space-y-4">
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="relative">
@@ -588,7 +594,6 @@ const JobSearchSection = () => {
             </div>
           </form>
 
-          {/* Filters are back here */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <Select
               value={filters.location}
@@ -597,7 +602,8 @@ const JobSearchSection = () => {
               <SelectTrigger className="h-12 rounded-lg text-gray-700 bg-white border-gray-300">
                 <SelectValue placeholder="Filter by Location" />
               </SelectTrigger>
-              <SelectContent>
+              {/* --- YAHAN BADLAV KIYA GAYA HAI --- */}
+              <SelectContent className="bg-white z-50 max-h-60 overflow-y-auto custom-scrollbar">
                 {uniqueLocations.map((location) => (
                   <SelectItem key={location} value={location}>
                     {location}
@@ -615,7 +621,8 @@ const JobSearchSection = () => {
               <SelectTrigger className="h-12 rounded-lg text-gray-700 bg-white border-gray-300">
                 <SelectValue placeholder="Filter by Salary" />
               </SelectTrigger>
-              <SelectContent>
+              {/* --- YAHAN BHI BADLAV KIYA GAYA HAI --- */}
+              <SelectContent className="bg-white z-50 max-h-60 overflow-y-auto custom-scrollbar">
                 {salaryRanges.map((range) => (
                   <SelectItem key={range.value} value={range.value}>
                     {range.label}
@@ -697,7 +704,6 @@ const HowWeWork = () => (
   <section className="w-full bg-white overflow-hidden">
     <div className="container mx-auto px-4 py-16 sm:py-24">
       <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-12 lg:items-center lg:gap-x-16">
-        {/* Content on the Left */}
         <div className="text-left lg:col-span-7">
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
             How We Empower Your Career
@@ -750,7 +756,6 @@ const HowWeWork = () => (
           </a>
         </div>
 
-        {/* Image on the Right with Badges */}
         <div className="relative rounded-2xl shadow-2xl overflow-hidden lg:col-span-5 h-full">
           <img
             src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop"
@@ -759,14 +764,12 @@ const HowWeWork = () => (
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent"></div>
 
-          {/* Top Right Badge */}
           <div className="absolute top-5 right-5 text-center rounded-full bg-green-500/95 backdrop-blur-sm px-5 py-3 text-sm font-bold text-white shadow-lg">
             💸 No Registration Fee
             <br />
             <span className="font-normal">First Salary, Then We Charge</span>
           </div>
 
-          {/* Bottom Badges - Stacked neatly */}
           <div className="absolute bottom-0 left-0 right-0 p-4 space-y-3">
             <div className="flex items-center gap-3 rounded-lg bg-white/90 backdrop-blur-sm p-3 shadow-xl">
               <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-orange-600">
@@ -804,14 +807,11 @@ const HowWeWork = () => (
     </div>
   </section>
 );
-// === END: UPDATED HowWeWork COMPONENT ===
 
-// === START: UPDATED ForEmployers COMPONENT WITH UI FIXES ===
 const ForEmployers = () => (
   <section className="w-full bg-gray-50 overflow-hidden">
     <div className="container mx-auto px-4 py-16 sm:py-24">
       <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-12 lg:items-center lg:gap-x-16">
-        {/* Image on the Left */}
         <div className="relative rounded-2xl shadow-2xl overflow-hidden order-last lg:order-first lg:col-span-5 h-full">
           <img
             src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2190&auto=format&fit=crop"
@@ -823,7 +823,6 @@ const ForEmployers = () => (
           </div>
         </div>
 
-        {/* Content on the Right */}
         <div className="text-left lg:col-span-7">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
             For Employers <span className="text-gray-400 font-light">/</span>{" "}
@@ -1003,35 +1002,66 @@ const TestimonialsSection = () => {
 const StatsSection = () => (
   <div className="bg-indigo-600 py-16 sm:py-20">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* --- Added Heading --- */}
       <div className="text-center">
         <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
           Trusted by Educators Across India
         </h2>
       </div>
 
-      {/* --- Stats Grid --- */}
       <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         <div>
-          <div className="text-4xl font-bold text-white">500+</div>
+          <div className="text-4xl font-bold text-white">
+            <CountUp
+              end={500}
+              duration={2.75}
+              enableScrollSpy
+              scrollSpyDelay={200}
+              suffix="+"
+            />
+          </div>
           <div className="text-sm text-indigo-200 mt-2">
             Successful Job Placements
           </div>
         </div>
         <div>
-          <div className="text-4xl font-bold text-white">200+</div>
+          <div className="text-4xl font-bold text-white">
+            <CountUp
+              end={200}
+              duration={2.75}
+              enableScrollSpy
+              scrollSpyDelay={200}
+              suffix="+"
+            />
+          </div>
           <div className="text-sm text-indigo-200 mt-2">
             Partner Schools & Colleges
           </div>
         </div>
         <div>
-          <div className="text-4xl font-bold text-white">95%</div>
+          <div className="text-4xl font-bold text-white">
+            <CountUp
+              end={95}
+              duration={2.75}
+              enableScrollSpy
+              scrollSpyDelay={200}
+              suffix="%"
+            />
+          </div>
           <div className="text-sm text-indigo-200 mt-2">
             Placement Success Rate
           </div>
         </div>
         <div>
-          <div className="text-4xl font-bold text-white">4.9/5</div>
+          <div className="text-4xl font-bold text-white">
+            <CountUp
+              end={4.9}
+              decimals={1}
+              duration={2.75}
+              enableScrollSpy
+              scrollSpyDelay={200}
+              suffix="/5"
+            />
+          </div>
           <div className="text-sm text-indigo-200 mt-2">
             Verified by Teacher
           </div>
