@@ -19,7 +19,7 @@ const Header = () => {
             <img
               src={logo}
               alt="TeacherJob Logo"
-              className="h-60 w-auto sm:h-16 md:h-16 lg:h-16 object-contain"
+              className="h-60 w-auto sm:h-48 md:h-32 lg:h-60 object-contain"
             />
           </Link>
           <NavigationMenu />
