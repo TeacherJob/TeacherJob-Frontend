@@ -15,6 +15,7 @@ import { useGetAllCareerArticlesQuery } from "@/features/admin/adminApiService";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// --- Components (ArticleCard, Skeleton, etc.) remain the same ---
 const ArticleCard = ({ article }: { article: any }) => (
   <Link
     to={`/career-guide/${article.slug}`}
@@ -181,9 +182,7 @@ const CareerGuidePage = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setIsScrollingUp(
-        currentScrollY <= 100 || currentScrollY < lastScrollY.current
-      );
+      setIsScrollingUp(currentScrollY < lastScrollY.current || currentScrollY < 100);
       lastScrollY.current = currentScrollY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -305,14 +304,16 @@ const CareerGuidePage = () => {
       setActiveSubTab(null);
     }
     setOpenDropdown(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     handleTabClick("career-guide");
   };
+
   const handleDropdownToggle = (tabId: string) =>
     setOpenDropdown(openDropdown === tabId ? null : tabId);
+    
   const handleSubTabClick = (
     e: React.MouseEvent,
     tabId: string,
@@ -470,7 +471,9 @@ const CareerGuidePage = () => {
 
   return (
     <div className="bg-main min-h-screen font-sans flex flex-col">
+      {/* --- START: CORRECTED STRUCTURE --- */}
       <div className="sticky top-0 z-50">
+        {/* Main Header that animates */}
         <div
           className={`transition-transform duration-300 ${
             isScrollingUp ? "translate-y-0" : "-translate-y-full"
@@ -478,6 +481,8 @@ const CareerGuidePage = () => {
         >
           <Header />
         </div>
+
+        {/* Career Navbar sits below the header inside the same sticky container */}
         <div
           ref={navRef}
           className={`border-b border-border transition-colors duration-300 bg-white shadow-sm`}
@@ -495,10 +500,10 @@ const CareerGuidePage = () => {
                     <button
                       onClick={(e) => {
                         e.preventDefault();
-                        if (tab.subTabs) {
+                        if (tab.subTabs && tab.subTabs.length > 0) {
                           handleDropdownToggle(tab.id);
                         } else {
-                          handleTabClick(tab.id);
+                           handleTabClick(tab.id);
                         }
                       }}
                       className={`flex items-center text-sm font-semibold px-4 py-5 transition-colors duration-200 relative ${
@@ -508,12 +513,12 @@ const CareerGuidePage = () => {
                       }`}
                     >
                       {tab.label}
-                      {tab.subTabs && (
+                      {tab.subTabs && tab.subTabs.length > 0 && (
                         <ChevronDown
                           className={`w-5 h-5 ml-1.5 transition-transform duration-200 ${openDropdown === tab.id ? "rotate-180" : ""}`}
                         />
                       )}
-                      {activeTab === tab.id && (
+                      {activeTab === tab.id && !openDropdown && (
                         <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-orange-500 rounded-full"></span>
                       )}
                     </button>
@@ -544,6 +549,7 @@ const CareerGuidePage = () => {
           </div>
         </div>
       </div>
+      {/* --- END: CORRECTED STRUCTURE --- */}
 
       <div className="flex-grow">
         {activeTab === "career-guide" ? renderHomePage() : renderContentPage()}
