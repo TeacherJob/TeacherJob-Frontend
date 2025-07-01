@@ -87,6 +87,7 @@ import AboutPage from "./pages/AboutPage";
 import VerifyOtp from "./features/auth/VerifyOtp";
 import ResetPassword from "./pages/ResetPassword";
 import ManageCarousel from "./pages/dashboard/admin/ManageCarousel";
+import ScrollToTop from "./pages/ScrollToTop";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -140,6 +141,7 @@ const AppContent = () => {
 
   return (
     <Router>
+       <ScrollToTop />
       <Routes>
         {/* --- PUBLIC ROUTES --- */}
         <Route path="/" element={<Index />} />
