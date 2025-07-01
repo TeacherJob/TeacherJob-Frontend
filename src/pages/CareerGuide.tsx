@@ -494,13 +494,17 @@ const CareerGuidePage = () => {
           style={{ top: isScrollingUp ? `${headerHeight}px` : "0px" }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center">
-              <a href="#" onClick={handleLogoClick} className="mr-8 py-4 flex-shrink-0">
-                <span className="font-bold text-main text-lg">
+            {/* --- FIX: Main container changed to flex and justify-between --- */}
+            <div className="flex items-center justify-between">
+              
+              <a href="#" onClick={handleLogoClick} className="py-4 flex-shrink-0">
+                <span className="font-bold text-main text-lg whitespace-nowrap">
                   Career Essentials
                 </span>
               </a>
-              <nav className="hidden md:flex items-center space-x-2 overflow-x-auto">
+
+              {/* --- FIX: Nav items now have flex-grow to take up space and justify-end --- */}
+              <nav className="hidden md:flex flex-grow items-center justify-end space-x-2">
                 {mainNav.map((tab) => (
                   <div key={tab.id} className="relative">
                     <button
@@ -529,7 +533,7 @@ const CareerGuidePage = () => {
                       )}
                     </button>
                     {tab.subTabs && openDropdown === tab.id && (
-                      <div className="absolute left-0 mt-1 w-64 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200 animate-in fade-in-20 zoom-in-95">
+                      <div className="absolute right-0 mt-1 w-64 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200 animate-in fade-in-20 zoom-in-95">
                         {tab.subTabs.map((subTab) => (
                           <a
                             key={subTab.id}
