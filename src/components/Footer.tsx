@@ -18,7 +18,10 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/jobs" className="hover:text-white transition-colors">
+                <Link
+                  to="/browse-jobs"
+                  className="hover:text-white transition-colors"
+                >
                   Find Jobs
                 </Link>
               </li>
@@ -49,26 +52,26 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/employer/post-job"
+                  to="/salary-guide"
                   className="hover:text-white transition-colors"
                 >
-                  Post a Job
+                  Salary Guide
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/employer/candidates"
+                  to="/browse-jobs"
                   className="hover:text-white transition-colors"
                 >
-                  Browse Resumes
+                  Browse Jobs
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/pricing"
+                  to="/career-guide"
                   className="hover:text-white transition-colors"
                 >
-                  Our Plans
+                  Career Guide
                 </Link>
               </li>
             </ul>
@@ -89,11 +92,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/contact"
-                  className="hover:text-white transition-colors"
-                >
-                  Contact
+                <Link to="/help" className="hover:text-white transition-colors">
+                  Help
                 </Link>
               </li>
               <li>
@@ -106,7 +106,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/privacy"
+                  to="/privacy-policy"
                   className="hover:text-white transition-colors"
                 >
                   Privacy Policy
