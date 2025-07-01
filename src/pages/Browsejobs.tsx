@@ -251,6 +251,30 @@ const JobListItem = ({
   </div>
 );
 
+// --- YAHAN BADLAV KIYA GAYA HAI ---
+const salaryRanges = [
+  { value: "0-500000", label: "₹0 - ₹5,00,000" },
+  { value: "500001-1000000", label: "₹5,00,001 - ₹10,00,000" },
+  { value: "1000001-1500000", label: "₹10,00,001 - ₹15,00,000" },
+  { value: "1500001-9999999", label: "Above ₹15,00,000" },
+];
+
+const parseAndCompareSalary = (
+  jobSalary: string,
+  rangeValue: string
+): boolean => {
+  const numbers = jobSalary.replace(/₹|,/g, "").match(/\d+/g)?.map(Number);
+  if (!numbers || numbers.length === 0) return false;
+
+  const jobAvgSalary =
+    numbers.length > 1 ? (numbers[0] + numbers[1]) / 2 : numbers[0];
+
+  const [min, max] = rangeValue.split("-").map(Number);
+
+  return jobAvgSalary >= min && jobAvgSalary <= max;
+};
+// --- END OF CHANGE ---
+
 const BrowseJobsPage = () => {
   const { data: jobs = [], isLoading, isError } = useGetPublicJobsQuery();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -283,10 +307,6 @@ const BrowseJobsPage = () => {
     return [...new Set(allLocations)].filter(Boolean);
   }, [jobs]);
 
-  const uniqueSalaries = useMemo(
-    () => [...new Set(jobs.map((job) => job.salary))],
-    [jobs]
-  );
   const uniqueRoles = useMemo(
     () => [...new Set(jobs.map((job) => job.type))],
     [jobs]
@@ -311,9 +331,14 @@ const BrowseJobsPage = () => {
       );
     }
 
+    // --- YAHAN BADLAV KIYA GAYA HAI ---
     if (salaryFilter && salaryFilter !== "all") {
-      tempJobs = tempJobs.filter((job) => job.salary === salaryFilter);
+      tempJobs = tempJobs.filter((job) =>
+        parseAndCompareSalary(job.salary, salaryFilter)
+      );
     }
+    // --- END OF CHANGE ---
+
     if (roleFilter && roleFilter !== "all") {
       tempJobs = tempJobs.filter((job) => job.type === roleFilter);
     }
@@ -386,8 +411,8 @@ const BrowseJobsPage = () => {
                     <SelectTrigger className="w-full h-11 bg-white">
                       <SelectValue placeholder="All Locations" />
                     </SelectTrigger>
-                    {/* --- FIX: Added className for max-height and scrolling --- */}
-                    <SelectContent className="max-h-72">
+                    {/* --- YAHAN BADLAV KIYA GAYA HAI --- */}
+                    <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
                       <SelectItem value="all">All Locations</SelectItem>
                       {uniqueLocations.map((location) => (
                         <SelectItem key={location} value={location}>
@@ -401,12 +426,12 @@ const BrowseJobsPage = () => {
                     <SelectTrigger className="w-full h-11 bg-white">
                       <SelectValue placeholder="Any Salary" />
                     </SelectTrigger>
-                    {/* --- FIX: Added className for max-height and scrolling --- */}
-                    <SelectContent className="max-h-72">
+                    {/* --- YAHAN BHI BADLAV KIYA GAYA HAI --- */}
+                    <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
                       <SelectItem value="all">Any Salary</SelectItem>
-                      {uniqueSalaries.map((salary) => (
-                        <SelectItem key={salary} value={salary}>
-                          {salary}
+                      {salaryRanges.map((range) => (
+                        <SelectItem key={range.value} value={range.value}>
+                          {range.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -416,8 +441,8 @@ const BrowseJobsPage = () => {
                     <SelectTrigger className="w-full h-11 bg-white">
                       <SelectValue placeholder="All Roles" />
                     </SelectTrigger>
-                    {/* --- FIX: Added className for max-height and scrolling --- */}
-                    <SelectContent className="max-h-72">
+                    {/* --- AUR YAHAN BHI BADLAV KIYA GAYA HAI --- */}
+                    <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
                       <SelectItem value="all">All Roles</SelectItem>
                       {uniqueRoles.map((role) => (
                         <SelectItem key={role} value={role}>
