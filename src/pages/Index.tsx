@@ -1,3 +1,4 @@
+// src/components/Index.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/app/hooks";
@@ -11,6 +12,8 @@ import {
   useSaveJobMutation,
   useGetMyApplicationsQuery,
 } from "@/features/profile/employerProfileApiService";
+
+// lucide-react icons (with one renamed to avoid conflict)
 import {
   MapPin,
   Briefcase,
@@ -20,10 +23,18 @@ import {
   Share2,
   Wallet,
   Building,
-  ShieldCheck,
+  ShieldCheck as LucideShieldCheck,
   Loader2,
   ArrowLeft,
 } from "lucide-react";
+// heroicons for the new sections
+import {
+  ShieldCheckIcon,
+  GiftIcon,
+  PhoneIcon,
+  ArrowRightIcon,
+} from "@heroicons/react/24/outline";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import toast from "react-hot-toast";
@@ -70,7 +81,7 @@ interface Testimonial {
   avatar: string;
 }
 
-// === SLIDES ARRAY UPDATED WITH A VIDEO FOR EACH SLIDE ===
+// === SLIDES ARRAY ===
 const slides: CarouselSlide[] = [
   {
     id: 1,
@@ -82,7 +93,7 @@ const slides: CarouselSlide[] = [
     secondaryButton: { text: "Sign Up Now", href: "/signup" },
     backgroundVideo:
       "https://videos.pexels.com/video-files/3209828/3209828-hd.mp4",
-    backgroundImage: img1, // classroom/teacher
+    backgroundImage: img1,
   },
   {
     id: 2,
@@ -94,7 +105,7 @@ const slides: CarouselSlide[] = [
     secondaryButton: { text: "About Us", href: "/about" },
     backgroundVideo:
       "https://pixabay.com/videos/library-books-the-corridor-window-846",
-    backgroundImage: img2, // news/education
+    backgroundImage: img2,
   },
   {
     id: 3,
@@ -106,7 +117,7 @@ const slides: CarouselSlide[] = [
     secondaryButton: { text: "Join Today", href: "/signup" },
     backgroundVideo:
       "https://videos.pexels.com/video-files/855341/855341-hd.mp4",
-    backgroundImage: img3, // student/learning
+    backgroundImage: img3,
   },
   {
     id: 4,
@@ -118,7 +129,7 @@ const slides: CarouselSlide[] = [
     secondaryButton: { text: "Get Started", href: "/signup" },
     backgroundVideo:
       "https://videos.pexels.com/video-files/4434253/4434253-hd.mp4",
-    backgroundImage: img4, // career/growth
+    backgroundImage: img4,
   },
   {
     id: 5,
@@ -130,11 +141,11 @@ const slides: CarouselSlide[] = [
     secondaryButton: { text: "Learn More", href: "/" },
     backgroundVideo:
       "https://videos.pexels.com/video-files/5949887/5949887-hd.mp4",
-    backgroundImage: img5, // institution/teachers
+    backgroundImage: img5,
   },
 ];
 
-// ... Testimonials array remains the same ...
+// === TESTIMONIALS ARRAY ===
 const testimonials: Testimonial[] = [
   {
     id: 1,
@@ -171,6 +182,7 @@ const testimonials: Testimonial[] = [
   },
 ];
 
+// === HERO CAROUSEL ===
 const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   useEffect(() => {
@@ -185,7 +197,6 @@ const HeroCarousel = () => {
   return (
     <div className="relative overflow-hidden bg-main">
       <div className="relative min-h-[600px] flex items-center justify-center">
-        {/* Background Image */}
         {currentSlideData.backgroundImage && (
           <img
             src={currentSlideData.backgroundImage}
@@ -194,7 +205,6 @@ const HeroCarousel = () => {
             style={{ filter: "brightness(0.85)" }}
           />
         )}
-        {/* Background Video (over image) */}
         {currentSlideData.backgroundVideo && (
           <video
             key={currentSlideData.id}
@@ -206,8 +216,6 @@ const HeroCarousel = () => {
             playsInline
           />
         )}
-        {/* Removed dark overlay for lighter look */}
-        {/* Text Content */}
         <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
           <div className="mb-4">
             <span className="inline-block px-4 py-2 bg-white text-primary font-bold rounded-full text-md">
@@ -236,7 +244,6 @@ const HeroCarousel = () => {
           </div>
         </div>
       </div>
-      {/* Navigation Dots */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
         {slides.map((_, index) => (
           <button
@@ -254,6 +261,7 @@ const HeroCarousel = () => {
   );
 };
 
+// === NEW JOB DETAILS ===
 const NewJobDetails = ({
   job,
   applicationStatus,
@@ -273,8 +281,6 @@ const NewJobDetails = ({
       navigate("/login");
       return;
     }
-    // ✅ FIX: This is the correct logic. It checks if the user's role is NOT 'teacher'
-    // and stops the function if that is the case. This prevents non-teachers from applying.
     if (currentUser && currentUser.role && currentUser.role !== "teacher") {
       toast.error(`Only teachers can ${action} for jobs.`);
       return;
@@ -414,6 +420,7 @@ const NewJobDetails = ({
   );
 };
 
+// === JOB LIST ITEM ===
 const JobListItem = (props: {
   job: Job;
   isSelected: boolean;
@@ -471,6 +478,7 @@ const JobListItem = (props: {
   );
 };
 
+// === JOB SEARCH SECTION ===
 const JobSearchSection = () => {
   const { data: jobs = [], isLoading, isError } = useGetPublicJobsQuery();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -619,164 +627,237 @@ const JobSearchSection = () => {
   );
 };
 
+// === START: UPDATED HowWeWork COMPONENT WITH UI FIXES ===
 const HowWeWork = () => (
-  <div className="bg-main">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-4xl font-bold text-main mb-4">How We Work</h2>
-            <p className="text-xl text-secondary mb-8">
-              Empowering teachers with transparency and trust.
-            </p>
-          </div>
-          <div className="space-y-6 text-secondary leading-relaxed">
-            <p className="text-lg">
-              Our mission is not just to help teachers find jobs, but to support
-              them in their journey from the first step to success. We believe
-              in fair practices and long-term impact.
-            </p>
-            <p className="text-lg">
-              That's why we do <strong>not charge any fees upfront</strong> from
-              teachers. Once you are successfully placed and receive your{" "}
-              <strong>first salary</strong>, only then we collect our service
-              charges. This is what makes us stand out in the industry — we grow
-              when you grow.
-            </p>
-          </div>
-          <div className="pt-6">
-            <Link
-              to="/register"
-              className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-full hover:opacity-90 transition-colors duration-200 shadow-lg hover:shadow-xl"
-            >
-              Join as a Teacher
-              <svg
-                className="ml-2 w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </Link>
-          </div>
-        </div>
-        <div className="relative">
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-            <img
-              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-              alt="Teacher celebrating"
-              className="w-full h-96 object-cover"
-            />
-          </div>
-          <div className="absolute -bottom-6 -left-6 bg-main rounded-xl shadow-xl p-6 border border-subtle">
-            <div className="flex items-center space-x-4">
-              <div className="bg-primary rounded-full p-3">
-                <Check className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-main">100%</p>
-                <p className="text-sm text-secondary">
-                  Upfront Fee-Free Placement
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="absolute -top-6 -right-6 bg-success text-white rounded-full p-4 shadow-lg">
-            <div className="text-center">
-              <p className="text-lg font-bold">1st Salary</p>
-              <p className="text-xs">Then We Charge</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-const ForEmployers = () => (
-  <div className="bg-main">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div className="relative lg:order-last">
-          <div className="space-y-8">
+  <section className="w-full bg-white overflow-hidden">
+    <div className="container mx-auto px-4 py-16 sm:py-24">
+      <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-12 lg:items-center lg:gap-x-16">
+        {/* Content on the Left */}
+        <div className="text-left lg:col-span-7">
+          <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+            How We Empower Your Career
+          </h2>
+          <p className="mt-6 text-lg text-gray-600 leading-relaxed">
+            We support every role that powers education. At TeacherJob.in, we
+            help individuals from all educational roles — school teachers,
+            college professors, coaching faculty, and non-teaching staff like
+            office assistants, drivers, lab technicians, librarians, cooks, and
+            support workers — find the right opportunities in trusted
+            institutions. Our mission goes beyond placement. We aim to uplift
+            every individual involved in education by offering transparent,
+            ethical, and performance-based hiring solutions.
+          </p>
+
+          <div className="mt-8 space-y-6 text-gray-700">
             <div>
-              <h2 className="text-4xl font-bold text-main mb-4">
-                For Employers
-              </h2>
-              <p className="text-xl text-secondary mb-8">
-                Find the best talent for your institution.
+              <strong className="text-gray-900">
+                💼 No upfront charges. Ever.
+              </strong>
+              <p className="mt-1">
+                You only pay us after you’re hired and receive your first salary
+                — that’s our performance-based promise. This unique model
+                ensures our success is directly tied to yours — we grow when you
+                do.
               </p>
             </div>
-            <div className="space-y-6 text-secondary leading-relaxed">
-              <p className="text-lg">
-                Our mission is to connect you with qualified and passionate
-                educators who can make a real difference in your institution. We
-                simplify the hiring process, saving you time and resources.
+            <div>
+              <strong className="text-gray-900">
+                🎁 We celebrate your success.
+              </strong>
+              <p className="mt-1">
+                Every successful hire through our platform receives a custom
+                welcome gift, along with a 6-month job security period and
+                dedicated support from our team for up to 1 year (21x7).
               </p>
-              <p className="text-lg">
-                We pre-screen candidates to ensure you only meet the most
-                suitable professionals. Post your job openings and access a
-                curated pool of talent ready to inspire your students.
-              </p>
-            </div>
-            <div className="pt-6">
-              <Link
-                to="/post-job"
-                className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-full hover:opacity-90 transition-colors duration-200 shadow-lg hover:shadow-xl"
-              >
-                Join as an Employer
-                <svg
-                  className="ml-2 w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </Link>
             </div>
           </div>
+
+          <p className="mt-8 font-semibold text-gray-800">
+            We're more than just a job portal — we're your career partner.
+          </p>
+
+          <a
+            href="#"
+            className="mt-10 inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-8 py-4 text-base font-semibold text-white shadow-md transition-all hover:scale-105 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+          >
+            Join as an Employee / Education Professional
+            <ArrowRightIcon className="w-5 h-5" />
+          </a>
         </div>
-        <div className="relative">
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-            <img
-              src="https://images.unsplash.com/photo-1573496130407-57329f01f769?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-              alt="Employer reviewing candidates"
-              className="w-full h-96 object-cover"
-            />
+
+        {/* Image on the Right with Badges */}
+        <div className="relative rounded-2xl shadow-2xl overflow-hidden lg:col-span-5 h-full">
+          <img
+            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop"
+            alt="Team of educators collaborating"
+            className="w-full h-full object-cover min-h-[500px] lg:min-h-full"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent"></div>
+
+          {/* Top Right Badge */}
+          <div className="absolute top-5 right-5 text-center rounded-full bg-green-500/95 backdrop-blur-sm px-5 py-3 text-sm font-bold text-white shadow-lg">
+            💸 No Registration Fee
+            <br />
+            <span className="font-normal">First Salary, Then We Charge</span>
           </div>
-          <div className="absolute -bottom-6 -left-6 bg-main rounded-xl shadow-xl p-6 border border-subtle">
-            <div className="flex items-center space-x-4">
-              <div className="bg-primary rounded-full p-3">
-                <ShieldCheck className="w-6 h-6 text-white" />
+
+          {/* Bottom Badges - Stacked neatly */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 space-y-3">
+            <div className="flex items-center gap-3 rounded-lg bg-white/90 backdrop-blur-sm p-3 shadow-xl">
+              <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-orange-600">
+                <ShieldCheckIcon className="h-6 w-6" />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-main">Quality</p>
-                <p className="text-sm text-secondary">Verified Candidates</p>
-              </div>
+              <p className="text-sm font-semibold text-gray-800">
+                6-Month Job Security
+                <br />
+                Guarantee
+              </p>
             </div>
-          </div>
-          <div className="absolute -top-6 -right-6 bg-success text-white rounded-full p-4 shadow-lg">
-            <div className="text-center">
-              <p className="text-lg font-bold">Efficient</p>
-              <p className="text-xs">Hiring</p>
+            <div className="flex items-center gap-3 rounded-lg bg-white/90 backdrop-blur-sm p-3 shadow-xl">
+              <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                <GiftIcon className="h-6 w-6" />
+              </div>
+              <p className="text-sm font-semibold text-gray-800">
+                Free Welcome Gift
+                <br />
+                Upon Joining
+              </p>
+            </div>
+            <div className="flex items-center gap-3 rounded-lg bg-white/90 backdrop-blur-sm p-3 shadow-xl">
+              <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                <PhoneIcon className="h-6 w-6" />
+              </div>
+              <p className="text-sm font-semibold text-gray-800">
+                21x7 Dedicated Support
+                <br />
+                365 Days
+              </p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 );
+// === END: UPDATED HowWeWork COMPONENT ===
+
+// === START: UPDATED ForEmployers COMPONENT WITH UI FIXES ===
+const ForEmployers = () => (
+  <section className="w-full bg-gray-50 overflow-hidden">
+    <div className="container mx-auto px-4 py-16 sm:py-24">
+      <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-12 lg:items-center lg:gap-x-16">
+        {/* Image on the Left */}
+        <div className="relative rounded-2xl shadow-2xl overflow-hidden order-last lg:order-first lg:col-span-5 h-full">
+          <img
+            src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2190&auto=format&fit=crop"
+            alt="Team discussing in a modern office"
+            className="w-full h-full object-cover min-h-[500px] lg:min-h-full"
+          />
+          <div className="absolute top-5 right-5 rounded-full bg-green-500 px-6 py-3 text-base font-bold text-white shadow-lg">
+            Efficient Hiring
+          </div>
+        </div>
+
+        {/* Content on the Right */}
+        <div className="text-left lg:col-span-7">
+          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+            For Employers <span className="text-gray-400 font-light">/</span>{" "}
+            <span className="text-green-600">
+              Start Talent Hunting for Free
+            </span>
+          </h2>
+          <p className="mt-6 text-lg text-gray-600">
+            We don’t charge you anything. Just tell us who you need — and we’ll
+            deliver.
+          </p>
+          <p className="mt-4 text-gray-600 leading-relaxed">
+            TeacherJob.in offers institutions a complete HR hiring solution,
+            without the overhead of hiring a full-time HR team. Whether you're a
+            school, college, or coaching center, we help you find the right
+            talent — teachers, professors, non-teaching staff, or support
+            personnel — all tailored to your budget, location and job role
+            criteria.
+          </p>
+
+          <div className="mt-8">
+            <h3 className="font-semibold text-gray-800">Here’s how we work:</h3>
+            <ul className="mt-4 space-y-3 text-gray-600 list-none">
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
+                  ✓
+                </span>
+                <span>
+                  We take care of your vacancy and qualification requirements.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
+                  ✓
+                </span>
+                <span>
+                  We filter candidates based on qualification, experience &
+                  salary fit and shortlist only the most suitable candidates.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
+                  ✓
+                </span>
+                <span>
+                  We conduct initial resume screening and first-round
+                  interviews.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
+                  ✓
+                </span>
+                <span>
+                  We handle communication, follow-ups, and interview scheduling.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
+                  ✓
+                </span>
+                <span>We ensure the candidate joins after selection.</span>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
+                  ✓
+                </span>
+                <span>
+                  We guide candidates through onboarding document preparation
+                  and ticket booking (if relocation is involved).
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <p className="mt-8 font-semibold text-gray-800">
+            Our platform takes care of everything — from discovery to
+            onboarding. <br />
+            <span className="font-normal text-gray-500">
+              No HR hiring needed. No fees. No extra cost. No hassle. Just
+              qualified people, ready to teach and contribute.
+            </span>
+          </p>
+
+          <a
+            href="#"
+            className="mt-10 inline-flex items-center gap-2 justify-center rounded-lg bg-orange-500 px-8 py-4 text-base font-semibold text-white shadow-md transition-all hover:scale-105 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+          >
+            Join as an Employer
+            <ArrowRightIcon className="w-5 h-5" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+// === END: UPDATED ForEmployers COMPONENT ===
+
+// === TESTIMONIALS SECTION ===
 const TestimonialsSection = () => {
   const [current, setCurrent] = useState(0);
   const total = Math.ceil(testimonials.length / 3);
@@ -856,6 +937,8 @@ const TestimonialsSection = () => {
     </div>
   );
 };
+
+// === STATS SECTION ===
 const StatsSection = () => (
   <div className="py-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center bg-indigo-600">
     <div>
@@ -877,6 +960,7 @@ const StatsSection = () => (
   </div>
 );
 
+// === INDEX COMPONENT ===
 const Index = () => {
   return (
     <div className="min-h-screen bg-main text-main">
@@ -891,4 +975,5 @@ const Index = () => {
     </div>
   );
 };
+
 export default Index;
