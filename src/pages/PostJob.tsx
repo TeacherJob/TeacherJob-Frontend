@@ -29,19 +29,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
-// NOTE: Ensure these colors are in your tailwind.config.js
-// theme: {
-//   extend: {
-//     colors: {
-//       'primary': '#4A55A2',
-//       'employer-dark': '#2d2d2d',
-//     },
-//   },
-// }
-
-// Interface for a posted job
+// --- Interface for a posted job (no changes) ---
 interface PostedJob {
   _id: string;
   title: string;
@@ -54,13 +55,17 @@ interface PostedJob {
   yearsOfExperience: number;
 }
 
-// Helper to get status badge
+// --- Helper to get status badge (no changes) ---
 const getStatusBadge = (status: string) => {
   switch (status) {
     case "pending":
-      return <Badge variant="secondary">Pending Review</Badge>;
+      return (
+        <Badge variant="secondary" className="font-medium">
+          Pending
+        </Badge>
+      );
     case "approved":
-      return <Badge className="bg-green-600 text-white">Approved</Badge>;
+      return <Badge className="bg-green-600 text-white hover:bg-green-700">Approved</Badge>;
     case "rejected":
       return <Badge variant="destructive">Rejected</Badge>;
     default:
@@ -68,8 +73,14 @@ const getStatusBadge = (status: string) => {
   }
 };
 
-// --- [NEW] Job Post Modal Component ---
-const JobPostModal = ({ onClose }: { onClose: () => void }) => {
+// --- [REFACTORED] Job Post Modal using ShadCN Dialog ---
+const JobPostModal = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, you would handle form submission here (e.g., send data to an API)
@@ -77,129 +88,82 @@ const JobPostModal = ({ onClose }: { onClose: () => void }) => {
     onClose(); // Close the modal after submission
   };
 
-  // Prevents the modal from closing when clicking inside the content area
-  const handleModalContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
-    // The Modal Overlay
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      {/* The Modal Content */}
-      <div
-        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-        onClick={handleModalContentClick}
-      >
-        <div className="p-8">
-          {/* Modal Header */}
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Post a New Job
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Fill out the details below to find your next great hire.
-              </p>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogHeader className="p-6 pb-4 bg-slate-50 rounded-t-lg border-b">
+          <DialogTitle className="text-2xl font-bold text-gray-900">
+            Post a New Job
+          </DialogTitle>
+          <DialogDescription>
+            Fill out the details below to find your next great hire.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleFormSubmit}>
+          <div className="p-6 grid gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle" className="font-semibold">
+                  Job Title
+                </Label>
+                <Input
+                  id="jobTitle"
+                  placeholder="e.g., Senior Physics Teacher"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="location" className="font-semibold">
+                  Location
+                </Label>
+                <Input
+                  id="location"
+                  placeholder="e.g., New Delhi, India"
+                  required
+                />
+              </div>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X size={24} />
-            </button>
-          </div>
-
-          {/* The Form */}
-          <form onSubmit={handleFormSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="jobTitle"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Job Title
-              </label>
-              <input
-                type="text"
-                id="jobTitle"
-                name="jobTitle"
-                placeholder="e.g., Senior Physics Teacher"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="location"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Location
-              </label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                placeholder="e.g., New Delhi, India"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="jobType"
-                className="block text-sm font-medium text-gray-700"
-              >
+            <div className="space-y-2">
+              <Label htmlFor="jobType" className="font-semibold">
                 Job Type
-              </label>
-              <select
-                id="jobType"
-                name="jobType"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              >
-                <option>Full-time</option>
-                <option>Part-time</option>
-                <option>Contract</option>
-                <option>Temporary</option>
-              </select>
+              </Label>
+              <Select required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a job type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Full-time">Full-time</SelectItem>
+                  <SelectItem value="Part-time">Part-time</SelectItem>
+                  <SelectItem value="Contract">Contract</SelectItem>
+                  <SelectItem value="Temporary">Temporary</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-
-            <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
-              >
+            <div className="space-y-2">
+              <Label htmlFor="description" className="font-semibold">
                 Job Description
-              </label>
-              <textarea
+              </Label>
+              <Textarea
                 id="description"
-                name="description"
-                rows={6}
-                placeholder="Describe the responsibilities, qualifications, and benefits..."
+                rows={8}
+                placeholder="Describe the responsibilities, required qualifications, and benefits..."
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              ></textarea>
+              />
             </div>
-
-            {/* Form Footer with Buttons */}
-            <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit">Post Job</Button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          </div>
+          <DialogFooter className="p-6 pt-4 bg-slate-50 rounded-b-lg border-t">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">Post Job</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-// --- FeatureCard Component ---
+// --- [IMPROVED] FeatureCard Component ---
 const FeatureCard = ({
   icon,
   title,
@@ -209,16 +173,16 @@ const FeatureCard = ({
   title: string;
   description: string;
 }) => (
-  <div className="text-center p-6 bg-white rounded-2xl border border-gray-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-    <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-5">
+  <div className="text-center p-8 bg-white rounded-2xl border border-gray-200/80 shadow-lg hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-xl flex items-center justify-center mx-auto mb-6">
       {icon}
     </div>
-    <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
+    <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
     <p className="text-gray-600 leading-relaxed">{description}</p>
   </div>
 );
 
-// --- [NEW] Job Detail Modal Component ---
+// --- [IMPROVED] Job Detail Modal Component ---
 const JobDetailModal = ({
   job,
   onClose,
@@ -232,13 +196,16 @@ const JobDetailModal = ({
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{job.title}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-2xl font-bold text-gray-900">
+            {job.title}
+          </DialogTitle>
+          <DialogDescription className="pt-1">
             {job.schoolName} • {job.location}
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-6">
-          <div className="flex flex-wrap gap-4 text-sm">
+        <div className="py-6 space-y-6">
+          <div className="flex flex-wrap gap-3 text-sm">
+            {getStatusBadge(job.status)}
             <Badge variant="outline">{job.jobType}</Badge>
             <Badge variant="outline">{job.experienceLevel}</Badge>
             <Badge variant="outline">
@@ -246,10 +213,12 @@ const JobDetailModal = ({
             </Badge>
           </div>
           <div>
-            <h4 className="font-semibold text-lg mb-2">Job Description</h4>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">
+            <h4 className="font-semibold text-lg mb-2 text-gray-800">
+              Job Description
+            </h4>
+            <div className="text-sm text-gray-700 whitespace-pre-wrap prose prose-sm max-w-none">
               {job.description}
-            </p>
+            </div>
           </div>
         </div>
       </DialogContent>
@@ -257,7 +226,7 @@ const JobDetailModal = ({
   );
 };
 
-// --- [NEW] Section to display posted jobs ---
+// --- [IMPROVED] Section to display posted jobs ---
 const PostedJobsSection = () => {
   const { data: jobs = [], isLoading, isError } = useGetMyJobsQuery();
   const [selectedJob, setSelectedJob] = useState<PostedJob | null>(null);
@@ -265,7 +234,7 @@ const PostedJobsSection = () => {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex justify-center items-center p-20">
+        <div className="flex justify-center items-center py-20">
           <Loader2 className="w-12 h-12 animate-spin text-primary" />
         </div>
       );
@@ -273,28 +242,27 @@ const PostedJobsSection = () => {
 
     if (isError) {
       return (
-        <div className="p-12 text-center bg-red-50 border border-red-200 rounded-lg">
+        <Card className="p-12 text-center bg-red-50 border-red-200">
           <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-destructive">
+          <h3 className="text-xl font-semibold text-destructive">
             Error Loading Jobs
           </h3>
-          <p className="text-sm text-red-600">
-            Could not fetch your job posts. Please try again later.
+          <p className="text-red-700 mt-2">
+            We couldn't fetch your job posts right now. Please try again later.
           </p>
-        </div>
+        </Card>
       );
     }
 
     if (jobs.length === 0) {
       return (
-        <div className="p-16 text-center bg-gray-50 border-2 border-dashed rounded-lg">
-          <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-gray-800">
-            No Jobs Posted Yet
-          </h3>
-          <p className="text-gray-600 mt-2">
-            The jobs you post from your dashboard will appear here.
-          </p>
+        <div className="text-center border-2 border-dashed rounded-2xl p-16">
+          <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-5" />
+          <h3 className="text-2xl font-bold text-gray-800">No Jobs Posted Yet</h3>
+          <p className="text-gray-600 mt-2 max-w-md mx-auto">
+            Click on "Post a Job" to create your first listing. Your active jobs
+            will appear here.
+          p>
         </div>
       );
     }
@@ -302,18 +270,21 @@ const PostedJobsSection = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {(jobs as PostedJob[]).map((job) => (
-          <Card key={job._id} className="flex flex-col">
+          <Card
+            key={job._id}
+            className="flex flex-col hover:shadow-lg transition-shadow duration-300"
+          >
             <CardHeader>
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-lg">{job.title}</CardTitle>
+              <div className="flex justify-between items-start gap-3">
+                <CardTitle className="text-lg font-bold">{job.title}</CardTitle>
                 {getStatusBadge(job.status)}
               </div>
-              <CardDescription>
+              <CardDescription className="pt-1">
                 {job.schoolName} • {job.location}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
-              <p className="text-sm text-gray-600 line-clamp-3">
+              <p className="text-sm text-gray-600 line-clamp-4">
                 {job.description}
               </p>
             </CardContent>
@@ -333,14 +304,14 @@ const PostedJobsSection = () => {
   };
 
   return (
-    <section className="py-20 sm:py-24 bg-white">
+    <section className="py-20 sm:py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Your Posted Jobs
+          <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+            Your Job Dashboard
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Here is a list of all the jobs you have created.
+          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+            Manage, view, and track the status of all your posted jobs.
           </p>
         </div>
         {renderContent()}
@@ -355,85 +326,54 @@ const PostedJobsSection = () => {
   );
 };
 
-// --- Main Page Component ---
+// --- [IMPROVED] Main Page Component ---
 const PostJob = () => {
-  // State to control the visibility of the job post form
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <EmployerHeader />
 
-      {/* --- HERO SECTION --- */}
-      {/* --- MODIFICATION START --- */}
+      {/* --- [IMPROVED] HERO SECTION --- */}
       <section
-        className="relative text-white py-20 sm:py-24 overflow-hidden bg-cover bg-center"
+        className="relative text-white py-24 sm:py-32 overflow-hidden bg-cover bg-center"
         style={{
           backgroundImage:
             "url('https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop')",
         }}
       >
-        {/* This div is the overlay. You can adjust the opacity (e.g., opacity-90) */}
-        <div className="absolute inset-0 bg-gradient-to-br from-employer-dark to-primary opacity-90"></div>
-        {/* --- MODIFICATION END --- */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-primary/80 to-primary opacity-95"></div>
+        <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/30 rounded-full filter blur-3xl opacity-50"></div>
+        <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-blue-500/20 rounded-full filter blur-3xl opacity-50"></div>
 
-        <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/30 rounded-full filter blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-blue-500/20 rounded-full filter blur-3xl"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-6">
-                Let's hire your next great teacher. Fast.
-              </h1>
-              <p className="text-xl mb-8 text-blue-100">
-                No matter the skills, experience, or qualifications, you'll find
-                the right people on TeacherJob.
-              </p>
-              <Button
-                size="lg"
-                className="px-8 py-3 bg-white text-primary font-bold rounded-lg hover:bg-gray-100 transition-colors text-lg shadow-lg"
-                onClick={() => setIsFormOpen(true)}
-              >
-                Post a Job for Free
-              </Button>
-              <div className="mt-8 flex items-center gap-6 text-slate-300">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>10,000+ Active Teachers</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>Fast & Easy Posting</span>
-                </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight mb-6">
+              Hire your next great teacher. Fast.
+            </h1>
+            <p className="text-xl lg:text-2xl mb-10 text-blue-100">
+              Reach thousands of qualified educators and find the perfect match
+              for your school.
+            </p>
+            <Button
+              size="lg"
+              className="px-10 py-7 bg-white text-primary font-bold rounded-full hover:bg-gray-200 hover:scale-105 transition-all text-lg shadow-2xl"
+              onClick={() => setIsFormOpen(true)}
+            >
+              Post a Job for Free
+            </Button>
+            <div className="mt-10 flex items-center justify-center gap-x-8 gap-y-4 text-slate-300 flex-wrap">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>10,000+ Active Teachers</span>
               </div>
-            </div>
-            <div className="hidden lg:flex items-center justify-center">
-              <div className="relative w-80 h-96">
-                <div className="absolute top-0 right-0 w-full h-full bg-white/10 rounded-3xl backdrop-blur-md border border-white/20 transform -rotate-6"></div>
-                <div className="relative w-full h-full bg-white/5 rounded-3xl backdrop-blur-xl border border-white/20 p-6 flex flex-col justify-between shadow-2xl">
-                  <div>
-                    <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                      <Users className="w-10 h-10 text-white" />
-                    </div>
-                    <h3 className="font-bold text-2xl text-white">
-                      Find Top Talent
-                    </h3>
-                    <p className="text-blue-200">
-                      Connect with qualified educators.
-                    </p>
-                  </div>
-                  <div className="bg-white/10 p-4 rounded-lg">
-                    <p className="text-sm font-bold text-white">
-                      "A seamless hiring experience."
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-slate-200">
-                        Verified Partner
-                      </span>
-                    </div>
-                  </div>
-                </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>Fast & Easy Posting</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>Verified Institutions</span>
               </div>
             </div>
           </div>
@@ -444,11 +384,11 @@ const PostJob = () => {
       <section className="py-20 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Everything you need to make great hires
+            <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+              Everything you need to hire
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our platform simplifies the hiring process for educational
+            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+              A streamlined hiring process designed for educational
               institutions.
             </p>
           </div>
@@ -456,12 +396,12 @@ const PostJob = () => {
             <FeatureCard
               icon={<Briefcase className="w-8 h-8 text-primary" />}
               title="1. Post Your Job"
-              description="Reach thousands of qualified teachers across India with a single, easy-to-create job post."
+              description="Create a detailed job post in minutes. Reach thousands of qualified teachers across India."
             />
             <FeatureCard
               icon={<Search className="w-8 h-8 text-primary" />}
               title="2. Find Quality Candidates"
-              description="Our smart matching tools help you identify and connect with the best-matched teachers for your role."
+              description="Our smart matching tools help you identify and connect with the best teachers for your role."
             />
             <FeatureCard
               icon={<CheckCircle className="w-8 h-8 text-primary" />}
@@ -472,33 +412,35 @@ const PostJob = () => {
         </div>
       </section>
 
-      {/* --- [NEW] Inserted the posted jobs section here --- */}
+      {/* --- Inserted the posted jobs section here --- */}
       <PostedJobsSection />
 
       {/* --- TESTIMONIALS SECTION --- */}
-      <section className="py-20 sm:py-24 bg-slate-50">
+      <section className="py-20 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-4xl font-extrabold text-gray-900">
               Trusted by Schools Across India
             </h2>
           </div>
           <div className="relative max-w-3xl mx-auto">
-            <div className="relative bg-white rounded-2xl p-8 sm:p-10 text-center border-t-4 border-primary shadow-2xl">
-              <Quote className="absolute top-4 right-4 w-16 h-16 text-gray-100" />
+            <div className="relative bg-primary text-white rounded-2xl p-8 sm:p-10 text-center shadow-2xl">
+              <Quote className="absolute top-6 right-6 w-20 h-20 text-white/10" />
               <img
-                className="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-4 border-4 border-white"
-                src="https://via.placeholder.com/150"
+                className="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-5 border-4 border-white"
+                src="https://randomuser.me/api/portraits/men/32.jpg"
                 alt="avatar"
               />
-              <blockquote className="text-xl text-gray-700 my-4 italic">
+              <blockquote className="text-xl text-blue-100 my-4 italic leading-relaxed">
                 "TeacherJob helped us find a qualified Physics PGT in just two
                 weeks. The process was seamless and the quality of candidates
                 was exceptional."
               </blockquote>
-              <div>
-                <p className="font-semibold text-gray-900">Dr. Rajesh Kumar</p>
-                <p className="text-gray-600">Principal, Delhi Public School</p>
+              <div className="mt-6">
+                <p className="font-semibold text-white text-lg">
+                  Dr. Rajesh Kumar
+                </p>
+                <p className="text-blue-200">Principal, Delhi Public School</p>
               </div>
             </div>
           </div>
@@ -506,20 +448,18 @@ const PostJob = () => {
       </section>
 
       {/* --- FINAL CTA SECTION --- */}
-      <section className="relative py-20 bg-primary text-white overflow-hidden">
-        <div className="absolute -left-16 -top-16 w-48 h-48 border-[16px] border-white/5 rounded-full"></div>
-        <div className="absolute -right-16 -bottom-16 w-48 h-48 border-[16px] border-white/5 rounded-full"></div>
+      <section className="relative py-20 bg-slate-50 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
             Ready to find your next great hire?
           </h2>
-          <p className="text-xl mb-8 text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl mb-8 text-gray-600 max-w-2xl mx-auto">
             Join thousands of schools that trust TeacherJob for their hiring
             needs.
           </p>
           <Button
             size="lg"
-            className="px-10 py-4 bg-white text-primary font-bold rounded-lg hover:bg-gray-100 transition-colors text-lg shadow-lg"
+            className="px-10 py-7 bg-primary text-white font-bold rounded-full hover:bg-primary/90 hover:scale-105 transition-all text-lg shadow-lg"
             onClick={() => setIsFormOpen(true)}
           >
             Post Your Job Now
@@ -530,7 +470,7 @@ const PostJob = () => {
       <Footer />
 
       {/* Render the modal form conditionally */}
-      {isFormOpen && <JobPostModal onClose={() => setIsFormOpen(false)} />}
+      <JobPostModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
     </div>
   );
 };
