@@ -14,7 +14,11 @@ export const publicApi = apiService.injectEndpoints({
         query: (collegeId) => `review/reviews/${collegeId}`,
         providesTags: (result, error, collegeId) => [{ type: 'Review', id: collegeId }],
     }),
+    getPublishedSlides: builder.query<any[], void>({
+        query: () => 'review/slides',
+        providesTags: [{ type: 'CarouselSlide', id: 'LIST' }]
+    }),
   }),
 });
 
-export const { useGetPublicJobsQuery, useGetPublicCollegesQuery, useGetReviewsByCollegeQuery } = publicApi;
+export const { useGetPublicJobsQuery, useGetPublicCollegesQuery, useGetReviewsByCollegeQuery,useGetPublishedSlidesQuery  } = publicApi;
