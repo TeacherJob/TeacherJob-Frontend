@@ -1,7 +1,5 @@
-// src/pages/CareerGuidePage.tsx
-
 import { useState, useRef, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Updated import
 import {
   Search,
   ChevronDown,
@@ -23,7 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const ArticleCard = ({ article }: { article: any }) => (
   <Link
     to={`/career-guide/${article.slug}`}
-    className="group bg-white rounded-2xl overflow-hidden shadow-md border border-gray-200 hover:border-indigo-500/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+    className="group bg-white rounded-2xl overflow-hidden shadow-md border border-gray-200 hover:border-orange-500/60 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
   >
     <div className="relative overflow-hidden">
       <img
@@ -33,7 +31,7 @@ const ArticleCard = ({ article }: { article: any }) => (
       />
     </div>
     <div className="p-6 flex flex-col flex-grow">
-      <p className="text-sm font-semibold text-indigo-600 mb-2">
+      <p className="text-sm font-semibold text-orange-600 mb-2">
         {article.category}
       </p>
       <h3 className="text-lg font-bold text-gray-900 mb-2 text-left">
@@ -42,7 +40,7 @@ const ArticleCard = ({ article }: { article: any }) => (
       <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 mb-4 text-left flex-grow">
         {article.summary}
       </p>
-      <div className="font-semibold text-indigo-600 flex items-center justify-start gap-1.5 text-sm transition-colors group-hover:text-indigo-700">
+      <div className="font-semibold text-orange-600 flex items-center justify-start gap-1.5 text-sm transition-colors group-hover:text-orange-700">
         Read Article
         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
       </div>
@@ -114,7 +112,7 @@ const CategorySection = ({
       <div className="mt-16 text-center">
         <button
           onClick={() => onExploreClick(categoryId)}
-          className="inline-block bg-indigo-600 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:bg-indigo-700"
+          className="inline-block bg-orange-500 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:bg-orange-600"
         >
           Explore All {title} Articles
         </button>
@@ -176,6 +174,7 @@ const CareerGuideHero = ({
 
 // --- MAIN PAGE COMPONENT ---
 const CareerGuidePage = () => {
+  const navigate = useNavigate(); // ADDED: Initialize navigate
   const [activeTab, setActiveTab] = useState("career-guide");
   const [activeSubTab, setActiveSubTab] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -263,7 +262,6 @@ const CareerGuidePage = () => {
     { id: "news", label: "News" },
   ];
 
-  // --- YAHAN BADLAV KIYA GAYA HAI ---
   const pageData: {
     [key: string]: { title: string; subtitle: string; categoryKey?: string };
   } = {
@@ -318,9 +316,16 @@ const CareerGuidePage = () => {
       categoryKey: "News",
     },
   };
-  // --- END OF CHANGE ---
 
+  // --- YAHAN BADLAV KIYA GAYA HAI ---
   const handleTabClick = (tabId: string, subTabId: string | null = null) => {
+    // If the "News" tab is clicked, navigate to the /press page and stop.
+    if (tabId === "news") {
+      navigate("/press");
+      return;
+    }
+
+    // Otherwise, continue with the existing logic to switch tabs.
     setActiveTab(tabId);
     const targetTab = mainNav.find((t) => t.id === tabId);
     if (subTabId) {
@@ -333,6 +338,7 @@ const CareerGuidePage = () => {
     setOpenDropdown(null);
     setIsMobileMenuOpen(false);
   };
+  // --- END OF CHANGE ---
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -352,7 +358,6 @@ const CareerGuidePage = () => {
     handleTabClick(tabId, subTabId);
   };
 
-  // --- YAHAN BHI BADLAV KIYA GAYA HAI ---
   const homePageThemes = [
     {
       id: "finding-a-job",
@@ -360,7 +365,7 @@ const CareerGuidePage = () => {
       icon: (
         <Briefcase
           size={20}
-          className="text-gray-500 group-hover:text-indigo-600"
+          className="text-gray-500 group-hover:text-orange-600"
         />
       ),
     },
@@ -412,7 +417,7 @@ const CareerGuidePage = () => {
         id: "finding-a-job",
         categoryName: "Finding a Job",
         theme: {
-          bgGradient: "bg-gradient-to-r from-indigo-200/30 to-indigo-100/10",
+          bgGradient: "bg-gradient-to-r from-orange-200/30 to-orange-100/10",
         },
       },
       {
@@ -428,7 +433,7 @@ const CareerGuidePage = () => {
         theme: { bgGradient: "bg-gradient-to-r from-sky-200/30 to-sky-100/10" },
       },
     ];
-    // --- END OF CHANGE ---
+
     return (
       <>
         <CareerGuideHero
