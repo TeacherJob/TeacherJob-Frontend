@@ -488,7 +488,7 @@ const CareerGuidePage = () => {
             <div className="flex items-center">
               <a href="#" onClick={handleLogoClick} className="mr-8 py-4">
                 <span className="font-bold text-main text-lg">
-                  Career Guide
+                  Career Essential
                 </span>
               </a>
               <nav className="hidden md:flex items-center space-x-2">
