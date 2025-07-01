@@ -1,3 +1,5 @@
+// src/components/header/MobileMenu.tsx
+
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -44,9 +46,10 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
   const [logoutUser] = useLogoutMutation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // --- YAHAN TYPO THEEK KIYA GAYA HAI ---
   const navItems = [
     { label: t("header.nav.home"), path: "/" },
-    { labke: t("header.nav.aboutUs"), path: "/about" },
+    { label: t("header.nav.aboutUs"), path: "/about" }, // 'labke' ko 'label' kiya gaya
     { label: t("header.nav.companyReviews"), path: "/company-reviews" },
     { label: t("header.nav.salaryGuide"), path: "/salary-guide" },
     { label: t("header.nav.careerGuide"), path: "/career-guide" },
@@ -205,7 +208,8 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
     user ? `/dashboard/${user.role.toLowerCase()}` : "/";
 
   return (
-    <div className="md:hidden">
+    // --- YAHAN SE REDUNDANT WRAPPER DIV HATA DIYA GAYA HAI ---
+    <>
       <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)}>
         <Menu className="h-6 w-6" />
       </Button>
@@ -303,7 +307,7 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 };
 
