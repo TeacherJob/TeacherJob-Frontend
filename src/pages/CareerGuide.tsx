@@ -8,6 +8,7 @@ import {
   MessageSquare,
   ArrowRight,
   Rocket,
+  Newspaper, // Added for the News tab
 } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -152,7 +153,7 @@ const CareerGuideHero = ({
           />
         </div>
       </form>
-      <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
         {themes.map((theme) => (
           <button
             key={theme.id}
@@ -218,12 +219,9 @@ const CareerGuidePage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // START: UPDATED NAVIGATION DATA
   const mainNav = [
-    {
-      id: "finding-a-job",
-      label: "Finding a Job",
-      subTabs: [{ id: "finding-a-job", label: "Job Search Advice" }],
-    },
+    { id: "finding-a-job", label: "Finding a Job" }, // Dropdown removed
     {
       id: "resumes-cover-letters",
       label: "Resumes & Letters",
@@ -233,16 +231,8 @@ const CareerGuidePage = () => {
         { id: "cover-letter-samples", label: "Cover Letter Samples" },
       ],
     },
-    {
-      id: "interviewing",
-      label: "Interviewing",
-      subTabs: [{ id: "interviewing", label: "Interviewing Tips" }],
-    },
-    {
-      id: "pay-salary",
-      label: "Pay & Salary",
-      subTabs: [{ id: "pay-salary", label: "Salary Negotiation" }],
-    },
+    { id: "interviewing", label: "Interviewing" }, // Dropdown removed
+    { id: "pay-salary", label: "Pay & Salary" }, // Dropdown removed
     {
       id: "career-development",
       label: "Career Development",
@@ -251,7 +241,9 @@ const CareerGuidePage = () => {
         { id: "starting-a-new-job", label: "Starting a New Job" },
       ],
     },
+    { id: "news", label: "News" }, // New item added
   ];
+  // END: UPDATED NAVIGATION DATA
 
   const pageData: {
     [key: string]: { title: string; subtitle: string; categoryKey?: string };
@@ -297,6 +289,13 @@ const CareerGuidePage = () => {
       subtitle:
         "Best practices to make a strong impression and transition smoothly.",
     },
+    // START: ADDED DATA FOR NEWS
+    news: {
+        title: "Latest News & Updates",
+        subtitle: "Stay informed with the latest happenings in the education sector.",
+        categoryKey: "News" // Assuming articles with this category exist
+    }
+    // END: ADDED DATA FOR NEWS
   };
 
   const handleTabClick = (tabId: string, subTabId: string | null = null) => {
@@ -371,6 +370,16 @@ const CareerGuidePage = () => {
         />
       ),
     },
+    {
+        id: "news",
+        title: "News",
+        icon: (
+            <Newspaper
+            size={20}
+            className="text-secondary group-hover:text-red-500"
+            />
+        )
+    }
   ];
 
   const renderHomePage = () => {
@@ -477,7 +486,6 @@ const CareerGuidePage = () => {
 
   return (
     <div className="bg-main min-h-screen font-sans flex flex-col">
-      {/* --- START: CORRECTED STRUCTURE --- */}
       <div
         ref={headerRef}
         className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
@@ -494,17 +502,19 @@ const CareerGuidePage = () => {
           style={{ top: isScrollingUp ? `${headerHeight}px` : "0px" }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* --- FIX: Main container changed to flex and justify-between --- */}
             <div className="flex items-center justify-between">
               
-              <a href="#" onClick={handleLogoClick} className="py-4 flex-shrink-0">
-                <span className="font-bold text-main text-lg whitespace-nowrap">
-                  Career Essentials
-                </span>
-              </a>
+              <div className="flex items-center">
+                 {/* --- FIX: Added whitespace-nowrap and shifted to the left --- */}
+                <a href="#" onClick={handleLogoClick} className="py-4 flex-shrink-0 -ml-4">
+                  <span className="font-bold text-main text-lg whitespace-nowrap">
+                    Career Essentials
+                  </span>
+                </a>
+              </div>
 
-              {/* --- FIX: Nav items now have flex-grow to take up space and justify-end --- */}
-              <nav className="hidden md:flex flex-grow items-center justify-end space-x-2">
+              {/* --- FIX: Nav items now have justify-end --- */}
+              <nav className="hidden md:flex flex-grow items-center justify-end">
                 {mainNav.map((tab) => (
                   <div key={tab.id} className="relative">
                     <button
@@ -562,7 +572,6 @@ const CareerGuidePage = () => {
         {activeTab === "career-guide" ? renderHomePage() : renderContentPage()}
       </div>
       <Footer />
-      {/* --- END: CORRECTED STRUCTURE --- */}
     </div>
   );
 };
