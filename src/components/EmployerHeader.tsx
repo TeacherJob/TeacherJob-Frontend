@@ -24,7 +24,7 @@ const EmployerHeader = () => {
             <div className="flex-shrink-0">
               {/* [CHANGED] Replaced text with logo image */}
               <Link to="/">
-                <img src={logo} alt="TeacherJob Logo" className="h-20 w-auto" />
+                <img src={logo} alt="TeacherJob Logo" className="h-[180px] w-auto" />
               </Link>
             </div>
 
