@@ -21,7 +21,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-background border-b border-border shadow-sm">
       <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between h-20">
-        <div className="flex items-center gap-4 -ml-10">
+        <div className="flex items-center gap-4 -ml-12">
           <Link
             to="/"
             className="relative flex-shrink-0 flex items-center h-20"
