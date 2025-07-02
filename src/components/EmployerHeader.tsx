@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import logo from "@/assets/logo.png"; // Assuming logo has a transparent background
+import logo from "@/assets/logo.png"; // Logo import is correct
 
 const navLinks = [
   { href: "/post-job", label: "Post a Job" },
@@ -18,32 +18,31 @@ const EmployerHeader = () => {
 
   return (
     <>
-      {/* [MODIFIED] Changed background to white, text to black, and added border/shadow */}
-      <header className="bg-white text-gray-900 sticky top-0 z-50 border-b border-gray-200 shadow-sm">
+      <header className="bg-white text-black sticky top-0 z-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex-shrink-0">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo on the left */}
+            <div className="flex-shrink-0 -ml-10">
               <Link to="/">
-                {/* [MODIFIED] Adjusted logo size for a standard header height */}
                 <img
                   src={logo}
                   alt="TeacherJob Logo"
-                  className="h-12 w-auto"
+                  className="h-[200px] w-auto"
                 />
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-2">
+            {/* [CHANGED] Desktop Navigation is now in the center */}
+            <nav className="hidden md:flex items-center gap-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}
-                  // [MODIFIED] Updated link styles for light theme
-                  className={`px-4 py-2 text-sm rounded-md transition-colors ${
+                  // [CHANGED] Text is now bold and styling is updated
+                  className={`px-4 py-2 text-sm font-bold rounded-full transition-colors ${
                     currentPath === link.href
-                      ? "font-semibold text-primary bg-primary/10"
-                      : "font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      ? "text-black bg-gray-100"
+                      : "text-gray-500 hover:text-black hover:bg-gray-100"
                   }`}
                 >
                   {link.label}
@@ -51,22 +50,21 @@ const EmployerHeader = () => {
               ))}
             </nav>
 
+            {/* "For Jobseekers" link on the right */}
             <div className="hidden md:flex items-center">
-              {/* [MODIFIED] Updated link style for light theme */}
               <Link
                 to="/"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                className="text-sm font-medium text-gray-600 hover:text-black"
               >
                 For Jobseekers
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - remains on the right */}
             <div className="md:hidden">
-              {/* [MODIFIED] Updated button color */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-600 hover:text-gray-900 p-2"
+                className="text-gray-800 hover:text-black p-2"
               >
                 {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
@@ -75,21 +73,20 @@ const EmployerHeader = () => {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - Styles updated for consistency */}
       {isMenuOpen && (
-        // [MODIFIED] Changed overlay to white background
-        <div className="md:hidden fixed inset-0 bg-white z-40 flex flex-col items-center justify-center pt-20">
-          <nav className="flex flex-col items-center gap-8">
+        <div className="md:hidden fixed inset-0 bg-white z-40 flex flex-col items-center justify-center pt-16">
+          <nav className="flex flex-col items-center gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                // [MODIFIED] Updated text colors for light theme
-                className={`text-2xl transition-colors ${
+                // [CHANGED] Mobile text is now also bold
+                className={`text-2xl font-bold rounded-full transition-colors ${
                   currentPath === link.href
-                    ? "font-bold text-primary"
-                    : "font-medium text-gray-700 hover:text-gray-900"
+                    ? "text-black"
+                    : "text-gray-500 hover:text-black"
                 }`}
               >
                 {link.label}
@@ -99,8 +96,7 @@ const EmployerHeader = () => {
             <Link
               to="/"
               onClick={() => setIsMenuOpen(false)}
-              // [MODIFIED] Updated text colors for light theme
-              className="text-lg font-medium text-gray-600 hover:text-gray-900"
+              className="text-lg font-medium text-gray-600 hover:text-black"
             >
               For Jobseekers
             </Link>
