@@ -75,7 +75,7 @@ const initialFormData = {
 };
 
 const articleCategories = [
-  "Finding a Job",
+  "TeacherJob",
   "Resumes & Cover Letters",
   "Interviewing",
   "Pay & Salary",
@@ -83,7 +83,7 @@ const articleCategories = [
   "Resume Sample",
   "Cover Letter Sample",
   "Starting a New Job",
-  "News
+  "News"
 ];
 
 const generateSlug = (title: string) => {
