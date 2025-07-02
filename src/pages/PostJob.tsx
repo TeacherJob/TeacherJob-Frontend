@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   CheckCircle,
   Users,
@@ -7,58 +6,16 @@ import {
   Briefcase,
   Quote,
   X,
-  Loader2,
-  AlertTriangle,
+  Award, // New Icon
+  Target, // New Icon
+  Zap, // New Icon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
 import EmployerHeader from "@/components/EmployerHeader"; // Reusable header
-import { useGetMyJobsQuery } from "@/features/api/employerJobApiService";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-
-// Interface for a posted job
-interface PostedJob {
-  _id: string;
-  title: string;
-  location: string;
-  schoolName: string;
-  status: "pending" | "approved" | "rejected";
-  jobType: string;
-  description: string;
-  experienceLevel: string;
-  yearsOfExperience: number;
-}
-
-// Helper to get status badge
-const getStatusBadge = (status: string) => {
-  switch (status) {
-    case "pending":
-      return <Badge variant="secondary">Pending Review</Badge>;
-    case "approved":
-      return <Badge className="bg-green-600 text-white">Approved</Badge>;
-    case "rejected":
-      return <Badge variant="destructive">Rejected</Badge>;
-    default:
-      return <Badge variant="outline">{status}</Badge>;
-  }
-};
 
 // --- Job Post Modal Component ---
+// This remains unchanged as it's a core feature
 const JobPostModal = ({ onClose }: { onClose: () => void }) => {
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,136 +150,76 @@ const FeatureCard = ({
   </div>
 );
 
-// --- Job Detail Modal Component ---
-const JobDetailModal = ({
-  job,
-  onClose,
-}: {
-  job: PostedJob | null;
-  onClose: () => void;
-}) => {
-  if (!job) return null;
-  return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{job.title}</DialogTitle>
-          <DialogDescription>
-            {job.schoolName} • {job.location}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="py-4 space-y-6">
-          <div className="flex flex-wrap gap-4 text-sm">
-            <Badge variant="outline">{job.jobType}</Badge>
-            <Badge variant="outline">{job.experienceLevel}</Badge>
-            <Badge variant="outline">
-              {job.yearsOfExperience} years experience
-            </Badge>
-          </div>
-          <div>
-            <h4 className="font-semibold text-lg mb-2">Job Description</h4>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">
-              {job.description}
-            </p>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-// --- Section to display posted jobs ---
-const PostedJobsSection = () => {
-  const { data: jobs = [], isLoading, isError } = useGetMyJobsQuery();
-  const [selectedJob, setSelectedJob] = useState<PostedJob | null>(null);
-
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className="flex justify-center items-center p-20">
-          <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        </div>
-      );
-    }
-    if (isError) {
-      return (
-        <div className="p-12 text-center bg-red-50 border border-red-200 rounded-lg">
-          <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-destructive">
-            Error Loading Jobs
-          </h3>
-          <p className="text-sm text-red-600">
-            Could not fetch your job posts. Please try again later.
-          </p>
-        </div>
-      );
-    }
-    if (jobs.length === 0) {
-      return (
-        <div className="p-16 text-center bg-gray-50 border-2 border-dashed rounded-lg">
-          <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-gray-800">
-            No Jobs Posted Yet
-          </h3>
-          <p className="text-gray-600 mt-2">
-            The jobs you post from your dashboard will appear here.
-          </p>
-        </div>
-      );
-    }
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {(jobs as PostedJob[]).map((job) => (
-          <Card key={job._id} className="flex flex-col">
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-lg">{job.title}</CardTitle>
-                {getStatusBadge(job.status)}
-              </div>
-              <CardDescription>
-                {job.schoolName} • {job.location}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              {/* --- THIS IS THE LINE THAT WAS FIXED --- */}
-              <p className="text-sm text-gray-600 line-clamp-3">
-                {job.description}
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => setSelectedJob(job)}
-              >
-                View Details
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    );
-  };
+// --- NEW STATIC UI SECTION ---
+const WhyHireWithUsSection = () => {
+  const benefits = [
+    {
+      icon: <Users className="w-6 h-6 text-white" />,
+      title: "Vast Talent Pool",
+      description:
+        "Tap into our network of over 10,000+ pre-vetted and active teaching professionals.",
+    },
+    {
+      icon: <Target className="w-6 h-6 text-white" />,
+      title: "Precision Matching",
+      description:
+        "Our AI-powered algorithm connects you with candidates who perfectly fit your requirements.",
+    },
+    {
+      icon: <Zap className="w-6 h-6 text-white" />,
+      title: "Accelerated Hiring",
+      description:
+        "Fill vacancies faster. Our streamlined process takes you from posting to hiring in record time.",
+    },
+    {
+      icon: <Award className="w-6 h-6 text-white" />,
+      title: "Quality Guaranteed",
+      description:
+        "We stand by our candidates with a 6-month replacement policy for your peace of mind.",
+    },
+  ];
 
   return (
     <section className="py-20 sm:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Your Posted Jobs
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Here is a list of all the jobs you have created.
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Left side: Content */}
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              The Smartest Way to Build Your Dream Team
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              We provide more than just a job board. We offer a complete hiring
+              solution designed to bring the best educational talent to your
+              institution.
+            </p>
+            <div className="space-y-6">
+              {benefits.map((item, index) => (
+                <div key={index} className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                    {item.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">
+                      {item.title}
+                    </h4>
+                    <p className="text-gray-600 mt-1">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Right side: Image */}
+          <div className="relative h-full w-full min-h-[450px] hidden lg:block">
+            <img
+              src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop"
+              alt="Team collaborating on hiring"
+              className="absolute inset-0 w-full h-full object-cover rounded-2xl shadow-2xl"
+            />
+            <div className="absolute inset-0 bg-primary/20 rounded-2xl"></div>
+          </div>
         </div>
-        {renderContent()}
       </div>
-      {selectedJob && (
-        <JobDetailModal
-          job={selectedJob}
-          onClose={() => setSelectedJob(null)}
-        />
-      )}
     </section>
   );
 };
@@ -335,7 +232,7 @@ const PostJob = () => {
     <div className="min-h-screen bg-slate-50">
       <EmployerHeader />
 
-      {/* --- HERO SECTION (REBUILT) --- */}
+      {/* --- HERO SECTION --- */}
       <section
         className="relative text-white bg-cover bg-center"
         style={{
@@ -408,7 +305,7 @@ const PostJob = () => {
       </section>
 
       {/* --- "HOW IT WORKS" SECTION --- */}
-      <section className="py-20 sm:py-24 bg-white">
+      <section className="py-20 sm:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -439,7 +336,8 @@ const PostJob = () => {
         </div>
       </section>
 
-      <PostedJobsSection />
+      {/* --- REPLACEMENT SECTION CALL --- */}
+      <WhyHireWithUsSection />
 
       {/* --- TESTIMONIALS SECTION --- */}
       <section className="py-20 sm:py-24 bg-slate-50">
