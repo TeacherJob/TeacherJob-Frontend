@@ -83,6 +83,7 @@ const articleCategories = [
   "Resume Sample",
   "Cover Letter Sample",
   "Starting a New Job",
+  "News
 ];
 
 const generateSlug = (title: string) => {
