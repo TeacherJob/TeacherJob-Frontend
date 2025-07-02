@@ -38,7 +38,7 @@ const Footer = () => {
                   to="/career-guide"
                   className="hover:text-white transition-colors"
                 >
-                  Job Alerts
+                  Career Essentials
                 </Link>
               </li>
             </ul>
