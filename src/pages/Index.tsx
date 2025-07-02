@@ -1078,7 +1078,7 @@ const Index = () => {
       <HowWeWork />
       <ForEmployers />
       <JobSearchSection />
-      <TestimonialsSection />
+{/*       <TestimonialsSection /> */}
       <StatsSection />
       <Footer />
     </div>
