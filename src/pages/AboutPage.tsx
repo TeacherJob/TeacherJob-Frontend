@@ -160,7 +160,7 @@ const AboutPage = () => {
                 size="lg"
                 className="bg-primary text-white hover:bg-primary/90 font-bold px-10 py-4 text-lg"
               >
-                <Link to="/jobs">Explore Open Roles</Link>
+                <Link to="/browse-jobs">Explore Open Roles</Link>
               </Button>
             </div>
           </div>
