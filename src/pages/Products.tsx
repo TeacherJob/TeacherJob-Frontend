@@ -1,40 +1,47 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle, ChevronDown, PenSquare, UserCheck } from "lucide-react";
+import {
+  Check,
+  CheckCircle,
+  LayoutDashboard,
+  BookOpen, // Added icon
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
 import EmployerHeader from "@/components/EmployerHeader";
-import img11 from "@/assets/img11.webp";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
 
-// --- [NEW] Reusable component for the feature sections ---
-const FeatureBlock = ({
+// --- Reusable Feature Card Component ---
+const FeatureCard = ({
+  icon,
   title,
-  descriptionNode,
-  visualNode,
-  imagePosition = "right",
+  description,
 }: {
+  icon: React.ReactNode;
   title: string;
-  descriptionNode: React.ReactNode;
-  visualNode: React.ReactNode;
-  imagePosition?: "left" | "right";
-}) => {
-  const imageClass = imagePosition === "left" ? "lg:order-1" : "lg:order-2";
-  const textClass = imagePosition === "left" ? "lg:order-2" : "lg:order-1";
-
-  return (
-    <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-      <div className={textClass}>
-        <h3 className="text-3xl font-bold text-main">{title}</h3>
-        <div className="mt-4 text-lg text-secondary leading-relaxed">
-          {descriptionNode}
-        </div>
-      </div>
-      <div className={imageClass}>{visualNode}</div>
+  description: string;
+}) => (
+  <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200/80 text-center hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300">
+    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+      {icon}
     </div>
-  );
-};
+    <h3 className="text-2xl font-bold text-gray-900 mb-3">{title}</h3>
+    <p className="text-gray-600 leading-relaxed">{description}</p>
+  </div>
+);
 
-// --- [NEW] Form Field Component for the contact form ---
+// --- Reusable Form Field Component ---
 const FormField = ({
   label,
   name,
@@ -50,471 +57,363 @@ const FormField = ({
   required?: boolean;
   children?: React.ReactNode;
 }) => (
-  <div>
-    <label
-      htmlFor={name}
-      className="block text-sm font-semibold text-main mb-1"
-    >
-      {label} {required && <span className="text-error">*</span>}
-    </label>
+  <div className="space-y-2">
+    <Label htmlFor={name} className="font-semibold">
+      {label} {required && <span className="text-red-500">*</span>}
+    </Label>
     {children || (
-      <input
+      <Input
         type={type}
         id={name}
         name={name}
         placeholder={placeholder}
         required={required}
-        className="w-full border border-border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
       />
     )}
   </div>
 );
 
+// --- Data for the Feature Table ---
+const hiringFeatures = [
+  "Free Job Posts",
+  "Resume Filtering",
+  "Screening Round",
+  "Interview Coordination",
+  "Hiring Support 24x7",
+  "Dedicated Account Manager",
+  "Document Handling Support",
+  "Joining Ticket Follow-up",
+  "No HR Needed – We Handle It",
+];
+
 // --- Main Products Page Component ---
 const Products = () => {
   return (
-    <div className="bg-main min-h-screen text-main font-sans">
+    <div className="bg-white min-h-screen text-gray-800 font-sans">
       <EmployerHeader />
 
       <main>
         {/* --- HERO SECTION --- */}
-        <section className="pt-20 pb-16 sm:pt-24 sm:pb-20 bg-gradient-to-br from-primary to-main/80 text-white relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-primary/20 rounded-full filter blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/10 rounded-full filter blur-3xl translate-x-1/2 translate-y-1/2"></div>
+        <section
+          className="relative bg-cover bg-center text-white pt-24 pb-24 sm:pt-32 sm:pb-32"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2070&auto=format&fit=crop')",
+          }}
+        >
+          <div className="absolute inset-0 bg-orange-500 bg-opacity-75"></div>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                  Matching and hiring made easy
-                </h1>
-                <p className="mt-4 text-xl font-semibold text-white/80">
-                  Products for small businesses
-                </p>
-                <p className="mt-4 text-lg text-blue-100">
-                  We have all the tools you need to find the right talent and to
-                  start hiring today.
-                </p>
-                <div className="mt-8">
-                  <Button
-                    size="lg"
-                    className="font-bold text-lg bg-white text-primary rounded-full px-8 py-3 shadow-lg hover:bg-subtle hover:text-primary"
-                  >
-                    Post a job
-                  </Button>
+            <div className="text-center">
+              <div className="mb-6 inline-block bg-white/20 p-4 rounded-2xl backdrop-blur-sm border border-white/30">
+                <BookOpen className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-lg">
+                Employer Resource Library
+              </h1>
+              <p className="mt-6 text-xl text-gray-100 max-w-3xl mx-auto drop-shadow">
+                Hiring made simple. Learn more about tools, hiring with
+                TeacherJob, trends, and more. It's all here in our resource
+                center.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* --- CORE FEATURES SECTION --- */}
+        <section className="py-20 sm:py-24 bg-gray-50 border-y border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+                A Better Way to Hire
+              </h2>
+              <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+                TeacherJob gives you the tools you need to go from job post to
+                hire, faster.
+              </p>
+            </div>
+            <div className="space-y-20">
+              {/* Feature 1: Free Job Post */}
+              <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">
+                    Start with a Free Job Post
+                  </h3>
+                  <div className="mt-4 text-lg text-gray-600 leading-relaxed space-y-4">
+                    <p>
+                      <strong className="text-primary">
+                        🎓 Post for any role
+                      </strong>{" "}
+                      — TGT, PGT, PRT, Professors, Non-teaching Staff, Coaches,
+                      and more.
+                    </p>
+                    <p>
+                      <strong className="text-primary">
+                        📝 Use ready-made job templates
+                      </strong>{" "}
+                      built for the education industry to attract the right
+                      candidates.
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-white p-8 rounded-2xl shadow-xl border">
+                  <div className="bg-primary/10 text-primary font-semibold text-xs uppercase tracking-wider py-1 px-3 rounded-full inline-block mb-4">
+                    Example
+                  </div>
+                  <div className="bg-white p-6 rounded-xl border space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-gray-500">
+                        Subject:
+                      </span>
+                      <span className="font-bold text-gray-800">
+                        English / Physics / Computer Science
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-gray-500">Type:</span>
+                      <span className="font-bold text-gray-800">
+                        Full-time / Part-time
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-gray-500">
+                        Experience:
+                      </span>
+                      <span className="font-bold text-gray-800">
+                        0–10+ Years
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-gray-500">
+                        Level:
+                      </span>
+                      <span className="font-bold text-gray-800">
+                        School / College / Coaching
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="hidden lg:block">
-                <img
-                  src={img11}
-                  alt="A professional looking happy for a job"
-                  className="rounded-lg object-cover w-full h-full max-h-[450px] shadow-xl border border-white/20"
-                />
+
+              {/* Feature 2: Smart Filtering */}
+              <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div className="lg:order-2">
+                  <h3 className="text-3xl font-bold text-gray-900">
+                    Smart Filtering & Pre-Screening
+                  </h3>
+                  <div className="mt-4 text-lg text-gray-600 leading-relaxed space-y-4">
+                    <p>
+                      <strong className="text-primary">
+                        We shortlist, you hire.
+                      </strong>
+                    </p>
+                    <p>
+                      ⏳ Save hours — we filter and screen resumes based on your
+                      preferences: location, salary, subject, experience,
+                      language, and more.
+                    </p>
+                    <ul className="space-y-2 mt-4">
+                      <li className="flex items-center gap-3">
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                        <span>Screening round + resume curation included</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                        <span>
+                          Only verified and interview-ready candidates
+                        </span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                        <span>
+                          View resumes and schedule interviews from your
+                          dashboard
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="lg:order-1">
+                  <img
+                    src="https://images.unsplash.com/photo-1556742044-3c52d6e88c62?q=80&w=2070&auto=format&fit=crop"
+                    alt="Filtering candidates on a screen"
+                    className="rounded-2xl shadow-xl w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Feature 3: End-to-End Hiring */}
+              <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900">
+                    End-to-End Hiring — In One Dashboard
+                  </h3>
+                  <div className="mt-4 text-lg text-gray-600 leading-relaxed space-y-4">
+                    <p>
+                      From job posting to onboarding — everything you need in
+                      one place.
+                    </p>
+                    <ul className="space-y-3 mt-4">
+                      <li className="flex items-start gap-3">
+                        <LayoutDashboard className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
+                        <span>
+                          <strong>Post jobs & track candidates</strong>
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <LayoutDashboard className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
+                        <span>
+                          <strong>Schedule interviews</strong> with
+                          auto-reminders
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <LayoutDashboard className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
+                        <span>
+                          <strong>Offer letter & joining confirmation</strong>{" "}
+                          templates
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <LayoutDashboard className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
+                        <span>
+                          <strong>Auto-upload documents</strong> for onboarding
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <LayoutDashboard className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
+                        <span>
+                          Support in <strong>follow-ups until joining</strong>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                  <img
+                    src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop"
+                    alt="A team managing a project on a dashboard"
+                    className="rounded-2xl shadow-xl w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* --- "START WITH A FREE JOB POST" SECTION --- */}
-        <section className="py-20 sm:py-24 border-t border-border bg-subtle">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h2 className="text-4xl font-extrabold text-main tracking-tight">
-                Start with a free job post
-                <sup className="text-lg font-normal text-secondary ml-1">
-                  [1]
-                </sup>
+        {/* --- WHY EMPLOYERS LOVE US --- */}
+        <section className="py-20 sm:py-24 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+                Why Employers Love Us
               </h2>
-              <div className="mt-4 w-24 h-1 bg-primary mx-auto rounded-full"></div>
             </div>
-            <div className="mt-20 space-y-24">
-              <FeatureBlock
-                title="Search templates for any industry"
-                descriptionNode={
-                  <p>
-                    Craft the perfect job post with one of our templates and an{" "}
-                    <a
-                      href="#"
-                      className="text-primary font-semibold hover:underline"
-                    >
-                      attention-grabbing job description.
-                    </a>
-                  </p>
-                }
-                visualNode={
-                  <div className="relative h-72 flex items-center justify-center">
-                    <div
-                      className="absolute -right-1/4 -bottom-1/4 w-full h-full bg-cyan-50"
-                      style={{ clipPath: "circle(50% at 80% 80%)" }}
-                    ></div>
-                    <div
-                      className="relative w-full h-full bg-[#0d2d5e] rounded-3xl"
-                      style={{
-                        clipPath:
-                          "polygon(0 0, 100% 0, 100% 100%, 25% 100%, 0 75%)",
-                      }}
-                    >
-                      <div className="absolute top-1/2 -translate-y-1/2 left-8 right-8 space-y-3">
-                        <div className="bg-white p-3 rounded-lg shadow-lg flex justify-between items-center">
-                          <div>
-                            <p className="font-semibold text-slate-700">
-                              Financial Analyst
-                            </p>
-                            <p className="text-xs text-slate-500">Mumbai</p>
-                          </div>
-                          <ChevronDown className="w-5 h-5 text-slate-400" />
-                        </div>
-                        <div className="bg-white p-3 rounded-lg shadow-lg flex justify-between items-center">
-                          <div>
-                            <p className="font-semibold text-slate-700">
-                              Software Engineer
-                            </p>
-                            <p className="text-xs text-slate-500">Hyderabad</p>
-                          </div>
-                          <ChevronDown className="w-5 h-5 text-slate-400" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                }
-              />
-              <FeatureBlock
-                title="Add screenings"
-                descriptionNode={
-                  <p>
-                    Screen potential applicants using your exact requirements.
-                  </p>
-                }
-                imagePosition="left"
-                visualNode={
-                  <div className="relative h-72 flex items-center justify-center">
-                    <div
-                      className="absolute -left-1/4 -bottom-1/4 w-full h-full bg-cyan-50"
-                      style={{ clipPath: "circle(50% at 20% 80%)" }}
-                    ></div>
-                    <div
-                      className="relative w-full h-full bg-[#0d2d5e] rounded-3xl p-6"
-                      style={{
-                        clipPath:
-                          "polygon(0 0, 75% 0, 100% 25%, 100% 100%, 0 100%)",
-                      }}
-                    >
-                      <div className="bg-white p-4 rounded-lg shadow-2xl h-full">
-                        <h4 className="text-sm font-bold text-slate-700 mb-4">
-                          Screening questions{" "}
-                          <span className="text-slate-400 font-normal">
-                            (Pick up to 5)
-                          </span>
-                        </h4>
-                        <div className="space-y-3 text-sm">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              className="form-radio text-blue-600"
-                            />
-                            <span>Years of experience</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              className="form-radio text-blue-600"
-                            />
-                            <span>Education</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              className="form-radio text-blue-600"
-                            />
-                            <span>Language</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              className="form-radio text-blue-600"
-                            />
-                            <span>Location</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                }
-              />
-              <FeatureBlock
-                title="Start to finish hiring, all in one place"
-                descriptionNode={
-                  <p>
-                    Your first job post lands you on your dashboard, your single
-                    source for managing all of your candidates and jobs. Track,
-                    message, invite, and interview directly on Indeed with no
-                    apps to download and flexible pricing options when you’re
-                    ready to increase your reach.
-                  </p>
-                }
-                visualNode={
-                  <div className="relative h-72 flex items-center justify-center">
-                    <div
-                      className="absolute w-full h-full bg-cyan-50"
-                      style={{ clipPath: "ellipse(70% 60% at 50% 50%)" }}
-                    ></div>
-                    <div className="relative w-[80%] h-full bg-[#0d2d5e] rounded-3xl p-4">
-                      <div className="bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-2xl h-full space-y-2 overflow-hidden">
-                        <h4 className="text-sm font-bold text-slate-700">
-                          Applicants
-                        </h4>
-                        <div className="p-2 rounded bg-white flex items-center gap-2">
-                          <UserCheck className="w-4 h-4 text-green-500" />
-                          <span>Matched candidates</span>
-                        </div>
-                        <div className="p-2 rounded bg-white flex items-center gap-2">
-                          <PenSquare className="w-4 h-4 text-blue-500" />
-                          <span>Awaiting review</span>
-                        </div>
-                        <div className="p-2 rounded bg-white flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-slate-500" />
-                          <span>Reviewed</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                }
-              />
-            </div>
+            <Card className="shadow-2xl border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-lg font-bold">Feature</TableHead>
+                    <TableHead className="text-right text-lg font-bold">
+                      Included?
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {hiringFeatures.map((feature, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{feature}</TableCell>
+                      <TableCell className="text-right">
+                        <Check className="inline-block w-6 h-6 text-green-600" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
           </div>
         </section>
 
-        {/* --- "UPGRADE" SECTION --- */}
-        <section className="py-20 sm:py-24 bg-main border-t border-border">
+        {/* --- INSTITUTIONS WE SERVE --- */}
+        <section className="py-20 sm:py-24 bg-gray-50 border-y border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h2 className="text-4xl font-extrabold text-main tracking-tight">
-                Upgrade to reach more quality candidates
-              </h2>
-              <div className="mt-4 w-24 h-1 bg-primary mx-auto rounded-full"></div>
-            </div>
-            <div className="mt-20 space-y-24">
-              <FeatureBlock
-                title="Get better visibility"
-                descriptionNode={
-                  <p>
-                    When you{" "}
-                    <a
-                      href="#"
-                      className="text-primary font-semibold hover:underline"
-                    >
-                      sponsor your job
-                    </a>
-                    , you receive higher visibility for relevant search results.
-                    Pause, resume, or cancel a Sponsored Job anytime, which
-                    means more flexibility if you’re hiring in a competitive
-                    market, or have a hard-to-fill position.
-                  </p>
-                }
-                visualNode={
-                  <div className="bg-slate-200 p-8 rounded-2xl">
-                    <img
-                      src="https://images.pexels.com/photos/3184423/pexels-photo-3184423.jpeg?auto=compress&cs=tinysrgb&w=800"
-                      alt="Team collaborating"
-                      className="rounded-lg shadow-lg"
-                    />
-                  </div>
-                }
-              />
-              <FeatureBlock
-                title="Get access to matched candidates"
-                descriptionNode={
-                  <p>
-                    With a{" "}
-                    <a
-                      href="#"
-                      className="text-primary font-semibold hover:underline"
-                    >
-                      subscription to Smart Sourcing
-                    </a>
-                    , see matching candidates who match your posted job
-                    description and qualifications. If you like the
-                    qualifications you see, then contact the candidates you like
-                    or invite them to apply.
-                  </p>
-                }
-                imagePosition="left"
-                visualNode={
-                  <div className="relative h-72 flex items-center justify-center">
-                    <img
-                      src="https://images.pexels.com/photos/4974915/pexels-photo-4974915.jpeg?auto=compress&cs=tinysrgb&w=800"
-                      alt="Person working on laptop"
-                      className="absolute inset-0 w-full h-full object-cover rounded-2xl"
-                    />
-                    <div className="absolute -top-4 -left-8 w-48 bg-white p-3 rounded-lg shadow-2xl space-y-1">
-                      <h5 className="font-bold text-sm">Abhinav Saini</h5>
-                      <p className="text-xs text-slate-500">Data Scientist</p>
-                      <Button
-                        size="sm"
-                        className="w-full text-xs bg-primary text-white rounded-full px-4 py-2 hover:bg-primary/90"
-                      >
-                        Invite to apply
-                      </Button>
-                    </div>
-                    <div className="absolute -bottom-4 -right-8 w-48 bg-white p-3 rounded-lg shadow-2xl space-y-1">
-                      <h5 className="font-bold text-sm">Radhika Bhargava</h5>
-                      <p className="text-xs text-slate-500">UX Designer</p>
-                      <Button
-                        size="sm"
-                        className="w-full text-xs bg-primary text-white rounded-full px-4 py-2 hover:bg-primary/90"
-                      >
-                        Invite to apply
-                      </Button>
-                    </div>
-                  </div>
-                }
-              />
-              <FeatureBlock
-                title="See Indeed Smart Sourcing in action"
-                descriptionNode={
-                  <p>
-                    Try Indeed Smart Sourcing now with{" "}
-                    <a
-                      href="#"
-                      className="text-primary font-semibold hover:underline"
-                    >
-                      a plan that works for you
-                    </a>
-                    . When you post a job, your Indeed Smart Sourcing
-                    subscription gives you access to matched candidates.
-                  </p>
-                }
-                visualNode={
-                  <div className="bg-slate-200 p-8 rounded-2xl">
-                    <img
-                      src="https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=800"
-                      alt="Team in a meeting"
-                      className="rounded-lg shadow-lg"
-                    />
-                  </div>
-                }
-              />
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                  Institutions We Serve
+                </h2>
+                <ul className="space-y-4">
+                  {[
+                    "K-12 Private & Public Schools",
+                    "Colleges & Universities",
+                    "Online & Offline Coaching Institutes",
+                    "EduTech Platforms",
+                    "NGOs and Skill Centers",
+                    "Preschools & Playschools",
+                    "CBSE, ICSE, State Boards, IB, IGCSE",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-3">
+                      <CheckCircle className="w-6 h-6 text-primary" />
+                      <span className="text-lg text-gray-700">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="lg:order-first">
+                <img
+                  src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop"
+                  alt="A university campus"
+                  className="rounded-2xl shadow-xl w-full h-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </section>
 
         {/* --- CONTACT FORM SECTION --- */}
-        <section className="py-20 sm:py-24 bg-subtle border-t border-border">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-extrabold text-main mb-2">
-              Try Indeed Smart Sourcing now
-            </h2>
-            <p className="text-lg text-secondary mb-8">
-              See real candidates searching for jobs on Indeed.
-            </p>
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-              <FormField label="First name" name="firstName" />
-              <FormField label="Last name" name="lastName" />
-              <FormField label="Phone number" name="phone" type="tel" />
-              <FormField label="Business email" name="email" type="email" />
-              <FormField label="Country/Region" name="country">
-                <select
-                  id="country"
-                  name="country"
-                  className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option>India</option>
-                </select>
-              </FormField>
-              <FormField label="Company name" name="companyName" />
-              <FormField label="Company size" name="companySize">
-                <select
-                  id="companySize"
-                  name="companySize"
-                  className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option>Company size...</option>
-                </select>
-              </FormField>
-              <FormField label="Job title" name="jobTitle">
-                <select
-                  id="jobTitle"
-                  name="jobTitle"
-                  className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option>Title...</option>
-                </select>
-              </FormField>
-              <div className="md:col-span-2">
-                <FormField
-                  label="Number of roles to fill"
-                  name="roles"
-                  type="number"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <FormField
-                  label="How can we help you?"
-                  name="help"
-                  required={false}
-                >
-                  <textarea
-                    id="help"
-                    name="help"
-                    rows={4}
-                    className="w-full border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  ></textarea>
-                </FormField>
-              </div>
-            </form>
-            <p className="text-xs text-secondary mt-6">
-              By submitting your information, you acknowledge that it will be
-              handled in accordance with Indeed's Privacy Policy and Terms.
-              Indeed India Operations (Poy) Ltd. will use the email you provide
-              to us to send you marketing emails about our services.
-            </p>
-            <p className="text-xs text-secondary mt-2">
-              To object to receiving such marketing emails you can do so here:{" "}
-              <a href="#" className="text-primary underline">
-                email preferences page
-              </a>
-              . You may also opt-out from receiving marketing emails by
-              following the unsubscribe link provided in each of our messages.
-            </p>
-            <div className="flex items-start gap-2 mt-6">
-              <input
-                type="checkbox"
-                id="marketingCalls"
-                name="marketingCalls"
-                className="mt-1"
-              />
-              <label
-                htmlFor="marketingCalls"
-                className="text-xs text-secondary"
-              >
-                I agree to receive marketing calls from Indeed about its
-                services. Please notify the caller if you do not wish to receive
-                any further phone calls.
-              </label>
+        <section className="py-20 sm:py-24 bg-white">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+                Want to Hire Faster?
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                Leave your details below. Our team will contact you within 1
+                hour.
+              </p>
             </div>
-            <div className="mt-6">
+            <form className="space-y-6">
+              <FormField label="Full Name" name="fullName" />
+              <FormField label="Email Address" name="email" type="email" />
+              <FormField label="Phone Number" name="phone" type="tel" />
+              <FormField label="Company Name" name="companyName" />
+              <FormField label="Your Message" name="message" required={false}>
+                <Textarea id="message" name="message" rows={4} />
+              </FormField>
               <Button
+                type="submit"
                 size="lg"
-                className="font-bold bg-primary text-white rounded-full px-8 py-3 hover:bg-primary/90"
+                className="w-full font-bold text-lg"
               >
                 Submit
               </Button>
-            </div>
+            </form>
           </div>
         </section>
 
         {/* --- FINAL CTA --- */}
         <section className="bg-primary text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-            <h2 className="text-3xl font-extrabold">Ready to try Indeed?</h2>
-            <p className="mt-2 text-xl text-blue-100">
-              Your next team member is looking for you, too!
+            <h2 className="text-3xl font-extrabold">Ready to Start Hiring?</h2>
+            <p className="mt-2 text-xl text-blue-200">
+              🎁 Your next great educator is waiting. Post your job today — for
+              free.
             </p>
             <div className="mt-8">
               <Button
                 size="lg"
-                className="font-bold bg-white text-primary rounded-full px-10 py-4 hover:bg-subtle"
+                className="font-bold bg-white text-primary rounded-full px-10 py-4 hover:bg-gray-100"
               >
-                Post a job
+                Post a Job
               </Button>
             </div>
           </div>
