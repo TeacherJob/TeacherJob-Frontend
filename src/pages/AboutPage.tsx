@@ -31,8 +31,10 @@ const PrincipleCard = ({
 // Reusable stat item
 const StatItem = ({ value, label }: { value: string; label: string }) => (
   <div className="text-center">
-    <p className="text-4xl lg:text-5xl font-extrabold text-primary">{value}</p>
-    <p className="mt-2 text-lg text-gray-600">{label}</p>
+    <p className="text-4xl lg:text-5xl font-extrabold text-orange-400 drop-shadow-md">
+      {value}
+    </p>
+    <p className="mt-2 text-lg text-indigo-200 tracking-wide">{label}</p>
   </div>
 );
 
@@ -41,20 +43,16 @@ const AboutPage = () => {
     <div className="min-h-screen flex flex-col bg-slate-50">
       <Header />
       <main className="flex-grow">
-        {/* --- HERO SECTION (MODIFIED) --- */}
+        {/* --- HERO SECTION --- */}
         <section className="relative">
-          {/* Background Image Container */}
           <div className="absolute inset-0">
             <img
               src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop"
               alt="Office background"
-              className="w-full h-full object-cover" // Removed opacity class
+              className="w-full h-full object-cover"
             />
-            {/* Dark Overlay for Readability */}
             <div className="absolute inset-0 bg-black/60"></div>
           </div>
-
-          {/* Content Container */}
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 sm:py-40 text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight">
               We're Changing How Education Hires.
@@ -65,7 +63,6 @@ const AboutPage = () => {
             </p>
           </div>
         </section>
-        {/* --- END OF HERO SECTION --- */}
 
         {/* --- OUR STORY SECTION --- */}
         <section className="py-20 sm:py-24 bg-white">
@@ -135,7 +132,7 @@ const AboutPage = () => {
         </section>
 
         {/* --- OUR IMPACT IN NUMBERS --- */}
-        <section className="py-20 bg-gradient-to-br from-primary to-blue-800 text-white">
+        <section className="py-20 bg-gradient-to-r from-orange-500 to-blue-700">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               <StatItem value="10,000+" label="Active Teachers" />
@@ -145,23 +142,7 @@ const AboutPage = () => {
           </div>
         </section>
 
-        {/* --- TESTIMONIAL SECTION --- */}
-        <section className="py-20 sm:py-24 bg-white">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <Quote className="w-16 h-16 text-primary/20 mx-auto mb-4" />
-            <blockquote className="text-2xl font-medium text-gray-800 italic">
-              "TeacherConnect completely transformed our hiring process. We
-              found a phenomenal physics teacher in under two weeks. The quality
-              of candidates is simply unmatched."
-            </blockquote>
-            <footer className="mt-6">
-              <p className="text-xl font-semibold text-gray-900">
-                Dr. Anjali Mehta
-              </p>
-              <p className="text-gray-600">Principal, Modern Heritage School</p>
-            </footer>
-          </div>
-        </section>
+        {/* --- TESTIMONIAL SECTION HAS BEEN REMOVED --- */}
 
         {/* --- FINAL CTA SECTION --- */}
         <section className="bg-slate-50">
