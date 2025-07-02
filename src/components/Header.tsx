@@ -21,7 +21,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-background border-b border-border shadow-sm">
       <div className="mx-auto px-4 flex items-center justify-between h-20">
-        <div className="flex items-center gap-4 -ml-10">
+        <div className="flex items-center gap-4 -ml-14">
           <Link
             to="/"
             className="relative flex-shrink-0 flex items-center h-20"
@@ -29,7 +29,7 @@ const Header = () => {
             <img
               src={logo}
               alt="TeacherJob Logo"
-              className="h-[200px] w-auto object-contain"
+              className="h-[240px] w-auto object-contain"
               style={{ minWidth: 120 }}
             />
           </Link>
