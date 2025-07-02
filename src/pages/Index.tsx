@@ -602,7 +602,6 @@ const JobSearchSection = () => {
               <SelectTrigger className="h-12 rounded-lg text-gray-700 bg-white border-gray-300">
                 <SelectValue placeholder="Filter by Location" />
               </SelectTrigger>
-              {/* --- YAHAN BADLAV KIYA GAYA HAI --- */}
               <SelectContent className="bg-white z-50 max-h-60 overflow-y-auto custom-scrollbar">
                 {uniqueLocations.map((location) => (
                   <SelectItem key={location} value={location}>
@@ -621,7 +620,6 @@ const JobSearchSection = () => {
               <SelectTrigger className="h-12 rounded-lg text-gray-700 bg-white border-gray-300">
                 <SelectValue placeholder="Filter by Salary" />
               </SelectTrigger>
-              {/* --- YAHAN BHI BADLAV KIYA GAYA HAI --- */}
               <SelectContent className="bg-white z-50 max-h-60 overflow-y-auto custom-scrollbar">
                 {salaryRanges.map((range) => (
                   <SelectItem key={range.value} value={range.value}>
@@ -705,6 +703,14 @@ const HowWeWork = () => (
     <div className="container mx-auto px-4 py-16 sm:py-24">
       <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-12 lg:items-center lg:gap-x-16">
         <div className="text-left lg:col-span-7">
+          {/* --- MODIFICATION START: Slogan added here --- */}
+          <div className="mb-6">
+            <p className="text-2xl lg:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-indigo-500 to-green-500">
+              School, Coaching, Ya Ho Teacher, Sabke Liye Hai Yahan Feature..
+            </p>
+          </div>
+          {/* --- MODIFICATION END --- */}
+
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
             How We Empower Your Career
           </h2>
@@ -1078,7 +1084,7 @@ const Index = () => {
       <HowWeWork />
       <ForEmployers />
       <JobSearchSection />
-{/*       <TestimonialsSection /> */}
+      {/* <TestimonialsSection /> */}
       <StatsSection />
       <Footer />
     </div>
