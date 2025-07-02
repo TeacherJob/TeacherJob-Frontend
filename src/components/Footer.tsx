@@ -35,7 +35,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/alerts"
+                  to="/career-guide"
                   className="hover:text-white transition-colors"
                 >
                   Job Alerts
