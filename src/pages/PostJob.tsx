@@ -340,7 +340,7 @@ const PostJob = () => {
       <WhyHireWithUsSection />
 
       {/* --- TESTIMONIALS SECTION --- */}
-      <section className="py-20 sm:py-24 bg-slate-50">
+{/*       <section className="py-20 sm:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -368,7 +368,7 @@ const PostJob = () => {
           </div>
         </div>
       </section>
-
+ */}
       {/* --- FINAL CTA SECTION --- */}
       <section className="relative py-20 bg-primary text-white overflow-hidden">
         <div className="absolute -left-16 -top-16 w-48 h-48 border-[16px] border-white/5 rounded-full"></div>
