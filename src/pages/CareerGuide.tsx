@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Updated import
+import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
   ChevronDown,
@@ -174,7 +174,7 @@ const CareerGuideHero = ({
 
 // --- MAIN PAGE COMPONENT ---
 const CareerGuidePage = () => {
-  const navigate = useNavigate(); // ADDED: Initialize navigate
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("career-guide");
   const [activeSubTab, setActiveSubTab] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -237,7 +237,6 @@ const CareerGuidePage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- Nav Data (No changes needed here) ---
   const mainNav = [
     { id: "finding-a-job", label: "Search Strategies" },
     {
@@ -262,6 +261,8 @@ const CareerGuidePage = () => {
     { id: "news", label: "News" },
   ];
 
+  // --- YAHAN BADLAV KIYA GAYA HAI ---
+  // pageData object mein "news" ke liye entry add ki gayi hai
   const pageData: {
     [key: string]: { title: string; subtitle: string; categoryKey?: string };
   } = {
@@ -309,23 +310,19 @@ const CareerGuidePage = () => {
       subtitle:
         "Best practices to make a strong impression and transition smoothly.",
     },
+    // News section ke liye data mapping add kiya gaya hai
     news: {
       title: "Latest News & Updates",
       subtitle:
-        "Stay informed with the latest happenings in the education sector.",
-      categoryKey: "News",
+        "Stay informed with the latest happenings in the job market and industries.",
+      categoryKey: "News", // Yeh backend se aane wali category se match hona chahiye
     },
   };
 
   // --- YAHAN BADLAV KIYA GAYA HAI ---
+  // handleTabClick se special 'news' ka logic hata diya gaya hai
   const handleTabClick = (tabId: string, subTabId: string | null = null) => {
-    // If the "News" tab is clicked, navigate to the /press page and stop.
-    if (tabId === "news") {
-      navigate("/press");
-      return;
-    }
-
-    // Otherwise, continue with the existing logic to switch tabs.
+    // Ab 'news' tab bhi baaki tabs ki tarah handle hoga
     setActiveTab(tabId);
     const targetTab = mainNav.find((t) => t.id === tabId);
     if (subTabId) {
@@ -613,12 +610,10 @@ const CareerGuidePage = () => {
         {/* --- Slide-out Sidebar Menu */}
         {isMobileMenuOpen && (
           <>
-            {/* Overlay */}
             <div
               className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
               onClick={() => setIsMobileMenuOpen(false)}
             />
-            {/* Sidebar */}
             <div
               ref={navRef}
               className={`fixed top-0 left-0 h-full w-4/5 max-w-xs bg-white z-50 shadow-xl flex flex-col transform transition-transform duration-300 ease-in-out md:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
