@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSignupMutation } from "@/features/auth/authApiService";
+import {
+  useSignupMutation,
+  useGoogleLoginMutation,
+} from "@/features/auth/authApiService";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
-import { setVerificationEmail, setTempToken } from "@/features/auth/authSlice";
+import {
+  setCredentials,
+  setVerificationEmail,
+  setTempToken,
+} from "@/features/auth/authSlice";
+import { GoogleLogin } from "@react-oauth/google";
 
+// Interface for form data state
 interface FormData {
   fullName: string;
   email: string;
@@ -13,6 +22,7 @@ interface FormData {
   role: string;
   termsAccepted: boolean;
 }
+// Interface for form errors
 interface FormErrors {
   fullName?: string;
   email?: string;
@@ -24,7 +34,11 @@ interface FormErrors {
 const Signup: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [signup, { isLoading }] = useSignupMutation();
+
+  // Use distinct loading state names to avoid conflicts
+  const [signup, { isLoading: isEmailLoading }] = useSignupMutation();
+  const [googleLogin, { isLoading: isGoogleLoading }] =
+    useGoogleLoginMutation();
 
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
@@ -36,6 +50,61 @@ const Signup: React.FC = () => {
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
+  // --- GOOGLE LOGIN LOGIC (from the first component) ---
+  const handleSuccessfulGoogleLogin = (response: any) => {
+    if (response.success && response.user) {
+      dispatch(setCredentials({ user: response.user, token: response.token }));
+      toast.success("Signed in with Google successfully!");
+      const { role } = response.user;
+      if (role === "admin") navigate("/dashboard/admin");
+      else if (role === "college") navigate("/dashboard/college");
+      else if (role === "employer") navigate("/dashboard/employer");
+      else navigate("/");
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    // Logic adapted to use the formData state object
+    if (!formData.role) {
+      toast.error("Please select a role before signing up with Google.");
+      return;
+    }
+    if (!formData.termsAccepted) {
+      toast.error("You must accept the terms and conditions to sign up.");
+      return;
+    }
+    const toastId = toast.loading("Signing up with Google...");
+    try {
+      const response = await googleLogin({
+        token: credentialResponse.credential,
+        role: formData.role, // Use formData.role
+      }).unwrap();
+      toast.dismiss(toastId);
+      handleSuccessfulGoogleLogin(response);
+    } catch (err: any) {
+      toast.error(err.data?.message || "Google Sign-up failed.", {
+        id: toastId,
+      });
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google Sign-up failed. Please try again.");
+  };
+
+  // --- DYNAMIC TERMS & CONDITIONS LINK (from the first component) ---
+  const termsLink = useMemo(() => {
+    // Logic adapted to use the formData state object
+    if (formData.role === "college") {
+      return "https://teacher-job.s3.ap-south-1.amazonaws.com/agreements/Signup+Term+%26+Condition+for+School.pdf";
+    }
+    if (formData.role === "employer") {
+      return "https://teacher-job.s3.ap-south-1.amazonaws.com/agreements/Signup+Term+%26+Condition+for+Teacher.pdf";
+    }
+    return "#";
+  }, [formData.role]);
+
+  // --- FORM VALIDATION & SUBMISSION (from the second component) ---
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
     if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
@@ -79,20 +148,15 @@ const Signup: React.FC = () => {
     const toastId = toast.loading("Creating your account...");
     try {
       const response = await signup(formData).unwrap();
-      if (!response.success) {
+      if (!response.success)
         throw new Error(response.message || "Signup failed");
-      }
 
       if (response.tempToken) {
         dispatch(setTempToken(response.tempToken));
       } else {
-        console.error(
-          "FATAL: Server did not provide a temporary token for OTP verification."
-        );
-        toast.error(
-          "Could not start verification session. Please contact support.",
-          { id: toastId }
-        );
+        toast.error("Could not start verification. Please contact support.", {
+          id: toastId,
+        });
         return;
       }
 
@@ -100,18 +164,12 @@ const Signup: React.FC = () => {
         id: toastId,
         duration: 2000,
       });
-
       dispatch(setVerificationEmail(formData.email));
 
-      // Navigate after a delay
-      setTimeout(() => {
-        navigate("/verify-otp");
-      }, 1500);
+      setTimeout(() => navigate("/verify-otp"), 1500);
     } catch (error: any) {
       const errorMessage =
-        error.data?.message ||
-        error.message ||
-        "Signup failed. Please try again.";
+        error.data?.message || error.message || "Signup failed.";
       toast.error(errorMessage, { id: toastId });
     }
   };
@@ -151,7 +209,34 @@ const Signup: React.FC = () => {
             </p>
           </div>
           <div className="mt-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {/* --- GOOGLE LOGIN UI & DIVIDER --- */}
+            <div>
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  shape="pill"
+                  width="320px"
+                  theme="filled_blue"
+                />
+              </div>
+            </div>
+            <div className="mt-6 relative">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-gray-100 px-2 text-gray-500">
+                  Or continue with email
+                </span>
+              </div>
+            </div>
+            {/* --- END OF GOOGLE LOGIN UI --- */}
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-6">
               {/* Full Name */}
               <div>
                 <label
@@ -273,13 +358,13 @@ const Signup: React.FC = () => {
                     value={formData.role}
                     onChange={handleChange}
                   >
-                    <option value="employer">Teacher / Candidate</option>
-                    <option value="college">School / College</option>
+                    <option value="employer">Employee</option>
+                    <option value="college">Employer</option>
                   </select>
                 </div>
               </div>
 
-              {/* Terms */}
+              {/* --- DYNAMIC TERMS & CONDITIONS UI --- */}
               <div className="flex items-start pt-2">
                 <div className="flex h-6 items-center">
                   <input
@@ -298,8 +383,19 @@ const Signup: React.FC = () => {
                   >
                     I agree to the{" "}
                     <a
-                      href="/terms"
-                      className="text-indigo-600 hover:text-indigo-500"
+                      href={termsLink} // Use dynamic link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        // Use adapted logic
+                        if (!formData.role) {
+                          e.preventDefault();
+                          toast.error(
+                            "Please select a role first to view the terms."
+                          );
+                        }
+                      }}
+                      className={`text-indigo-600 hover:text-indigo-500 ${!formData.role ? "cursor-not-allowed opacity-50" : "underline"}`}
                     >
                       Terms and Conditions
                     </a>
@@ -316,10 +412,10 @@ const Signup: React.FC = () => {
               <div>
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isEmailLoading || isGoogleLoading}
                   className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-400 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? "Processing..." : "Create Account"}
+                  {isEmailLoading ? "Processing..." : "Create Account"}
                 </button>
               </div>
             </form>
