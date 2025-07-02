@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, X, FileText, Calendar, Building, User, Briefcase, Info, Mail, Phone, MapPin, Star, GraduationCap, LinkIcon, Download, Video } from 'lucide-react';
+import { Check, X, FileText, Calendar, Building, User, Briefcase, Info, Mail, Phone, MapPin, Star, GraduationCap, Link as LinkIcon, Download, Video } from 'lucide-react'; // Renamed Link to LinkIcon to avoid conflict
 import toast from 'react-hot-toast';
 import { useGetApplicationsForAdminQuery, useForwardInterviewMutation, useForwardOfferMutation, useUpdateApplicationByAdminMutation, useGetPendingApplicationsQuery, useGetPendingDocumentApplicationsQuery, useVerifyDocumentsMutation, useGetInterviewApplicationsQuery } from '@/features/admin/adminApiService';
 
@@ -94,38 +94,65 @@ const AllInterviewsList = () => {
     if (isError) return <div className="text-center py-10 text-red-500"><Button onClick={() => refetch()} variant="link">Error loading data. Click to try again.</Button></div>;
 
     return (
-         <Card>
-            <CardHeader>
-                <CardTitle>All Scheduled Interviews</CardTitle>
-                <CardDescription>A complete log of all interviews, including those pending and already approved.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-4">
-                {interviews.length === 0 && <div className="text-center py-10 text-muted-foreground"><Info className="mx-auto mb-2" />No interviews have been scheduled on the platform yet.</div>}
-                {interviews.map(app => (
-                    <Card key={app._id} className="p-4">
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                            <div className="flex-1">
-                                <p className="font-semibold">{app.user.employerProfile?.name}</p>
-                                <p className="text-sm text-muted-foreground">For: {app.job.title} at {app.job.schoolName}</p>
-                                <p className="text-sm mt-2"><strong>Date:</strong> {new Date(app.interviewDetails.scheduledOn).toLocaleString()}</p>
-                                <p className="text-sm"><strong>Type:</strong> {app.interviewDetails.interviewType}</p>
-                            </div>
-                            <div className="flex flex-col items-end gap-2">
-                                {getStatusBadge(app)}
-                                {app.interviewDetails.meetingLink && (
-                                    <a href={app.interviewDetails.meetingLink} target="_blank" rel="noopener noreferrer">
-                                        <Button size="sm" variant="outline"><Video className="mr-2 h-4 w-4" />Join Call</Button>
-                                    </a>
-                                )}
-                            </div>
-                        </div>
-                    </Card>
-                ))}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Scheduled Interviews</CardTitle>
+          <CardDescription>
+            A complete log of all interviews, including those pending and
+            already approved.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {interviews.length === 0 && (
+              <div className="text-center py-10 text-muted-foreground">
+                <Info className="mx-auto mb-2" />
+                No interviews have been scheduled on the platform yet.
+              </div>
+            )}
+            {interviews.map((app) => (
+              <Card key={app._id} className="p-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <p className="font-semibold">
+                      {app?.user?.employerProfile?.name || "Unknown User"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      For: {app.job.title} at {app.job.schoolName}
+                    </p>
+                    <p className="text-sm mt-2">
+                      <strong>Date:</strong>{" "}
+                      {new Date(
+                        app.interviewDetails.scheduledOn
+                      ).toLocaleString()}
+                    </p>
+                    <p className="text-sm">
+                      <strong>Type:</strong>{" "}
+                      {app.interviewDetails.interviewType}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    {getStatusBadge(app)}
+                    {app.interviewDetails.meetingLink && (
+                      <a
+                        href={app.interviewDetails.meetingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="sm" variant="outline">
+                          <Video className="mr-2 h-4 w-4" />
+                          Join Call
+                        </Button>
+                      </a>
+                    )}
+                  </div>
                 </div>
-            </CardContent>
-        </Card>
-    )
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
 };
 
 
@@ -147,38 +174,93 @@ const DocumentApprovalQueue = () => {
     if (isError) return <div className="text-center py-10 text-red-500"><Button onClick={() => refetch()} variant="link">Error loading data. Click to try again.</Button></div>;
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Document Verification Queue</CardTitle>
-                <CardDescription>Review and verify documents submitted by candidates after accepting an offer.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {pendingDocs.length === 0 && <div className="text-center py-10 text-muted-foreground"><Info className="mx-auto mb-2" />No documents are pending verification.</div>}
-                {pendingDocs.map(app => (
-                    <Card key={app._id} className="p-4 flex flex-col sm:flex-row justify-between items-start gap-4">
-                        <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2"><User size={16} /><h4 className="font-semibold">{app.user.employerProfile?.name}</h4></div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground"><Briefcase size={14} /><span>For: {app.job.title}</span></div>
-                            <div className="mt-2 space-y-1">
-                                {app.acceptanceDocuments.map(doc => (
-                                    <a key={doc._id} href={doc.url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1.5"><Download size={14}/>View {doc.documentType.replace('_', ' ')}</a>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="flex gap-2 w-full sm:w-auto">
-                            <Button size="sm" className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => handleVerification(app._id, true)} disabled={isVerifying}><Check size={16} className="mr-2"/>Approve Docs</Button>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild><Button variant="destructive" size="sm" className="flex-1"><X size={16} className="mr-2"/>Reject Docs</Button></AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader><AlertDialogTitle>Reject Documents?</AlertDialogTitle><AlertDialogDescription>This will reject the submitted documents and notify the user.</AlertDialogDescription></AlertDialogHeader>
-                                    <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleVerification(app._id, false)} className="bg-destructive hover:bg-destructive/90">Confirm Reject</AlertDialogAction></AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    </Card>
-                ))}
-            </CardContent>
-        </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Document Verification Queue</CardTitle>
+          <CardDescription>
+            Review and verify documents submitted by candidates after accepting
+            an offer.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {pendingDocs.length === 0 && (
+            <div className="text-center py-10 text-muted-foreground">
+              <Info className="mx-auto mb-2" />
+              No documents are pending verification.
+            </div>
+          )}
+          {pendingDocs.map((app) => (
+            <Card
+              key={app._id}
+              className="p-4 flex flex-col sm:flex-row justify-between items-start gap-4"
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <User size={16} />
+                  <h4 className="font-semibold">
+                    {app?.user?.employerProfile?.name || "Unknown User"}
+                  </h4>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Briefcase size={14} />
+                  <span>For: {app.job.title}</span>
+                </div>
+                <div className="mt-2 space-y-1">
+                  {app.acceptanceDocuments.map((doc) => (
+                    <a
+                      key={doc._id}
+                      href={doc.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-primary hover:underline flex items-center gap-1.5"
+                    >
+                      <Download size={14} />
+                      View {doc.documentType.replace(/_/g, " ")}
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button
+                  size="sm"
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={() => handleVerification(app._id, true)}
+                  disabled={isVerifying}
+                >
+                  <Check size={16} className="mr-2" />
+                  Approve Docs
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm" className="flex-1">
+                      <X size={16} className="mr-2" />
+                      Reject Docs
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Reject Documents?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will reject the submitted documents and notify the
+                        user.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleVerification(app._id, false)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Confirm Reject
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </Card>
+          ))}
+        </CardContent>
+      </Card>
     );
 };
 
@@ -200,35 +282,91 @@ const NewApplicationApprovalQueue = () => {
     if (isError) return <div className="text-center py-10 text-red-500"><Button onClick={() => refetch()} variant="link">Error loading data. Click to try again.</Button></div>;
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>New Application Queue</CardTitle>
-                <CardDescription>Review new applications before they are visible to colleges. Approve to forward, or reject to dismiss.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {pendingApps.length === 0 && <div className="text-center py-10 text-muted-foreground"><Info className="mx-auto mb-2" />No new applications are pending approval.</div>}
-                {pendingApps.map(app => (
-                    <Card key={app._id} className="p-4 flex flex-col sm:flex-row justify-between items-start gap-4">
-                        <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2"><User size={16} /><h4 className="font-semibold">{app.user.employerProfile?.name}</h4></div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground"><Briefcase size={14} /><span>Applied for: {app.job.title}</span></div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground"><Building size={14} /><span>At: {app.job.schoolName}</span></div>
-                        </div>
-                        <div className="flex gap-2 w-full sm:w-auto">
-                            <Dialog><DialogTrigger asChild><Button variant="outline" size="sm" className="flex-1">View Details</Button></DialogTrigger><ApplicationDetailsModal application={app} /></Dialog>
-                            <Button size="sm" className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => handleApproval(app._id, true)} disabled={isUpdating}><Check size={16} className="mr-2"/>Approve</Button>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild><Button variant="destructive" size="sm" className="flex-1"><X size={16} className="mr-2"/>Reject</Button></AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader><AlertDialogTitle>Reject Application?</AlertDialogTitle><AlertDialogDescription>This will permanently dismiss the application. It will not be sent to the college.</AlertDialogDescription></AlertDialogHeader>
-                                    <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleApproval(app._id, false)} className="bg-destructive hover:bg-destructive/90">Confirm Reject</AlertDialogAction></AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    </Card>
-                ))}
-            </CardContent>
-        </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>New Application Queue</CardTitle>
+          <CardDescription>
+            Review new applications before they are visible to colleges. Approve
+            to forward, or reject to dismiss.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {pendingApps.length === 0 && (
+            <div className="text-center py-10 text-muted-foreground">
+              <Info className="mx-auto mb-2" />
+              No new applications are pending approval.
+            </div>
+          )}
+          {pendingApps.map((app) => (
+            <Card
+              key={app._id}
+              className="p-4 flex flex-col sm:flex-row justify-between items-start gap-4"
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <User size={16} />
+                  <h4 className="font-semibold">
+                    {app?.user?.employerProfile?.name || "Unknown User"}
+                  </h4>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Briefcase size={14} />
+                  <span>Applied for: {app.job.title}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Building size={14} />
+                  <span>At: {app.job.schoolName}</span>
+                </div>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      View Details
+                    </Button>
+                  </DialogTrigger>
+                  <ApplicationDetailsModal application={app} />
+                </Dialog>
+                <Button
+                  size="sm"
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={() => handleApproval(app._id, true)}
+                  disabled={isUpdating}
+                >
+                  <Check size={16} className="mr-2" />
+                  Approve
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm" className="flex-1">
+                      <X size={16} className="mr-2" />
+                      Reject
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Reject Application?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently dismiss the application. It will
+                        not be sent to the college.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleApproval(app._id, false)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Confirm Reject
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </Card>
+          ))}
+        </CardContent>
+      </Card>
     );
 };
 
@@ -244,7 +382,17 @@ const InterviewOfferApprovalQueue = () => {
       if (app.status === 'interview_scheduled') { type = 'Interview Schedule'; status = app.interviewDetails?.confirmedByAdmin ? 'Approved' : 'Pending Approval'; } 
       else if (app.status === 'offer_extended') { type = 'Offer Letter'; status = app.offerLetter?.forwardedByAdmin ? 'Approved' : 'Pending Approval'; } 
       else { return null; }
-      return { id: app._id, type, status, candidateName: app.user?.employerProfile?.name || 'N/A', collegeName: app.job?.schoolName || 'N/A', jobTitle: app.job?.title || 'N/A', updatedAt: app.updatedAt, interviewDetails: app.interviewDetails, offerLetter: app.offerLetter };
+      return {
+        id: app._id,
+        type,
+        status,
+        candidateName: app?.user?.employerProfile?.name || "N/A",
+        collegeName: app.job?.schoolName || "N/A",
+        jobTitle: app.job?.title || "N/A",
+        updatedAt: app.updatedAt,
+        interviewDetails: app.interviewDetails,
+        offerLetter: app.offerLetter,
+      };
     }).filter(item => item !== null && item.status === 'Pending Approval'), [applications]);
 
     const handleApprove = async (item, agreementFile: File | null = null) => {
@@ -323,44 +471,137 @@ const InterviewOfferApprovalQueue = () => {
 };
 
 const ApplicationDetailsModal = ({ application }) => (
-    <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
-        <DialogHeader>
-            <DialogTitle>Application Details</DialogTitle>
-            <DialogDescription>A complete overview of the applicant and the job they applied for.</DialogDescription>
-        </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 flex-1 overflow-y-auto pr-4">
-            <div className="space-y-4">
-                <Card><CardHeader><CardTitle className="flex items-center gap-2"><User size={20}/>Applicant Profile</CardTitle></CardHeader>
-                    <CardContent className="space-y-3">
-                        <p><strong>Name:</strong> {application.user.employerProfile.name}</p>
-                        <p className="flex items-center gap-2"><strong>Email:</strong> <a href={`mailto:${application.user.email}`} className="text-primary hover:underline">{application.user.email}</a></p>
-                        <p className="flex items-center gap-2"><strong>Phone:</strong> {application.user.employerProfile.phone || 'N/A'}</p>
-                        <p className="flex items-center gap-2"><strong>Location:</strong> {application.user.employerProfile.location || 'N/A'}</p>
-                        <p><strong>Headline:</strong> {application.user.employerProfile.headline || 'N/A'}</p>
-                        <div className="pt-2"><p className="font-semibold mb-2">Skills:</p><div className="flex flex-wrap gap-2">{application.user.employerProfile.skills.map(s => <Badge key={s._id} variant="secondary">{s.name}</Badge>)}</div></div>
-                    </CardContent>
-                </Card>
-                <Card><CardHeader><CardTitle className="flex items-center gap-2"><Briefcase size={20}/>Work Experience</CardTitle></CardHeader>
-                    <CardContent>{application.user.employerProfile.workExperience.map(exp => <div key={exp._id} className="mb-2"><p className="font-semibold">{exp.title} at {exp.company}</p><p className="text-sm text-muted-foreground">{exp.duration}</p></div>)}</CardContent>
-                </Card>
-                 <Card><CardHeader><CardTitle className="flex items-center gap-2"><GraduationCap size={20}/>Education</CardTitle></CardHeader>
-                    <CardContent>{application.user.employerProfile.education.map(edu => <div key={edu._id} className="mb-2"><p className="font-semibold">{edu.degree} from {edu.school}</p><p className="text-sm text-muted-foreground">{edu.year}</p></div>)}</CardContent>
-                </Card>
+  <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
+    <DialogHeader>
+      <DialogTitle>Application Details</DialogTitle>
+      <DialogDescription>
+        A complete overview of the applicant and the job they applied for.
+      </DialogDescription>
+    </DialogHeader>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 flex-1 overflow-y-auto pr-4">
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User size={20} />
+              Applicant Profile
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p>
+              <strong>Name:</strong>{" "}
+              {application?.user?.employerProfile?.name || "N/A"}
+            </p>
+            <p className="flex items-center gap-2">
+              <strong>Email:</strong>{" "}
+              <a
+                href={`mailto:${application?.user?.email}`}
+                className="text-primary hover:underline"
+              >
+                {application?.user?.email || "N/A"}
+              </a>
+            </p>
+            <p className="flex items-center gap-2">
+              <strong>Phone:</strong>{" "}
+              {application?.user?.employerProfile?.phone || "N/A"}
+            </p>
+            <p className="flex items-center gap-2">
+              <strong>Location:</strong>{" "}
+              {application?.user?.employerProfile?.location || "N/A"}
+            </p>
+            <p>
+              <strong>Headline:</strong>{" "}
+              {application?.user?.employerProfile?.headline || "N/A"}
+            </p>
+            <div className="pt-2">
+              <p className="font-semibold mb-2">Skills:</p>
+              <div className="flex flex-wrap gap-2">
+                {application?.user?.employerProfile?.skills?.map((s) => (
+                  <Badge key={s._id} variant="secondary">
+                    {s.name}
+                  </Badge>
+                )) || "No skills listed"}
+              </div>
             </div>
-            <div className="space-y-4">
-                <Card><CardHeader><CardTitle className="flex items-center gap-2"><Briefcase size={20}/>Job Details</CardTitle></CardHeader>
-                    <CardContent className="space-y-3">
-                        <p><strong>Title:</strong> {application.job.title}</p>
-                        <p><strong>School:</strong> {application.job.schoolName}</p>
-                        <p><strong>Location:</strong> {application.job.location}</p>
-                        <p><strong>Salary:</strong> {application.job.salary || 'Not Disclosed'}</p>
-                        <p><strong>Type:</strong> {application.job.type || 'N/A'}</p>
-                        <div className="pt-2"><p className="font-semibold">Description:</p><p className="text-sm text-muted-foreground whitespace-pre-wrap">{application.job.description}</p></div>
-                    </CardContent>
-                </Card>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase size={20} />
+              Work Experience
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {application?.user?.employerProfile?.workExperience?.map((exp) => (
+              <div key={exp._id} className="mb-2">
+                <p className="font-semibold">
+                  {exp.title} at {exp.company}
+                </p>
+                <p className="text-sm text-muted-foreground">{exp.duration}</p>
+              </div>
+            )) || (
+              <p className="text-muted-foreground">
+                No work experience listed.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <GraduationCap size={20} />
+              Education
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {application?.user?.employerProfile?.education?.map((edu) => (
+              <div key={edu._id} className="mb-2">
+                <p className="font-semibold">
+                  {edu.degree} from {edu.school}
+                </p>
+                <p className="text-sm text-muted-foreground">{edu.year}</p>
+              </div>
+            )) || <p className="text-muted-foreground">No education listed.</p>}
+          </CardContent>
+        </Card>
+      </div>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase size={20} />
+              Job Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p>
+              <strong>Title:</strong> {application.job.title}
+            </p>
+            <p>
+              <strong>School:</strong> {application.job.schoolName}
+            </p>
+            <p>
+              <strong>Location:</strong> {application.job.location}
+            </p>
+            <p>
+              <strong>Salary:</strong>{" "}
+              {application.job.salary || "Not Disclosed"}
+            </p>
+            <p>
+              <strong>Type:</strong> {application.job.type || "N/A"}
+            </p>
+            <div className="pt-2">
+              <p className="font-semibold">Description:</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                {application.job.description}
+              </p>
             </div>
-        </div>
-    </DialogContent>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </DialogContent>
 );
 
 export default Workflow;
