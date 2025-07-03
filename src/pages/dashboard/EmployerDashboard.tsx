@@ -112,7 +112,7 @@ const EmployerDashboard = () => {
               </div>
               <div>
                 <h2 className="font-semibold text-primary-text">
-                  Employer Dashboard
+                  Employee Dashboard
                 </h2>
                 <p
                   className="text-sm text-secondary-text truncate"
