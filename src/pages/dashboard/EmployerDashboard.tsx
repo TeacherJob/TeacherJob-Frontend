@@ -42,11 +42,6 @@ const EmployerDashboard = () => {
       icon: FileText,
     },
     {
-      path: "/dashboard/employer/posts",
-      label: "Manage Posts",
-      icon: Briefcase,
-    },
-    {
       path: "/dashboard/employer/contributions",
       label: "My Contributions",
       icon: PenSquare,
