@@ -41,11 +41,11 @@ const EmployerDashboard = () => {
       label: "My Applications",
       icon: FileText,
     },
-    {
-      path: "/dashboard/employer/contributions",
-      label: "My Contributions",
-      icon: PenSquare,
-    },
+    // {
+    //   path: "/dashboard/employer/contributions",
+    //   label: "My Contributions",
+    //   icon: PenSquare,
+    // },
     {
       path: "/dashboard/employer/payment",
       label: "Payments",
