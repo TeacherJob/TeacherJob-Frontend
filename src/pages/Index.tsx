@@ -706,7 +706,7 @@ const HowWeWork = () => (
           {/* --- MODIFICATION START: Slogan added here --- */}
           <div className="mb-6">
             <p className="text-2xl lg:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-indigo-500 to-green-500">
-              School, Coaching, Ya Ho Teacher, Sabke Liye Hai Yahan Feature..
+              School, Coaching, Ya Ho Teacher, Sabke Liye Hai Yahan Future..
             </p>
           </div>
           {/* --- MODIFICATION END --- */}
