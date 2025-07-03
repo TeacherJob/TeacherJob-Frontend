@@ -42,7 +42,7 @@ const CollegeDashboard = () => {
       icon: GraduationCap,
     },
     {
-      path: "/dashboard/college/posts",
+      path: "/dashboard/college/post-job",
       label: "Post New Job",
       icon: PlusCircle,
     },
