@@ -1,10 +1,11 @@
-// src/pages/HelpPage.tsx
+// src/pages/Help.tsx
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Search, Mail, Phone, ChevronDown, HelpCircle } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 // Using a consistent placeholder image URL
 const bannerImage =
@@ -228,7 +229,7 @@ const FaqAccordionItem = ({
   );
 };
 
-const HelpPage = () => {
+const Help = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredFaqData = faqData
@@ -244,6 +245,13 @@ const HelpPage = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
+      <Helmet>
+        <title>Help Center | Teaching Jobs & Hiring FAQs | TeacherJob.in</title>
+        <meta
+          name="description"
+          content="Get answers to all your questions about applying, hiring, interview support, and platform policies."
+        />
+      </Helmet>
       <Header />
 
       <main className="flex-grow">
@@ -333,10 +341,10 @@ const HelpPage = () => {
                   Send us an email and we'll get back to you soon.
                 </p>
                 <a
-                  href="mailto:indresharora2006@gmail.com"
+                  href="mailto:support@teacherjob.in"
                   className="mt-4 inline-block text-indigo-600 font-medium hover:underline"
                 >
-                  indresharora2006@gmail.com
+                  support@teacherjob.in
                 </a>
               </div>
               <div className="bg-white p-6 rounded-lg border border-gray-200">
@@ -361,5 +369,4 @@ const HelpPage = () => {
     </div>
   );
 };
-
-export default HelpPage;
+export default Help;
