@@ -45,7 +45,6 @@ const AdminDashboard = () => {
     { path: "/dashboard/admin/jobs", label: "Manage Jobs", icon: Briefcase },
     { path: "/dashboard/admin/users", label: "User Management", icon: Users },
     { path: "/dashboard/admin/workflow", label: "Workflows", icon: BarChart3 },
-    { path: "/dashboard/admin/reviews", label: "Manage Reviews", icon: Star },
     {
       path: "/dashboard/admin/articles",
       label: "Career Articles",
