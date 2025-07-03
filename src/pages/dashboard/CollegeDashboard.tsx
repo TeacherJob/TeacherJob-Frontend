@@ -122,7 +122,7 @@ const CollegeDashboard = () => {
               </div>
               <div>
                 <h2 className="font-semibold text-primary-text">
-                  College Dashboard
+                  Employer Dashboard
                 </h2>
                 <p
                   className="text-sm text-secondary-text truncate"
