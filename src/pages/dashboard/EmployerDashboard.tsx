@@ -185,7 +185,7 @@ const EmployerDashboard = () => {
           >
             <Menu className="w-6 h-6" />
           </Button>
-          <h1 className="text-lg font-semibold">Employer Dashboard</h1>
+          <h1 className="text-lg font-semibold">Employee Dashboard</h1>
           <div className="w-8"></div> {/* Spacer */}
         </header>
 
