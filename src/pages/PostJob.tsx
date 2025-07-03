@@ -1,3 +1,5 @@
+// src/pages/PostJob.tsx
+
 import React, { useState } from "react";
 import {
   CheckCircle,
@@ -6,13 +8,14 @@ import {
   Briefcase,
   Quote,
   X,
-  Award, // New Icon
-  Target, // New Icon
-  Zap, // New Icon
+  Award,
+  Target,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
-import EmployerHeader from "@/components/EmployerHeader"; // Reusable header
+import EmployerHeader from "@/components/EmployerHeader";
+import { Helmet } from "react-helmet-async"; // Import Helmet
 
 // --- Job Post Modal Component ---
 // This remains unchanged as it's a core feature
@@ -230,6 +233,13 @@ const PostJob = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <Helmet>
+        <title>Post Jobs & Hire Teachers for Free | TeacherJob.in</title>
+        <meta
+          name="description"
+          content="No upfront cost, full hiring support for schools and colleges. Filtered resumes, interview scheduling, and onboarding done for you."
+        />
+      </Helmet>
       <EmployerHeader />
 
       {/* --- HERO SECTION --- */}
@@ -340,7 +350,7 @@ const PostJob = () => {
       <WhyHireWithUsSection />
 
       {/* --- TESTIMONIALS SECTION --- */}
-{/*       <section className="py-20 sm:py-24 bg-slate-50">
+      <section className="py-20 sm:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -368,7 +378,7 @@ const PostJob = () => {
           </div>
         </div>
       </section>
- */}
+
       {/* --- FINAL CTA SECTION --- */}
       <section className="relative py-20 bg-primary text-white overflow-hidden">
         <div className="absolute -left-16 -top-16 w-48 h-48 border-[16px] border-white/5 rounded-full"></div>
