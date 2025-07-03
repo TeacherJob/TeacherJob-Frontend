@@ -31,7 +31,7 @@ const CollegeOfferLetter = () => {
         }
     }, [appIdFromUrl, candidates]);
     
-    // Logic functions remain the same as they were correct
+    // Logic functions remain the same
     const getOfferStatus = (app: any) => {
         if (app.status === 'hired') return { label: 'Hired', color: 'bg-green-100 text-green-800' };
         if (app.status === 'documents_approved') return { label: 'Documents Verified', color: 'bg-teal-100 text-teal-800' };
@@ -90,20 +90,34 @@ const CollegeOfferLetter = () => {
     <div className="space-y-6">
       <div><h1 className="text-3xl font-bold text-foreground">Offer Letters</h1><p className="text-muted-foreground">Upload and manage offer letters for admin approval.</p></div>
       
-      {/* === [LAYOUT THEEK KIYA GAYA] Main Grid Container === */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* === Left Column (Upload Form and Pipeline) === */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader><CardTitle>Upload Offer Letter</CardTitle><CardDescription>Upload a custom offer letter and send it to an admin for approval.</CardDescription></CardHeader>
             <CardContent className="space-y-4">
-              <div><Label htmlFor="candidate">Select Candidate</Label><Select value={selectedCandidateId} onValueChange={setSelectedCandidateId}><SelectTrigger><SelectValue placeholder="Choose a candidate post-interview..." /></SelectTrigger><SelectContent>{eligibleCandidates.length > 0 ? eligibleCandidates.map(app => (<SelectItem key={app._id} value={app._id}>{app.user.employerProfile.name} - {app.job.title}</SelectItem>)) : <div className="p-4 text-sm text-muted-foreground">No candidates eligible for an offer.</div>}</SelectContent></Select></div>
+              <div>
+                <Label htmlFor="candidate">Select Candidate</Label>
+                <Select value={selectedCandidateId} onValueChange={setSelectedCandidateId}>
+                    <SelectTrigger><SelectValue placeholder="Choose a candidate post-interview..." /></SelectTrigger>
+                    {/* === [FIX] YAHAN PAR BADLAV KIYA GAYA HAI === */}
+                    <SelectContent className="bg-background">
+                        {eligibleCandidates.length > 0 ? 
+                            eligibleCandidates.map(app => (
+                                <SelectItem key={app._id} value={app._id}>
+                                    {app.user.employerProfile.name} - {app.job.title}
+                                </SelectItem>
+                            )) : 
+                            <div className="p-4 text-sm text-muted-foreground">No candidates eligible for an offer.</div>
+                        }
+                    </SelectContent>
+                </Select>
+              </div>
               <div><Label htmlFor="offerFile">Offer Letter Document (PDF, DOCX)</Label><Input id="offerFile" type="file" onChange={handleFileChange} accept=".pdf,.doc,.docx" className="pt-1.5"/></div>
               <Button onClick={handleSendForApproval} disabled={!selectedCandidateId || !offerLetterFile || isUploading}><Send className="w-4 h-4 mr-2" />{isUploading ? 'Uploading...' : 'Send for Approval'}</Button>
             </CardContent>
           </Card>
 
+          {/* Offer Pipeline Card remains the same */}
           <Card>
             <CardHeader><CardTitle>Offer Pipeline</CardTitle><CardDescription>Track the status of all candidates in the offer process.</CardDescription></CardHeader>
             <CardContent><div className="space-y-4">
@@ -147,7 +161,7 @@ const CollegeOfferLetter = () => {
           </Card>
         </div>
         
-        {/* === Right Column (Status Overview) === */}
+        {/* Right Column (Status Overview) remains the same */}
         <div className="lg:col-span-1">
           <Card>
               <CardHeader><CardTitle>Offer Status Overview</CardTitle></CardHeader>
