@@ -164,7 +164,7 @@ const CollegeApplications = () => {
                 >
                   New ({stats.new})
                 </Button>
-                <Button
+{/*                 <Button
                   variant={
                     statusFilter === "underreview" ? "default" : "outline"
                   }
@@ -172,7 +172,7 @@ const CollegeApplications = () => {
                   onClick={() => setStatusFilter("viewed")}
                 >
                   Under Review ({stats.underReview})
-                </Button>
+                </Button> */}
                 <Button
                   variant={
                     statusFilter === "shortlisted" ? "default" : "outline"
