@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, X, FileText, Calendar, Building, User, Briefcase, Info, Mail, Phone, MapPin, Star, GraduationCap, Link as LinkIcon, Download, Video } from 'lucide-react'; // Renamed Link to LinkIcon to avoid conflict
+import { Check, X, FileText, Calendar, Building, User, Briefcase, Info, Mail, Phone, MapPin, Star, GraduationCap, Link as LinkIcon, Download, Video } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useGetApplicationsForAdminQuery, useForwardInterviewMutation, useForwardOfferMutation, useUpdateApplicationByAdminMutation, useGetPendingApplicationsQuery, useGetPendingDocumentApplicationsQuery, useVerifyDocumentsMutation, useGetInterviewApplicationsQuery } from '@/features/admin/adminApiService';
 
@@ -57,7 +57,7 @@ const Workflow = () => {
             </CardHeader>
         </Card>
         <Tabs defaultValue="new-applications" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
                 <TabsTrigger value="new-applications">New Applications</TabsTrigger>
                 <TabsTrigger value="interview-offers">Interview & Offer Queue</TabsTrigger>
                 <TabsTrigger value="document-verification">Document Verification</TabsTrigger>
@@ -267,6 +267,7 @@ const DocumentApprovalQueue = () => {
 const NewApplicationApprovalQueue = () => {
     const { data: pendingApps = [], isLoading, isError, refetch } = useGetPendingApplicationsQuery();
     const [updateApplication, { isLoading: isUpdating }] = useUpdateApplicationByAdminMutation();
+    const [detailsModalApp, setDetailsModalApp] = useState(null);
 
     const handleApproval = async (appId: string, isApproved: boolean) => {
         const status = isApproved ? 'applied' : 'rejected';
@@ -318,15 +319,10 @@ const NewApplicationApprovalQueue = () => {
                   <span>At: {app.job.schoolName}</span>
                 </div>
               </div>
-              <div className="flex gap-2 w-full sm:w-auto">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      View Details
-                    </Button>
-                  </DialogTrigger>
-                  <ApplicationDetailsModal application={app} />
-                </Dialog>
+              <div className="flex gap-2 w-full sm:w-auto flex-wrap">
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => setDetailsModalApp(app)}>
+                    View Details
+                </Button>
                 <Button
                   size="sm"
                   className="flex-1 bg-green-600 hover:bg-green-700"
@@ -366,6 +362,11 @@ const NewApplicationApprovalQueue = () => {
             </Card>
           ))}
         </CardContent>
+         {detailsModalApp && (
+            <Dialog open={true} onOpenChange={() => setDetailsModalApp(null)}>
+                <ApplicationDetailsModal application={detailsModalApp} />
+            </Dialog>
+        )}
       </Card>
     );
 };
@@ -375,49 +376,45 @@ const InterviewOfferApprovalQueue = () => {
     const [forwardInterview, { isLoading: isApprovingInterview }] = useForwardInterviewMutation();
     const [forwardOffer, { isLoading: isApprovingOffer }] = useForwardOfferMutation();
     const [updateApplication, { isLoading: isRejecting }] = useUpdateApplicationByAdminMutation();
-    const [showAgreementModal, setShowAgreementModal] = useState<any | null>(null);
+    const [showAgreementModal, setShowAgreementModal] = useState(null);
+    const [detailsModalApp, setDetailsModalApp] = useState(null);
 
-    const workflowItems = useMemo(() => applications.map(app => {
-      let type = '', status = '';
-      if (app.status === 'interview_scheduled') { type = 'Interview Schedule'; status = app.interviewDetails?.confirmedByAdmin ? 'Approved' : 'Pending Approval'; } 
-      else if (app.status === 'offer_extended') { type = 'Offer Letter'; status = app.offerLetter?.forwardedByAdmin ? 'Approved' : 'Pending Approval'; } 
-      else { return null; }
-      return {
-        id: app._id,
-        type,
-        status,
-        candidateName: app?.user?.employerProfile?.name || "N/A",
-        collegeName: app.job?.schoolName || "N/A",
-        jobTitle: app.job?.title || "N/A",
-        updatedAt: app.updatedAt,
-        interviewDetails: app.interviewDetails,
-        offerLetter: app.offerLetter,
-      };
-    }).filter(item => item !== null && item.status === 'Pending Approval'), [applications]);
+    const pendingItems = useMemo(() => {
+      if (!applications) return [];
+      return applications.filter(app => 
+        (app.status === 'interview_scheduled' && !app.interviewDetails?.confirmedByAdmin) || 
+        (app.status === 'offer_extended' && !app.offerLetter?.forwardedByAdmin)
+      );
+    }, [applications]);
 
-    const handleApprove = async (item, agreementFile: File | null = null) => {
+    const handleApprove = async (app, agreementFile: File | null = null) => {
+        const isInterview = app.status === 'interview_scheduled';
         try {
-            if (item.type === 'Interview Schedule') { 
-                await forwardInterview(item.id).unwrap(); 
-                toast.success('Interview forwarded!'); 
-            } else if (item.type === 'Offer Letter' && agreementFile) { 
+            if (isInterview) { 
+                await forwardInterview(app._id).unwrap(); 
+                toast.success('Interview forwarded to candidate!'); 
+            } else { 
+                if (!agreementFile) {
+                    toast.error("Agreement file is missing.");
+                    return;
+                }
                 const formData = new FormData();
                 formData.append('agreement', agreementFile);
-                await forwardOffer({ appId: item.id, formData }).unwrap(); 
-                toast.success('Offer forwarded with agreement!'); 
+                await forwardOffer({ appId: app._id, formData }).unwrap(); 
+                toast.success('Offer forwarded to candidate with agreement!'); 
                 setShowAgreementModal(null);
             }
         } catch (err) { 
-            toast.error('Failed to approve.'); 
-            setShowAgreementModal(null);
+            toast.error('Failed to approve the submission.'); 
+            if (!isInterview) setShowAgreementModal(null);
         }
     };
     
-    const handleReject = async (item) => {
+    const handleReject = async (app) => {
         try {
-            await updateApplication({ appId: item.id, body: { status: 'rejected', category: 'archived' } }).unwrap();
-            toast.success('Submission rejected.');
-        } catch (err) { toast.error('Failed to reject.'); }
+            await updateApplication({ appId: app._id, body: { status: 'rejected', category: 'archived' } }).unwrap();
+            toast.success('Submission has been rejected and archived.');
+        } catch (err) { toast.error('Failed to reject the submission.'); }
     };
 
     if (isLoading) return <Skeleton className="h-64 w-full rounded-lg" />;
@@ -430,34 +427,40 @@ const InterviewOfferApprovalQueue = () => {
                 <CardDescription>Review interviews and offers scheduled by colleges before they are sent to candidates.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                {workflowItems.length === 0 && <div className="text-center py-10 text-muted-foreground"><Info className="mx-auto mb-2" />No interviews or offers are pending approval.</div>}
-                {workflowItems.map(item => (
-                    <Card key={item.id} className="p-4">
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                           <div className="flex-1">
-                               <div className="flex items-center gap-3 mb-2">
-                                   <div className={`p-2 rounded-full ${item.type === 'Interview Schedule' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
-                                       {item.type === 'Interview Schedule' ? <Calendar size={16}/> : <FileText size={16}/>}
+                {pendingItems.length === 0 && <div className="text-center py-10 text-muted-foreground"><Info className="mx-auto mb-2" />No interviews or offers are pending approval.</div>}
+                {pendingItems.map(app => {
+                    const isInterview = app.status === 'interview_scheduled';
+                    const type = isInterview ? 'Interview Schedule' : 'Offer Letter';
+
+                    return (
+                        <Card key={app._id} className="p-4">
+                            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                               <div className="flex-1">
+                                   <div className="flex items-center gap-3 mb-2">
+                                       <div className={`p-2 rounded-full ${isInterview ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
+                                           {isInterview ? <Calendar size={16}/> : <FileText size={16}/>}
+                                       </div>
+                                       <h4 className="font-semibold">{type}</h4>
                                    </div>
-                                   <h4 className="font-semibold">{item.type}</h4>
+                                   <p className="text-sm"><strong>Candidate:</strong> {app.user?.employerProfile?.name || "N/A"}</p>
+                                   <p className="text-sm"><strong>College:</strong> {app.job?.schoolName || "N/A"} for {app.job?.title || "N/A"}</p>
+                                   {!isInterview && app.offerLetter?.url && <a href={app.offerLetter.url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1 mt-1"><LinkIcon size={14}/>View Offer Letter</a>}
                                </div>
-                               <p className="text-sm"><strong>Candidate:</strong> {item.candidateName}</p>
-                               <p className="text-sm"><strong>College:</strong> {item.collegeName} for {item.jobTitle}</p>
-                               {item.type === 'Offer Letter' && item.offerLetter?.url && <a href={item.offerLetter.url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1 mt-1"><LinkIcon size={14}/>View Offer Letter</a>}
-                           </div>
-                           <div className="flex gap-2 w-full sm:w-auto">
-                                <Button size="sm" className="flex-1" onClick={() => item.type === 'Interview Schedule' ? handleApprove(item) : setShowAgreementModal(item)} disabled={isApprovingInterview || isApprovingOffer}><Check size={16} className="mr-2"/>Approve</Button>
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild><Button variant="destructive" size="sm" className="flex-1"><X size={16} className="mr-2"/>Reject</Button></AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader><AlertDialogTitle>Reject Submission?</AlertDialogTitle><AlertDialogDescription>This will reject the submission and notify the college.</AlertDialogDescription></AlertDialogHeader>
-                                        <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(item)} disabled={isRejecting} className="bg-destructive hover:bg-destructive/90">Confirm Reject</AlertDialogAction></AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                           </div>
-                        </div>
-                    </Card>
-                ))}
+                               <div className="flex gap-2 w-full sm:w-auto flex-wrap justify-end">
+                                    <Button variant="outline" size="sm" className="flex-1" onClick={() => setDetailsModalApp(app)}>View Details</Button>
+                                    <Button size="sm" className="flex-1" onClick={() => isInterview ? handleApprove(app) : setShowAgreementModal(app)} disabled={isApprovingInterview || isApprovingOffer}><Check size={16} className="mr-2"/>Approve</Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild><Button variant="destructive" size="sm" className="flex-1"><X size={16} className="mr-2"/>Reject</Button></AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader><AlertDialogTitle>Reject Submission?</AlertDialogTitle><AlertDialogDescription>This will reject the submission and notify the college.</AlertDialogDescription></AlertDialogHeader>
+                                            <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleReject(app)} disabled={isRejecting} className="bg-destructive hover:bg-destructive/90">Confirm Reject</AlertDialogAction></AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                               </div>
+                            </div>
+                        </Card>
+                    );
+                })}
             </CardContent>
             {showAgreementModal && (
                 <AgreementUploadModal 
@@ -466,9 +469,15 @@ const InterviewOfferApprovalQueue = () => {
                     onSubmit={(file) => handleApprove(showAgreementModal, file)} 
                 />
             )}
+            {detailsModalApp && (
+                <Dialog open={true} onOpenChange={() => setDetailsModalApp(null)}>
+                    <ApplicationDetailsModal application={detailsModalApp} />
+                </Dialog>
+            )}
         </Card>
     );
 };
+
 
 const ApplicationDetailsModal = ({ application }) => (
   <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
@@ -599,6 +608,32 @@ const ApplicationDetailsModal = ({ application }) => (
             </div>
           </CardContent>
         </Card>
+         {application.status === 'interview_scheduled' && application.interviewDetails && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Calendar /> Interview Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    <p><strong>Date & Time:</strong> {new Date(application.interviewDetails.scheduledOn).toLocaleString()}</p>
+                    <p><strong>Type:</strong> {application.interviewDetails.interviewType}</p>
+                    <p><strong>Meeting Link:</strong> <a href={application.interviewDetails.meetingLink} target="_blank" rel="noreferrer" className="text-primary hover:underline break-all">{application.interviewDetails.meetingLink}</a></p>
+                    <p><strong>Notes from College:</strong> {application.interviewDetails.notes || 'N/A'}</p>
+                </CardContent>
+            </Card>
+        )}
+
+        {application.status === 'offer_extended' && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><FileText /> Offer Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    <p><strong>Candidate:</strong> {application?.user?.employerProfile?.name}</p>
+                    <p><strong>Job:</strong> {application.job.title} at {application.job.schoolName}</p>
+                    {application.offerLetter?.url && <a href={application.offerLetter.url} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center gap-1 mt-1 font-semibold"><LinkIcon size={14}/>View Official Offer Letter PDF</a>}
+                </CardContent>
+            </Card>
+        )}
       </div>
     </div>
   </DialogContent>
