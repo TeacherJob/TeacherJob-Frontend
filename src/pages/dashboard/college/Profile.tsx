@@ -39,8 +39,8 @@ const CollegeProfile = () => {
         description: profile.description || '',
         established: profile.established || '',
         accreditation: profile.accreditation || '',
-        studentCount: profile.studentCount || '',
-        facultyCount: profile.facultyCount || '',
+        studentCount: profile.studentCount || '0',
+        facultyCount: profile.facultyCount || '0',
         departments: profile.departments || [],
         facilities: profile.facilities || [],
       });
@@ -91,13 +91,17 @@ const CollegeProfile = () => {
           <h1 className="text-3xl font-bold text-foreground">College Profile</h1>
           <p className="text-muted-foreground">Manage your institution's information and settings</p>
         </div>
-        <Button 
-          onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-          variant={isEditing ? "default" : "outline"}
-          disabled={isUpdating}
-        >
-          {isUpdating ? 'Saving...' : isEditing ? 'Save Changes' : 'Edit Profile'}
-        </Button>
+        <div className='flex gap-2'>
+            {isEditing && (
+                 <Button onClick={() => setIsEditing(false)} variant="outline">Cancel</Button>
+            )}
+            <Button 
+            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+            disabled={isUpdating}
+            >
+            {isUpdating ? 'Saving...' : isEditing ? 'Save Changes' : 'Edit Profile'}
+            </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -139,18 +143,39 @@ const CollegeProfile = () => {
           <Card>
             <CardHeader><CardTitle>Institution Statistics</CardTitle><CardDescription>Key numbers about your institution</CardDescription></CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg"><div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center"><Users className="w-6 h-6 text-primary" /></div><div><p className="text-2xl font-bold text-foreground">{formData.studentCount}</p><p className="text-sm text-muted-foreground">Students Enrolled</p></div></div>
-                <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg"><div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center"><Award className="w-6 h-6 text-secondary" /></div><div><p className="text-2xl font-bold text-foreground">{formData.facultyCount}</p><p className="text-sm text-muted-foreground">Faculty Members</p></div></div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle>Departments & Facilities</CardTitle><CardDescription>Academic departments and campus facilities</CardDescription></CardHeader>
-            <CardContent className="space-y-4">
-              <div><Label>Academic Departments</Label><div className="flex flex-wrap gap-2 mt-2">{formData.departments.map((dept, index) => (<Badge key={index} variant="secondary">{dept}</Badge>))}</div></div>
-              <div><Label>Campus Facilities</Label><div className="flex flex-wrap gap-2 mt-2">{formData.facilities.map((facility, index) => (<Badge key={index} variant="outline">{facility}</Badge>))}</div></div>
+                {isEditing ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <Label htmlFor="studentCount">Students Enrolled</Label>
+                            <Input id="studentCount" type="number" value={formData.studentCount} onChange={handleInputChange} />
+                        </div>
+                        <div>
+                            <Label htmlFor="facultyCount">Faculty Members</Label>
+                            <Input id="facultyCount" type="number" value={formData.facultyCount} onChange={handleInputChange} />
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
+                            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                                <Users className="w-6 h-6 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-foreground">{formData.studentCount || '0'}</p>
+                                <p className="text-sm text-muted-foreground">Employee Enrolled</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
+                            <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+                                <Award className="w-6 h-6 text-secondary" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-foreground">{formData.facultyCount || '0'}</p>
+                                <p className="text-sm text-muted-foreground">Faculty Members</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </CardContent>
           </Card>
         </div>
