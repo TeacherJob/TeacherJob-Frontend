@@ -3,15 +3,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
-import logo from "@/assets/logo.png"; // Assuming your logo path is correct
 
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        {/* Top section with links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Column 1: For Candidates */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
               For Candidates
@@ -44,7 +41,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Column 2: For Employers */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
               For Employers
@@ -77,7 +73,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Column 3: Company */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
               Company
@@ -94,6 +89,11 @@ const Footer = () => {
               <li>
                 <Link to="/help" className="hover:text-white transition-colors">
                   Help
+                </Link>
+              </li>
+               <li>
+                <Link to="/contact" className="hover:text-white transition-colors">
+                  Contact Us
                 </Link>
               </li>
               <li>
@@ -115,25 +115,39 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Column 4: Social Links */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
               Follow Us
             </h3>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-white transition-colors">
+              <a 
+                href="https://www.facebook.com/profile.php?id=61578169764266" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-white transition-colors"
+              >
                 <span className="sr-only">Facebook</span>
                 <Facebook size={20} />
               </a>
-              <a href="#" className="hover:text-white transition-colors">
+{/*               <a href="#" className="hover:text-white transition-colors">
                 <span className="sr-only">Twitter</span>
                 <Twitter size={20} />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
+              </a> */}
+              <a 
+                href="https://www.linkedin.com/company/teacherjob-in/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-white transition-colors"
+              >
                 <span className="sr-only">LinkedIn</span>
                 <Linkedin size={20} />
               </a>
-              <a href="#" className="hover:text-white transition-colors">
+              <a 
+                href="https://www.instagram.com/teacherjob.in" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-white transition-colors"
+              >
                 <span className="sr-only">Instagram</span>
                 <Instagram size={20} />
               </a>
@@ -141,7 +155,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom section with legal info */}
         <div className="mt-12 pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
           <p className="font-semibold text-gray-200">
             © 2025 TeacherJob.in — A Brand by MentisGate Learning Private
