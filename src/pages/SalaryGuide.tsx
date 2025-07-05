@@ -2,9 +2,13 @@ import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Briefcase, ArrowRight, Wallet, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// 1. Import the RTK Query hook from your admin API service
+import { useGetAllSalaryGuidesQuery } from "@/features/admin/adminApiService";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import img9 from "@/assets/img9.avif"; // Assuming this is used somewhere in the code
+import img9 from "@/assets/img9.avif";
 
 // --- TYPE DEFINITIONS ---
 interface Career {
@@ -17,6 +21,7 @@ type ButtonProps = React.ComponentProps<"button">;
 type InputProps = React.ComponentProps<"input">;
 
 // --- IN-FILE PLACEHOLDER COMPONENTS ---
+// These are kept as-is, as they are not the focus of the integration.
 const Button: React.FC<ButtonProps> = ({ children, className, ...props }) => (
   <button
     className={`inline-flex items-center justify-center rounded-full font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${className}`}
@@ -33,29 +38,34 @@ const Input: React.FC<InputProps> = ({ className, ...props }) => (
   />
 );
 
-// --- MAIN PAGE COMPONENT ---
-const categoryThemes: {
-  [key: string]: { color: string; iconBg: string; border: string };
-} = {
+// --- THEME & COMPONENT DEFINITIONS ---
+
+// 2. FIX: Modified the theme object to include full Tailwind class names.
+// This is necessary for Tailwind's JIT compiler to work correctly.
+const categoryThemes = {
   Technology: {
-    color: "primary",
+    textColor: "text-primary",
+    bgColor: "bg-primary",
     iconBg: "bg-primary/10",
-    border: "border-primary",
+    hoverBorderColor: "hover:border-primary",
   },
   Teacher: {
-    color: "success",
+    textColor: "text-success",
+    bgColor: "bg-success",
     iconBg: "bg-success/10",
-    border: "border-success",
+    hoverBorderColor: "hover:border-success",
   },
   Academics: {
-    color: "primary-text",
+    textColor: "text-primary-text",
+    bgColor: "bg-primary-text",
     iconBg: "bg-primary-text/10",
-    border: "border-primary-text",
+    hoverBorderColor: "hover:border-primary-text",
   },
   Default: {
-    color: "primary-text",
-    iconBg: "bg-primary-text/10",
-    border: "border-primary-text",
+    textColor: "text-secondary-text",
+    bgColor: "bg-secondary-text",
+    iconBg: "bg-gray-500/10",
+    hoverBorderColor: "hover:border-gray-400",
   },
 };
 
@@ -87,7 +97,11 @@ const SkeletonCard: React.FC = () => (
 );
 
 const SalaryCard: React.FC<{ career: Career }> = ({ career }) => {
-  const theme = categoryThemes[career.category] || categoryThemes.Default;
+  // Use a type-safe key access for the themes
+  const theme =
+    categoryThemes[career.category as keyof typeof categoryThemes] ||
+    categoryThemes.Default;
+
   return (
     <motion.div
       layout
@@ -101,12 +115,13 @@ const SalaryCard: React.FC<{ career: Career }> = ({ career }) => {
         className="group block h-full"
       >
         <div
-          className={`bg-background rounded-2xl border border-gray-200 hover:shadow-lift hover:-translate-y-1.5 transition-all duration-300 h-full flex flex-col overflow-hidden shadow-card hover:border-${theme.color}`}
+          // 3. FIX: Applied the full class name for the hover effect
+          className={`bg-background rounded-2xl border border-gray-200 hover:shadow-lift hover:-translate-y-1.5 transition-all duration-300 h-full flex flex-col overflow-hidden shadow-card ${theme.hoverBorderColor}`}
         >
           <div className="p-6">
             <div className="flex items-start gap-4">
               <div className={`p-3 rounded-lg ${theme.iconBg}`}>
-                <Briefcase className={`w-6 h-6 text-${theme.color}`} />
+                <Briefcase className={`w-6 h-6 ${theme.textColor}`} />
               </div>
               <div>
                 <h3 className="font-bold text-lg text-primary-text group-hover:text-primary">
@@ -124,11 +139,11 @@ const SalaryCard: React.FC<{ career: Career }> = ({ career }) => {
                   ₹{career.averageSalary.toLocaleString("en-IN")}
                 </p>
               </div>
-              <SalaryGraph colorClass={`bg-${theme.color}`} />
+              <SalaryGraph colorClass={theme.bgColor} />
             </div>
           </div>
           <div
-            className={`mt-auto border-t border-gray-200 p-4 bg-subtle-bg text-sm font-semibold text-center text-${theme.color} opacity-0 group-hover:opacity-100 transition-opacity`}
+            className={`mt-auto border-t border-gray-200 p-4 bg-subtle-bg text-sm font-semibold text-center ${theme.textColor} opacity-0 group-hover:opacity-100 transition-opacity`}
           >
             View Details <ArrowRight className="inline w-4 h-4" />
           </div>
@@ -138,66 +153,54 @@ const SalaryCard: React.FC<{ career: Career }> = ({ career }) => {
   );
 };
 
+// --- MAIN PAGE COMPONENT ---
 const SalaryGuide: React.FC = () => {
-  const mockCareers: Career[] = [
-    {
-      _id: "1",
-      jobTitle: "Mathematics Teacher",
-      category: "Teacher",
-      averageSalary: 799998,
-    },
-    {
-      _id: "2",
-      jobTitle: "Software Developer",
-      category: "Technology",
-      averageSalary: 450000,
-    },
-    {
-      _id: "3",
-      jobTitle: "Hindi Teacher",
-      category: "Teacher",
-      averageSalary: 300000,
-    },
-    {
-      _id: "4",
-      jobTitle: "Science Teacher",
-      category: "Teacher",
-      averageSalary: 40000,
-    },
-    {
-      _id: "5",
-      jobTitle: "GK Teacher",
-      category: "Teacher",
-      averageSalary: 40000,
-    },
-    {
-      _id: "6",
-      jobTitle: "Academic Coordinator",
-      category: "Academics",
-      averageSalary: 550000,
-    },
-  ];
+  // 4. Fetch data using the RTK Query hook. This replaces the old mock data.
   const {
-    data: careers = mockCareers,
+    data: apiResponse,
     isLoading,
     isError,
-  } = { data: mockCareers, isLoading: false, isError: false };
+  } = useGetAllSalaryGuidesQuery();
+
+  // 5. Safely extract the careers array from the API response. This logic is correct.
+  const careers = useMemo(
+    () => (apiResponse?.data as Career[]) || [],
+    [apiResponse]
+  );
 
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const categories = useMemo(
     () => ["All", ...new Set(careers?.map((c) => c.category) || [])],
     [careers]
   );
+
+  // 6. The client-side filtering logic now works on the data fetched from the API.
   const filteredCareers = useMemo(() => {
-    if (activeCategory === "All") return careers;
-    return careers?.filter((c) => c.category === activeCategory);
-  }, [careers, activeCategory]);
+    let results = careers;
+
+    if (activeCategory !== "All") {
+      results = results.filter((c) => c.category === activeCategory);
+    }
+
+    if (searchTerm) {
+      const lowercasedTerm = searchTerm.toLowerCase();
+      results = results.filter(
+        (c) =>
+          c.jobTitle.toLowerCase().includes(lowercasedTerm) ||
+          c.category.toLowerCase().includes(lowercasedTerm)
+      );
+    }
+
+    return results;
+  }, [careers, activeCategory, searchTerm]);
 
   return (
     <div className="bg-background text-primary-text min-h-screen flex flex-col font-sans">
       <Header />
       <main className="flex-grow">
+        {/* Hero Section with Search Form (unchanged) */}
         <div className="relative text-white overflow-hidden">
           <img
             src={img9}
@@ -221,12 +224,17 @@ const SalaryGuide: React.FC = () => {
               Compare salaries for thousands of jobs and take the next step in
               your career.
             </p>
-            <form className="mt-10 max-w-xl mx-auto">
+            <form
+              className="mt-10 max-w-xl mx-auto"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <div className="relative">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/50 w-5 h-5" />
                 <Input
                   placeholder="Search job title or category..."
                   className="h-14 pl-14 pr-32 text-md bg-white/10 text-white placeholder:text-white/60 rounded-full border-2 border-white/20 focus:ring-2 focus:ring-white/50"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <Button
                   type="submit"
@@ -238,6 +246,8 @@ const SalaryGuide: React.FC = () => {
             </form>
           </motion.div>
         </div>
+
+        {/* Content Section with dynamic data */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-primary-text tracking-tight">
@@ -247,6 +257,7 @@ const SalaryGuide: React.FC = () => {
               Browse average salaries by job role in your industry.
             </p>
           </div>
+
           <div className="flex justify-center flex-wrap gap-3 mb-12">
             {categories.map((category) => (
               <Button
@@ -258,11 +269,8 @@ const SalaryGuide: React.FC = () => {
               </Button>
             ))}
           </div>
-          {isError && (
-            <div className="text-center p-8 bg-error/10 rounded-lg text-error">
-              Failed to load salary data.
-            </div>
-          )}
+
+          {/* This section now correctly reflects the API call's state */}
           <AnimatePresence>
             <motion.div
               layout
@@ -272,7 +280,20 @@ const SalaryGuide: React.FC = () => {
                 Array.from({ length: 6 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
-              {filteredCareers &&
+
+              {isError && (
+                <div className="col-span-full text-center p-8 bg-error/10 rounded-lg text-error">
+                  Failed to load salary data. Please try again later.
+                </div>
+              )}
+
+              {!isLoading && !isError && filteredCareers.length === 0 && (
+                <div className="col-span-full text-center p-8 bg-subtle-bg rounded-lg text-secondary-text">
+                  No salary guides found matching your criteria.
+                </div>
+              )}
+
+              {!isLoading &&
                 filteredCareers.map((career) => (
                   <SalaryCard key={career._id} career={career} />
                 ))}
