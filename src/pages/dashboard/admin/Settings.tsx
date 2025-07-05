@@ -31,9 +31,9 @@ const AdminSettings = () => {
             <TabsContent value="account" className="mt-4">
                 <AdminAccountSettings />
             </TabsContent>
-            <TabsContent value="security" className="mt-4">
+{/*             <TabsContent value="security" className="mt-4">
                 <AdminSecuritySettings />
-            </TabsContent>
+            </TabsContent> */}
             <TabsContent value="platform" className="mt-4">
                 <AdminPlatformSettings />
             </TabsContent>
