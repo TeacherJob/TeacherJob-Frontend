@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -11,6 +11,10 @@ import {
   Sun,
 } from "lucide-react";
 import { motion } from "framer-motion";
+
+// Import the hook for fetching a single salary guide by ID
+import { useGetSalaryGuideByIdQuery } from "@/features/admin/adminApiService";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -25,9 +29,10 @@ interface CareerDetails {
   commonSkills: string[];
   relatedProfiles: { _id: string; jobTitle: string }[];
 }
-type ButtonProps = React.ComponentProps<"button"> & { asChild?: boolean };
+// FIX: Removed the `asChild` prop as it was not implemented and led to invalid HTML.
+type ButtonProps = React.ComponentProps<"button">;
 
-// --- IN-FILE PLACEHOLDER COMPONENTS ---
+// --- REUSABLE UI COMPONENTS ---
 const Button: React.FC<ButtonProps> = ({ children, className, ...props }) => (
   <button
     className={`inline-flex items-center justify-center rounded-full font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${className}`}
@@ -36,7 +41,6 @@ const Button: React.FC<ButtonProps> = ({ children, className, ...props }) => (
     {children}
   </button>
 );
-
 const Card: React.FC<{ className?: string; children: React.ReactNode }> = ({
   className,
   children,
@@ -53,8 +57,6 @@ const CardContent: React.FC<{
   className?: string;
   children: React.ReactNode;
 }> = ({ className, children }) => <div className={className}>{children}</div>;
-
-// --- REUSABLE UI COMPONENTS (Redesigned) ---
 const IconWrapper: React.FC<{
   children: React.ReactNode;
   className: string;
@@ -65,7 +67,6 @@ const IconWrapper: React.FC<{
     {children}
   </div>
 );
-
 const InfoCard: React.FC<{
   icon: React.ReactNode;
   title: string;
@@ -79,7 +80,6 @@ const InfoCard: React.FC<{
     <CardContent className="p-6 pt-0">{children}</CardContent>
   </Card>
 );
-
 const SalaryBar: React.FC<{ low: number; high: number; avg: number }> = ({
   low,
   high,
@@ -114,54 +114,48 @@ const SalaryBar: React.FC<{ low: number; high: number; avg: number }> = ({
 const SalaryDetailsPage = () => {
   const { careerPath: id } = useParams<{ careerPath: string }>();
 
-  // Using Mock Data as the query hook is not available. Replace with your actual hook.
-  const mockJobData: CareerDetails = {
-    _id: "1",
-    category: "Technology",
-    jobTitle: "Software Developer",
-    averageSalary: 1200000,
-    salaryRange: { min: 800000, max: 2000000 },
-    jobDescription:
-      "A Software Developer is responsible for designing, developing, and maintaining software systems. This includes writing clean, scalable code, debugging issues, and collaborating with cross-functional teams to produce high-quality software solutions.",
-    commonSkills: [
-      "JavaScript",
-      "React",
-      "Node.js",
-      "TypeScript",
-      "SQL",
-      "Git",
-    ],
-    relatedProfiles: [
-      { _id: "2", jobTitle: "Frontend Developer" },
-      { _id: "3", jobTitle: "Backend Developer" },
-    ],
-  };
   const {
-    data: jobData = mockJobData,
+    data: apiResponse,
     isLoading,
     isError,
-  } = { data: mockJobData, isLoading: false, isError: false }; // Replace with your actual RTK Query hook: useGetSalaryGuideByIdQuery(id!, { skip: !id });
+  } = useGetSalaryGuideByIdQuery(id!, { skip: !id });
 
-  if (isLoading || isError) {
-    const message = isLoading ? "Loading Job Details..." : "Details Not Found";
+  const jobData = useMemo(
+    () => (apiResponse?.data as CareerDetails) || null,
+    [apiResponse]
+  );
+
+  if (isLoading) {
+    return (
+      <div className="bg-background min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow flex items-center justify-center text-center px-4">
+          <p className="text-xl text-secondary-text animate-pulse">
+            Loading Job Details...
+          </p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (isError || !jobData) {
     return (
       <div className="bg-background min-h-screen flex flex-col">
         <Header />
         <div className="flex-grow flex items-center justify-center text-center px-4">
           <div>
-            <p
-              className={`text-xl text-secondary-text ${isLoading && "animate-pulse"}`}
-            >
-              {message}
+            <p className="text-xl text-secondary-text">
+              Sorry, the details for this job could not be found.
             </p>
-            {isError && (
-              <Button asChild className="mt-6 bg-primary text-white">
-                <Link to="/salary-guide">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Salary Guide
-                </Link>
-              </Button>
-            )}
+            {/* FIX: Removed the invalid Button wrapper and applied styles directly to the Link component. */}
+            <Link
+              to="/salary-guide"
+              className="inline-flex items-center justify-center rounded-full font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mt-6 bg-primary text-white hover:bg-primary/90 px-4 py-2"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Salary Guide
+            </Link>
           </div>
         </div>
         <Footer />
@@ -169,10 +163,12 @@ const SalaryDetailsPage = () => {
     );
   }
 
+  // --- Render the page with the fetched data ---
   return (
     <div className="bg-subtle-bg text-primary-text min-h-screen font-sans">
       <Header />
       <main>
+        {/* Hero Section */}
         <div className="relative text-white overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2232&auto=format&fit=crop"
@@ -216,6 +212,7 @@ const SalaryDetailsPage = () => {
           </motion.div>
         </div>
 
+        {/* Main Content Grid */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
@@ -303,7 +300,7 @@ const SalaryDetailsPage = () => {
                   Ready to take the next step? Find open positions for{" "}
                   {jobData.jobTitle} roles.
                 </p>
-                <Button className="w-full bg-white hover:bg-subtle-bg text-primary font-bold">
+                <Button className="w-full bg-white hover:bg-subtle-bg text-primary font-bold py-2.5">
                   Search {jobData.jobTitle} Jobs
                 </Button>
               </div>
