@@ -136,8 +136,8 @@ const AcceptanceModal = ({ application, onClose, onSuccess }: { application: App
         const formData = new FormData();
         formData.append('termsAndConditionsAccepted', 'true');
         for (const key in files) {
-            if (files[key]) {
-                formData.append(key, files[key]);
+            if (files[key as keyof typeof files]) {
+                formData.append(key, files[key as keyof typeof files] as Blob);
             }
         }
 
@@ -171,7 +171,7 @@ const AcceptanceModal = ({ application, onClose, onSuccess }: { application: App
                             <h4 className="font-semibold text-sm text-muted-foreground">Optional Documents</h4>
                             <div><Label htmlFor="aadhar">Aadhar Card</Label><Input id="aadhar" name="aadhar" type="file" onChange={handleFileChange} /></div>
                             <div><Label htmlFor="pan">PAN Card</Label><Input id="pan" name="pan" type="file" onChange={handleFileChange} /></div>
-                            <div><Label htmlFor="result">Latest Marksheet/Result</Label><Input id="result" name="result" type="file" onChange={handleFileChange} /></div>
+                            <div><Label htmlFor="result">Marksheet/Result</Label><Input id="result" name="result" type="file" onChange={handleFileChange} /></div>
                             <div><Label htmlFor="experience">Experience/Salary Slip</Label><Input id="experience" name="experience" type="file" onChange={handleFileChange} /></div>
                         </div>
                     </div>
@@ -247,14 +247,14 @@ const EmployerApplications = () => {
                                         {app.interviewDetails.notes && <p><strong>Notes from College:</strong> {app.interviewDetails.notes}</p>}
                                     </div>
                                 )}
-                                {app.offerLetter?.forwardedByAdmin && (
+                                {app.status === 'hired' && (
                                     <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm space-y-1">
                                         <p className="font-semibold text-green-800 flex items-center gap-2"><FileText size={16} />Offer Details</p>
                                         <p><strong>Salary:</strong> {app.offerDetails?.salary}</p>
                                         <p><strong>Joining Date:</strong> {new Date(app.offerDetails?.joiningDate!).toLocaleDateString()}</p>
                                         {app.offerDetails?.offerText && <p><strong>Message:</strong> {app.offerDetails.offerText}</p>}
                                         <div className="flex flex-wrap gap-4 mt-2">
-                                            {app.offerLetter.url && <a href={app.offerLetter.url} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center gap-1 font-medium"><LinkIcon size={14} />View Official Offer Letter</a>}
+                                            {app.offerLetter?.url && <a href={app.offerLetter.url} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center gap-1 font-medium"><LinkIcon size={14} />View Official Offer Letter</a>}
                                             {app.agreementLetter?.url && <a href={app.agreementLetter.url} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center gap-1 font-medium"><LinkIcon size={14} />View Agreement</a>}
                                         </div>
                                     </div>
@@ -262,7 +262,7 @@ const EmployerApplications = () => {
                                  {app.acceptanceDocuments && app.acceptanceDocuments.length > 0 && (
                                     <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm space-y-1">
                                         <p className="font-semibold text-yellow-800 flex items-center gap-2"><Upload size={16} />Submitted Documents</p>
-                                        <ul className="list-disc list-inside pl-4">{app.acceptanceDocuments.map(doc => <li key={doc._id}><a href={doc.url} target="_blank" rel="noreferrer" className="hover:underline">{doc.name} ({doc.documentType.replace('_', ' ')})</a></li>)}</ul>
+                                        <ul className="list-disc list-inside pl-4">{app.acceptanceDocuments.map(doc => <li key={doc._id}><a href={doc.url} target="_blank" rel="noreferrer" className="hover:underline">{doc.name} ({doc.documentType.replace(/_/g, ' ')})</a></li>)}</ul>
                                     </div>
                                 )}
                                 <div className="pt-2 overflow-x-auto"><ApplicationProgress app={app} /></div>
