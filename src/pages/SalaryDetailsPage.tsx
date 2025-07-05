@@ -171,7 +171,7 @@ const SalaryDetailsPage = () => {
 
   // --- Render the page with the fetched data ---
   return (
-    <div className="bg-subtle-bg text-primary-text min-h-screen font-sans">
+    <div className="bg-subtle-bg text-primary-text min-h-screen font-sans overflow-x-hidden">
       <Header />
       <main>
         {/* Hero Section */}
