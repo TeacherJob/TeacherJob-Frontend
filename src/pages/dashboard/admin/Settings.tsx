@@ -25,7 +25,7 @@ const AdminSettings = () => {
         <Tabs defaultValue="account" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="account"><User className="w-4 h-4 mr-2"/>Account</TabsTrigger>
-                <TabsTrigger value="security"><Shield className="w-4 h-4 mr-2"/>Security</TabsTrigger>
+{/*                 <TabsTrigger value="security"><Shield className="w-4 h-4 mr-2"/>Security</TabsTrigger> */}
                 <TabsTrigger value="platform"><Server className="w-4 h-4 mr-2"/>Platform</TabsTrigger>
             </TabsList>
             <TabsContent value="account" className="mt-4">
