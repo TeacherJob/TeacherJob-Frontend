@@ -49,6 +49,7 @@ import SalaryDetailsPage from "./pages/SalaryDetailsPage";
 import SalaryGuide from "./pages/SalaryGuide";
 import SettingsPage from "./pages/SettingsPage/SettingsPage";
 import ArticleDetailsPage from "./pages/ArticlesDetailsPage";
+import ContactPage from "./components/Contact";
 
 import CollegeDashboard from "./pages/dashboard/CollegeDashboard";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
@@ -167,6 +168,7 @@ const AppContent = () => {
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/security" element={<SecurityPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
 
         <Route
           path="/career/:careerPath/salaries"
