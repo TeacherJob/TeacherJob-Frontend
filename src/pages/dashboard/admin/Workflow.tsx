@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 import { useGetApplicationsForAdminQuery, useForwardInterviewMutation, useForwardOfferMutation, useUpdateApplicationByAdminMutation, useGetPendingApplicationsQuery, useGetPendingDocumentApplicationsQuery, useVerifyDocumentsMutation, useGetInterviewApplicationsQuery } from '@/features/admin/adminApiService';
 
 const AgreementUploadModal = ({ onSubmit, onClose, isLoading }) => {
-    const [agreementFile, setAgreementFile] = useState<File | null>(null);
+    const [agreementFile, setAgreementFile] = useState(null);
 
     const handleSubmit = () => {
         if (!agreementFile) {
@@ -118,7 +118,7 @@ const AllInterviewsList = () => {
                       {app?.user?.employerProfile?.name || "Unknown User"}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      For: {app.job.title} at {app.job.schoolName}
+                      For: {app?.job?.title || "N/A"} at {app?.job?.schoolName || "N/A"}
                     </p>
                     <p className="text-sm mt-2">
                       <strong>Date:</strong>{" "}
@@ -160,7 +160,7 @@ const DocumentApprovalQueue = () => {
     const { data: pendingDocs = [], isLoading, isError, refetch } = useGetPendingDocumentApplicationsQuery();
     const [verifyDocuments, { isLoading: isVerifying }] = useVerifyDocumentsMutation();
 
-    const handleVerification = async (appId: string, isApproved: boolean) => {
+    const handleVerification = async (appId, isApproved) => {
         const status = isApproved ? 'documents_approved' : 'documents_rejected';
         try {
             await verifyDocuments({ appId, status }).unwrap();
@@ -203,7 +203,7 @@ const DocumentApprovalQueue = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Briefcase size={14} />
-                  <span>For: {app.job.title}</span>
+                  <span>For: {app?.job?.title || "N/A"}</span>
                 </div>
                 <div className="mt-2 space-y-1">
                   {app.acceptanceDocuments.map((doc) => (
@@ -269,7 +269,7 @@ const NewApplicationApprovalQueue = () => {
     const [updateApplication, { isLoading: isUpdating }] = useUpdateApplicationByAdminMutation();
     const [detailsModalApp, setDetailsModalApp] = useState(null);
 
-    const handleApproval = async (appId: string, isApproved: boolean) => {
+    const handleApproval = async (appId, isApproved) => {
         const status = isApproved ? 'applied' : 'rejected';
         try {
             await updateApplication({ appId, body: { status, category: isApproved ? 'applied' : 'archived' } }).unwrap();
@@ -312,11 +312,11 @@ const NewApplicationApprovalQueue = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Briefcase size={14} />
-                  <span>Applied for: {app.job.title}</span>
+                  <span>Applied for: {app?.job?.title || "N/A"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Building size={14} />
-                  <span>At: {app.job.schoolName}</span>
+                  <span>At: {app?.job?.schoolName || "N/A"}</span>
                 </div>
               </div>
               <div className="flex gap-2 w-full sm:w-auto flex-wrap">
@@ -387,7 +387,7 @@ const InterviewOfferApprovalQueue = () => {
       );
     }, [applications]);
 
-    const handleApprove = async (app, agreementFile: File | null = null) => {
+    const handleApprove = async (app, agreementFile = null) => {
         const isInterview = app.status === 'interview_scheduled';
         try {
             if (isInterview) { 
@@ -585,25 +585,25 @@ const ApplicationDetailsModal = ({ application }) => (
           </CardHeader>
           <CardContent className="space-y-3">
             <p>
-              <strong>Title:</strong> {application.job.title}
+              <strong>Title:</strong> {application?.job?.title || "N/A"}
             </p>
             <p>
-              <strong>School:</strong> {application.job.schoolName}
+              <strong>School:</strong> {application?.job?.schoolName || "N/A"}
             </p>
             <p>
-              <strong>Location:</strong> {application.job.location}
+              <strong>Location:</strong> {application?.job?.location || "N/A"}
             </p>
             <p>
               <strong>Salary:</strong>{" "}
-              {application.job.salary || "Not Disclosed"}
+              {application?.job?.salary || "Not Disclosed"}
             </p>
             <p>
-              <strong>Type:</strong> {application.job.type || "N/A"}
+              <strong>Type:</strong> {application?.job?.type || "N/A"}
             </p>
             <div className="pt-2">
               <p className="font-semibold">Description:</p>
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {application.job.description}
+                {application?.job?.description || "No description provided."}
               </p>
             </div>
           </CardContent>
@@ -628,8 +628,8 @@ const ApplicationDetailsModal = ({ application }) => (
                     <CardTitle className="flex items-center gap-2"><FileText /> Offer Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                    <p><strong>Candidate:</strong> {application?.user?.employerProfile?.name}</p>
-                    <p><strong>Job:</strong> {application.job.title} at {application.job.schoolName}</p>
+                    <p><strong>Candidate:</strong> {application?.user?.employerProfile?.name || "N/A"}</p>
+                    <p><strong>Job:</strong> {application?.job?.title || "N/A"} at {application?.job?.schoolName || "N/A"}</p>
                     {application.offerLetter?.url && <a href={application.offerLetter.url} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center gap-1 mt-1 font-semibold"><LinkIcon size={14}/>View Official Offer Letter PDF</a>}
                 </CardContent>
             </Card>
