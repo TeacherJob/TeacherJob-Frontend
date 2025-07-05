@@ -12,9 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-// Import the hook for fetching a single salary guide by ID
 import { useGetSalaryGuideByIdQuery } from "@/features/admin/adminApiService";
-
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -29,7 +27,6 @@ interface CareerDetails {
   commonSkills: string[];
   relatedProfiles: { _id: string; jobTitle: string }[];
 }
-// FIX: Removed the `asChild` prop as it was not implemented and led to invalid HTML.
 type ButtonProps = React.ComponentProps<"button">;
 
 // --- REUSABLE UI COMPONENTS ---
@@ -80,6 +77,8 @@ const InfoCard: React.FC<{
     <CardContent className="p-6 pt-0">{children}</CardContent>
   </Card>
 );
+
+// --- FIX: THIS COMPONENT IS COMPLETELY REDESIGNED TO MATCH THE SCREENSHOT ---
 const SalaryBar: React.FC<{ low: number; high: number; avg: number }> = ({
   low,
   high,
@@ -87,23 +86,31 @@ const SalaryBar: React.FC<{ low: number; high: number; avg: number }> = ({
 }) => {
   const percentage = high > low ? ((avg - low) / (high - low)) * 100 : 50;
   const formatCurrency = (value: number) => `₹${(value / 100000).toFixed(1)}L`;
+
   return (
-    <div className="w-full">
-      <div className="relative h-2.5 bg-gray-200 rounded-full">
+    // Add margin-top to create space for the average label above the bar
+    <div className="w-full mt-6">
+      <div className="relative mb-4 h-8">
+        {/* Average Label - Positioned absolutely based on percentage */}
         <div
-          className="absolute h-full rounded-full bg-primary"
-          style={{ width: `${percentage}%` }}
-        />
-        <div
-          className="absolute top-1/2 -translate-y-1/2 h-5 w-5 bg-white rounded-full border-4 border-primary ring-2 ring-white"
-          style={{ left: `calc(${percentage}% - 10px)` }}
-        />
+          className="absolute bottom-full mb-1"
+          style={{
+            left: `${percentage}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          <span className="text-lg font-bold text-primary-text border-b-2 border-primary pb-1">
+            {formatCurrency(avg)}
+          </span>
+        </div>
       </div>
-      <div className="flex justify-between mt-3 text-sm font-medium text-secondary-text">
+
+      {/* The visible bar */}
+      <div className="relative h-2 bg-primary rounded-full"></div>
+
+      {/* Low and High Labels - Positioned below the bar */}
+      <div className="flex justify-between mt-2 text-sm font-medium text-secondary-text">
         <span>{formatCurrency(low)}</span>
-        <span className="font-bold text-primary-text">
-          {formatCurrency(avg)}
-        </span>
         <span>{formatCurrency(high)}</span>
       </div>
     </div>
@@ -148,7 +155,6 @@ const SalaryDetailsPage = () => {
             <p className="text-xl text-secondary-text">
               Sorry, the details for this job could not be found.
             </p>
-            {/* FIX: Removed the invalid Button wrapper and applied styles directly to the Link component. */}
             <Link
               to="/salary-guide"
               className="inline-flex items-center justify-center rounded-full font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mt-6 bg-primary text-white hover:bg-primary/90 px-4 py-2"
@@ -215,6 +221,7 @@ const SalaryDetailsPage = () => {
         {/* Main Content Grid */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column */}
             <div className="lg:col-span-2 space-y-8">
               <InfoCard
                 icon={
@@ -224,7 +231,7 @@ const SalaryDetailsPage = () => {
                 }
                 title="Salary Range"
               >
-                <p className="text-secondary-text mb-6 text-sm">
+                <p className="text-secondary-text text-sm">
                   Salaries for a {jobData.jobTitle} can range from ~₹
                   {jobData.salaryRange.min.toLocaleString("en-IN")} to ~₹
                   {jobData.salaryRange.max.toLocaleString("en-IN")} per year.
@@ -288,6 +295,7 @@ const SalaryDetailsPage = () => {
                 </p>
               </InfoCard>
             </div>
+            {/* Right Column */}
             <div className="lg:col-span-1 space-y-8">
               <div className="relative bg-gradient-to-br from-primary to-[#ff8c5a] p-6 rounded-2xl shadow-lift text-white">
                 <div className="flex items-center gap-3 mb-3">
