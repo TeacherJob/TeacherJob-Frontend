@@ -169,10 +169,10 @@ const CollegeProfile = () => {
                             <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
                                 <Award className="w-6 h-6 text-secondary" />
                             </div>
-                            <div>
+{/*                             <div>
                                 <p className="text-2xl font-bold text-foreground">{formData.facultyCount || '0'}</p>
                                 <p className="text-sm text-muted-foreground">Faculty Members</p>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 )}
