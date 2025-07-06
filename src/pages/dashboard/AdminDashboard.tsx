@@ -56,7 +56,7 @@ const AdminDashboard = () => {
   const [logoutUser] = useLogoutMutation();
 
   const menuItems = [
-    { path: "/dashboard/admin/dashboard", label: "Dashboard", icon: Home },
+    // { path: "/dashboard/admin/dashboard", label: "Dashboard", icon: Home },
     { path: "/dashboard/admin/profile", label: "My Profile", icon: Shield },
     { path: "/dashboard/admin/jobs", label: "Manage Jobs", icon: Briefcase },
     { path: "/dashboard/admin/users", label: "User Management", icon: Users },
