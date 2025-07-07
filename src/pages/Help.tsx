@@ -284,7 +284,7 @@ const Help = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search for a question..."
-                  className="block w-full h-12 pl-10 pr-3 py-2 border border-transparent rounded-md leading-5 bg-white bg-opacity-90 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white sm:text-sm"
+                  className="block w-full text-black h-12 pl-10 pr-3 py-2 border border-transparent rounded-md leading-5 bg-white bg-opacity-90 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white sm:text-sm"
                 />
               </div>
             </div>
