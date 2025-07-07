@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
-              For Candidates
+              For Employee
             </h3>
             <ul className="space-y-2">
               <li>
@@ -24,10 +24,18 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/profile"
+                  to="/signup"
                   className="hover:text-white transition-colors"
                 >
                   Create Profile
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/salary-guide"
+                  className="hover:text-white transition-colors"
+                >
+                  Earning insights
                 </Link>
               </li>
               <li>
@@ -38,36 +46,44 @@ const Footer = () => {
                   Career Essentials
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
-              For Employee
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/salary-guide"
-                  className="hover:text-white transition-colors"
-                >
-                  Salary Guide
-                </Link>
-              </li>
               <li>
                 <Link
                   to="/browse-jobs"
                   className="hover:text-white transition-colors"
                 >
-                  Browse Jobs
+                  Browse jobs
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
+              For Employers
+            </h3>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  to="/post-job"
+                  className="hover:text-white transition-colors"
+                >
+                  Post a Job
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/career-guide"
+                  to="/products"
                   className="hover:text-white transition-colors"
                 >
-                  Career Guide
+                  Products
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/resources"
+                  className="hover:text-white transition-colors"
+                >
+                  Resources
                 </Link>
               </li>
             </ul>
@@ -129,7 +145,7 @@ const Footer = () => {
                 <span className="sr-only">Facebook</span>
                 <Facebook size={20} />
               </a>
-{/*               <a href="#" className="hover:text-white transition-colors">
+              {/* <a href="#" className="hover:text-white transition-colors">
                 <span className="sr-only">Twitter</span>
                 <Twitter size={20} />
               </a> */}
