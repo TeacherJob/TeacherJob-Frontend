@@ -50,9 +50,11 @@ export interface EmployerProfile {
   phone: string;
   email: string; 
   profilePicture?: Media;
-  demoVideo?: Media;
+  demoVideoUrl?: string;
   documents: Document[];
   isVisible: boolean;
+  currentSalary?: string;
+  expectedSalary?: string;
   workExperience: WorkExperience[];
   education: Education[];
   skills: Skill[];
