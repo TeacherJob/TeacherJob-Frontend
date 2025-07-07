@@ -17,7 +17,7 @@ import {
   ChevronDown,
   Shield,
   Newspaper,
-  DollarSign,
+  Coins,
   Settings,
   LogOut,
   WalletCards,
@@ -74,7 +74,7 @@ const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           { path: '/dashboard/admin/users', label: 'User Management', icon: Users },
           { path: '/dashboard/admin/workflow', label: 'Workflows', icon: BarChart3 },
           { path: "/dashboard/admin/articles", label: "Manage Articles", icon: Newspaper },
-          { path: "/dashboard/admin/salary-guides", label: "Salary Guides", icon: DollarSign },
+          { path: "/dashboard/admin/salary-guides", label: "Salary Guides", icon: Coins },
           { path: '/dashboard/admin/control', label: 'Control Panel', icon: Monitor },
           { path: "/dashboard/admin/resources", label: "Manage Resources", icon: BookOpenCheck },
           { path: "/dashboard/admin/press-articles", label:"News Articles", icon: Newspaper },
@@ -94,7 +94,7 @@ const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
     const loadingToast = toast.loading("Signing out...");
     try {
       // Step 1: Server ko logout ke liye request bhejein
-      await logoutUser({}).unwrap();
+      await logoutUser().unwrap();
       
       // Step 2: Client-side par auth slice ko saaf karein
       dispatch(logOut());
