@@ -7,7 +7,7 @@ import {
   FileText,
   UserCheck,
   ShieldCheck,
-  DollarSign,
+  Coins,
   RefreshCw,
   AlertTriangle,
   ClipboardCheck,
@@ -129,7 +129,7 @@ const TermsPage = () => {
                 </ContentSection>
 
                 <ContentSection
-                  icon={<DollarSign size={24} />}
+                  icon={<Coins size={24} />}
                   title="4. Placement Charges"
                 >
                   <p>
@@ -209,7 +209,7 @@ const TermsPage = () => {
                 </ContentSection>
 
                 <ContentSection
-                  icon={<DollarSign size={24} />}
+                  icon={<Coins size={24} />}
                   title="2. Service Fees and Payment"
                 >
                   <p>
