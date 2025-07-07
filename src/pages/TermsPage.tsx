@@ -320,7 +320,7 @@ const TermsPage = () => {
               </div>
 
               <div className="mt-16 pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
-                <p>Last updated: October 27, 2023</p>
+{/*                 <p>Last updated: October 27, 2023</p> */}
                 <p className="mt-2">
                   For any questions regarding these Terms and Conditions, please
                   contact our legal team at{" "}
