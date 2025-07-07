@@ -20,7 +20,7 @@ import {
   Users,
   BarChart3,
   Newspaper,
-  DollarSign,
+  Coins,
   Monitor,
   WalletCards,
   BookOpenCheck,
@@ -157,7 +157,7 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
           {
             path: "/dashboard/admin/salary-guides",
             label: "Salary Guides",
-            icon: DollarSign,
+            icon: Coins,
           },
           {
             path: "/dashboard/admin/control",
@@ -191,7 +191,7 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
     setIsMenuOpen(false);
     const loadingToast = toast.loading("Signing out...");
     try {
-      await logoutUser({}).unwrap();
+      await logoutUser().unwrap();
       dispatch(logOut());
       dispatch(apiService.util.resetApiState());
       toast.success("Signed out successfully.", { id: loadingToast });
