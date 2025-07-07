@@ -9,6 +9,7 @@ import { selectCurrentUser, logOut } from "@/features/auth/authSlice";
 import { useLogoutMutation } from "@/features/auth/authApiService";
 import { apiService } from "@/features/api/apiService";
 import toast from "react-hot-toast";
+import RupeeIcon from "@/components/RupeeIcon";
 
 import {
   Shield,
@@ -19,7 +20,7 @@ import {
   Home,
   Settings,
   Newspaper,
-  DollarSign,
+  RupeeIcon,
   Menu,
   X,
   BookOpenCheck,
@@ -63,7 +64,7 @@ const AdminDashboard = () => {
     { path: "/dashboard/admin/workflow", label: "Workflows", icon: BarChart3 },
     { path: "/dashboard/admin/articles", label: "Career Articles", icon: Newspaper },
     { path: "/dashboard/admin/press-articles", label: "News Articles", icon: Newspaper },
-    { path: "/dashboard/admin/salary-guides", label: "Salary Guides", icon: DollarSign },
+    { path: "/dashboard/admin/salary-guides", label: "Salary Guides", icon: RupeeIcon },
     { path: "/dashboard/admin/resources", label: "Manage Resources", icon: BookOpenCheck },
     { path: "/dashboard/admin/carousel", label: "Manage Carousel", icon: Clapperboard },
     { path: "/dashboard/admin/control", label: "Control Panel", icon: Monitor },
