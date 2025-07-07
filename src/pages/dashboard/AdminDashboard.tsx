@@ -20,7 +20,6 @@ import {
   Home,
   Settings,
   Newspaper,
-  RupeeIcon,
   Menu,
   X,
   BookOpenCheck,
