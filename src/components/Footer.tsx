@@ -91,7 +91,7 @@ const Footer = () => {
 
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
-              Company
+              Institution
             </h3>
             <ul className="space-y-2">
               <li>
