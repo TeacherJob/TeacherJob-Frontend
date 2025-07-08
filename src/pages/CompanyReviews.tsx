@@ -334,7 +334,7 @@ const CompanyReviews = () => {
                 Find Great Places to Work
               </h1>
               <p className="mt-4 text-lg text-white/80 max-w-2xl mx-auto">
-                Get insider access to company reviews from teachers like you.
+                Get insider access to institution reviews from teachers like you.
               </p>
               <form
                 onSubmit={(e) => e.preventDefault()}
