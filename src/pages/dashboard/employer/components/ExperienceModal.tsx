@@ -67,7 +67,7 @@ export const ExperienceModal = ({ isOpen, onClose, experience }: ExperienceModal
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2"><Label htmlFor="title">Title</Label><Input id="title" name="title" value={formData.title} onChange={handleChange} required /></div>
-          <div className="space-y-2"><Label htmlFor="company">Company</Label><Input id="company" name="company" value={formData.company} onChange={handleChange} required /></div>
+          <div className="space-y-2"><Label htmlFor="company">Institution</Label><Input id="company" name="company" value={formData.company} onChange={handleChange} required /></div>
           <div className="space-y-2"><Label htmlFor="location">Location</Label><Input id="location" name="location" value={formData.location} onChange={handleChange} /></div>
           <div className="space-y-2"><Label htmlFor="duration">Duration</Label><Input id="duration" name="duration" value={formData.duration} onChange={handleChange} placeholder="e.g., 2019 - Present" /></div>
           <DialogFooter>
