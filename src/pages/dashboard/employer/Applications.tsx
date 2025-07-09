@@ -14,6 +14,9 @@ import { Application } from '@/types/employer';
 
 type ApplicationCategory = 'applied' | 'interviews' | 'offers' | 'hired' | 'saved';
 
+const VERCEL_HOBBY_LIMIT_MB = 4.5;
+const MAX_FILE_SIZE_BYTES = VERCEL_HOBBY_LIMIT_MB * 1024 * 1024;
+
 const getApplicationStatus = (app: Application) => {
     if (app.status === 'pending_admin_approval') return { text: "Pending Admin Approval", color: "bg-gray-100 text-gray-800", icon: <Loader2 className="w-3 h-3 animate-spin" /> };
     if (app.status === 'pending_document_approval') return { text: "Documents Pending Verification", color: "bg-yellow-100 text-yellow-800", icon: <Loader2 className="w-3 h-3 animate-spin" /> };
@@ -28,7 +31,7 @@ const getApplicationStatus = (app: Application) => {
 };
 
 const ApplicationProgress = ({ app }: { app: Application }) => {
-    const steps = [ { label: "Applied" }, { label: "Admin Review" }, { label: "College Review" }, { label: "Interview" }, { label: "Offer" }, { label: "Hired" } ];
+    const steps = [{ label: "Applied" }, { label: "Admin Review" }, { label: "College Review" }, { label: "Interview" }, { label: "Offer" }, { label: "Hired" }];
     let currentStep = 0;
     if (app.status === 'pending_admin_approval') currentStep = 1;
     if (app.status === 'applied' || app.status === 'viewed' || app.status === 'shortlisted') currentStep = 2;
@@ -59,16 +62,17 @@ const InterviewLink = ({ scheduledOn, meetingLink }: { scheduledOn?: string; mee
         const checkTime = () => {
             const now = new Date();
             const interviewTime = new Date(scheduledOn);
-            const startTime = new Date(interviewTime.getTime() - 30 * 60000); 
+            const startTime = new Date(interviewTime.getTime() - 30 * 60000);
             const endTime = new Date(interviewTime.getTime() + 30 * 60000);
-            if (now >= startTime && now <= endTime) { setLinkState('active'); } 
-            else if (now > endTime) { setLinkState('expired'); } 
+            if (now >= startTime && now <= endTime) { setLinkState('active'); }
+            else if (now > endTime) { setLinkState('expired'); }
             else { setLinkState('upcoming'); }
         };
         checkTime();
         const interval = setInterval(checkTime, 60000);
         return () => clearInterval(interval);
     }, [scheduledOn]);
+
     if (!meetingLink) return null;
     if (linkState === 'active') { return <a href={meetingLink} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium break-all">{meetingLink}</a>; }
     const message = linkState === 'upcoming' ? `Link will be active 30 mins before the interview` : `Interview time has passed`;
@@ -87,19 +91,19 @@ const SavedJobCard = ({ app, onUnsave }: { app: Application; onUnsave: (appId: s
             toast.error(err.data?.message || 'Failed to apply.', { id: loadingToast });
         }
     };
-    
+
     return (
         <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex-1">
                     <CardTitle className="text-lg">{app.job.title}</CardTitle>
-                    <CardDescription className="flex items-center gap-2 mt-1"><Building size={14}/> {app.job.schoolName}</CardDescription>
-                    <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1"><MapPin size={14}/> {app.job.location}</p>
+                    <CardDescription className="flex items-center gap-2 mt-1"><Building size={14} /> {app.job.schoolName}</CardDescription>
+                    <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1"><MapPin size={14} /> {app.job.location}</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
-                    <Button onClick={handleApply} disabled={isApplying} className="flex-1"><Send className="w-4 h-4 mr-2"/>Apply Now</Button>
+                    <Button onClick={handleApply} disabled={isApplying} className="flex-1"><Send className="w-4 h-4 mr-2" />Apply Now</Button>
                     <AlertDialog>
-                        <AlertDialogTrigger asChild><Button variant="outline" className="flex-1"><Trash2 className="w-4 h-4 mr-2"/>Unsave</Button></AlertDialogTrigger>
+                        <AlertDialogTrigger asChild><Button variant="outline" className="flex-1"><Trash2 className="w-4 h-4 mr-2" />Unsave</Button></AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This will remove the job from your saved list.</AlertDialogDescription></AlertDialogHeader>
                             <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => onUnsave(app._id)}>Confirm</AlertDialogAction></AlertDialogFooter>
@@ -118,9 +122,17 @@ const AcceptanceModal = ({ application, onClose, onSuccess }: { application: App
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, files: selectedFiles } = e.target;
-        if (selectedFiles && selectedFiles.length > 0) {
-            setFiles(prev => ({ ...prev, [name]: selectedFiles[0] }));
+        if (!selectedFiles || selectedFiles.length === 0) return;
+
+        const file = selectedFiles[0];
+        
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+            toast.error(`File size cannot exceed ${VERCEL_HOBBY_LIMIT_MB} MB.`);
+            e.target.value = ''; // Reset the file input
+            return;
         }
+
+        setFiles(prev => ({ ...prev, [name]: file }));
     };
 
     const handleSubmit = async () => {
@@ -141,13 +153,14 @@ const AcceptanceModal = ({ application, onClose, onSuccess }: { application: App
             }
         }
 
+        const loadingToast = toast.loading("Submitting documents...");
         try {
             await submitAcceptance({ appId: application._id, data: formData }).unwrap();
-            toast.success("Offer accepted! Documents are now under review.");
+            toast.success("Offer accepted! Documents are now under review.", { id: loadingToast });
             onSuccess();
             onClose();
         } catch (err: any) {
-            toast.error(err.data?.message || "Failed to submit.");
+            toast.error(err.data?.message || "Failed to submit. Check file sizes and try again.", { id: loadingToast });
         }
     };
 
@@ -158,17 +171,17 @@ const AcceptanceModal = ({ application, onClose, onSuccess }: { application: App
                 <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto pr-4">
                     {application.agreementLetter?.url && (
                         <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                             <h4 className="font-semibold mb-2">Admin Agreement</h4>
-                             <a href={application.agreementLetter.url} target="_blank" rel="noreferrer">
+                            <h4 className="font-semibold mb-2">Admin Agreement</h4>
+                            <a href={application.agreementLetter.url} target="_blank" rel="noreferrer">
                                 <Button variant="outline"><Download className="mr-2 h-4 w-4" /> Download Agreement PDF</Button>
                             </a>
                         </div>
                     )}
                     <div className="p-4 bg-gray-50 rounded-lg border">
                         <div className="space-y-3">
-                            <div><Label htmlFor="signedAgreement" className="font-bold">Signed Agreement (Required)</Label><Input id="signedAgreement" name="signedAgreement" type="file" onChange={handleFileChange} /></div>
-                            <hr className="my-2"/>
-                            <h4 className="font-semibold text-sm text-muted-foreground">Optional Documents</h4>
+                            <div><Label htmlFor="signedAgreement" className="font-bold">Signed Agreement (Required, Max {VERCEL_HOBBY_LIMIT_MB}MB)</Label><Input id="signedAgreement" name="signedAgreement" type="file" onChange={handleFileChange} /></div>
+                            <hr className="my-2" />
+                            <h4 className="font-semibold text-sm text-muted-foreground">Optional Documents (Max {VERCEL_HOBBY_LIMIT_MB}MB each)</h4>
                             <div><Label htmlFor="aadhar">Aadhar Card</Label><Input id="aadhar" name="aadhar" type="file" onChange={handleFileChange} /></div>
                             <div><Label htmlFor="pan">PAN Card</Label><Input id="pan" name="pan" type="file" onChange={handleFileChange} /></div>
                             <div><Label htmlFor="result">Marksheet/Result</Label><Input id="result" name="result" type="file" onChange={handleFileChange} /></div>
@@ -189,7 +202,6 @@ const AcceptanceModal = ({ application, onClose, onSuccess }: { application: App
     );
 };
 
-
 const EmployerApplications = () => {
     const [activeCategory, setActiveCategory] = useState<ApplicationCategory>('applied');
     const { data: applications = [], isLoading, isError, refetch } = useGetMyApplicationsQuery(activeCategory);
@@ -199,23 +211,33 @@ const EmployerApplications = () => {
     const [acceptanceModalApp, setAcceptanceModalApp] = useState<Application | null>(null);
 
     const handleUpdate = async (appId: string, action: 'decline_offer') => {
-        try { 
-            await updateApplication({ appId, body: { action } }).unwrap(); 
-            toast.success(`Offer declined!`); 
-        } catch { 
-            toast.error("Failed to update offer status."); 
+        try {
+            await updateApplication({ appId, body: { action } }).unwrap();
+            toast.success(`Offer declined!`);
+        } catch {
+            toast.error("Failed to update offer status.");
         }
     };
-    
+
     const handleWithdraw = async (appId: string) => {
-        try { await withdrawApplication(appId).unwrap(); toast.success('Application has been withdrawn.'); } catch { toast.error("Failed to withdraw application."); }
-    };
-    
-    const handleUnsave = async (appId: string) => {
-        try { await unsaveJob(appId).unwrap(); toast.success('Job unsaved.'); } catch { toast.error("Failed to unsave job."); }
+        try {
+            await withdrawApplication(appId).unwrap();
+            toast.success('Application has been withdrawn.');
+        } catch {
+            toast.error("Failed to withdraw application.");
+        }
     };
 
-    const categories = [ { key: 'applied' as const, label: 'Applied', icon: Send }, { key: 'interviews' as const, label: 'Interviews', icon: Calendar }, { key: 'offers' as const, label: 'Offers', icon: FileText }, { key: 'hired' as const, label: 'Hired', icon: CheckCircle }, { key: 'saved' as const, label: 'Saved', icon: Bookmark } ];
+    const handleUnsave = async (appId: string) => {
+        try {
+            await unsaveJob(appId).unwrap();
+            toast.success('Job unsaved.');
+        } catch {
+            toast.error("Failed to unsave job.");
+        }
+    };
+
+    const categories = [{ key: 'applied' as const, label: 'Applied', icon: Send }, { key: 'interviews' as const, label: 'Interviews', icon: Calendar }, { key: 'offers' as const, label: 'Offers', icon: FileText }, { key: 'hired' as const, label: 'Hired', icon: CheckCircle }, { key: 'saved' as const, label: 'Saved', icon: Bookmark }];
 
     const renderContent = () => {
         if (isLoading) return <div className="flex justify-center items-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
@@ -227,6 +249,7 @@ const EmployerApplications = () => {
                 <p className="text-muted-foreground text-sm max-w-xs">Applications in the '{activeCategory}' stage will appear here.</p>
             </Card>
         );
+
         return (
             <div className="space-y-6">
                 {applications.map((app) => {
@@ -259,7 +282,7 @@ const EmployerApplications = () => {
                                         </div>
                                     </div>
                                 )}
-                                 {app.acceptanceDocuments && app.acceptanceDocuments.length > 0 && (
+                                {app.acceptanceDocuments && app.acceptanceDocuments.length > 0 && (
                                     <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm space-y-1">
                                         <p className="font-semibold text-yellow-800 flex items-center gap-2"><Upload size={16} />Submitted Documents</p>
                                         <ul className="list-disc list-inside pl-4">{app.acceptanceDocuments.map(doc => <li key={doc._id}><a href={doc.url} target="_blank" rel="noreferrer" className="hover:underline">{doc.name} ({doc.documentType.replace(/_/g, ' ')})</a></li>)}</ul>
