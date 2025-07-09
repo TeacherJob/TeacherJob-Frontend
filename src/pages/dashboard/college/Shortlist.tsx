@@ -73,6 +73,7 @@ const ScheduleInterviewModal = ({
   onClose: () => void;
   onSchedule: (details: any) => Promise<void>;
 }) => {
+  const isReschedule = !!application.interviewDetails?.scheduledOn;
   const [details, setDetails] = useState({
     scheduledOn: "",
     interviewType: "",
@@ -80,6 +81,25 @@ const ScheduleInterviewModal = ({
     notes: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isReschedule && application.interviewDetails) {
+      const { interviewDetails } = application;
+      const d = new Date(interviewDetails.scheduledOn);
+      // Format the UTC date from DB to a local datetime string for the input field
+      const localDateTimeString = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+
+      setDetails({
+        scheduledOn: localDateTimeString,
+        interviewType: interviewDetails.interviewType || "",
+        meetingLink: interviewDetails.meetingLink || "",
+        notes: interviewDetails.notes || "",
+      });
+    }
+  }, [application, isReschedule]);
+
 
   const handleSubmit = async () => {
     if (!details.scheduledOn || !details.interviewType) {
@@ -92,8 +112,6 @@ const ScheduleInterviewModal = ({
     }
 
     setIsLoading(true);
-
-    // FIX: Convert local datetime string to a full ISO string (UTC) before sending
     const scheduledDate = new Date(details.scheduledOn);
     const payload = {
       ...details,
@@ -109,11 +127,12 @@ const ScheduleInterviewModal = ({
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Schedule Interview</DialogTitle>
+          <DialogTitle>{isReschedule ? "Reschedule Interview" : "Schedule Interview"}</DialogTitle>
           <DialogDescription>
-            Propose interview details for{" "}
-            {application.user.employerProfile.name}. This will be sent to an
-            admin for confirmation.
+            Propose interview details for {application.user.employerProfile.name}.
+            {isReschedule
+              ? " This will override the previous details and be sent for admin confirmation."
+              : " This will be sent to an admin for confirmation."}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -179,7 +198,9 @@ const ScheduleInterviewModal = ({
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? "Scheduling..." : "Schedule"}
+            {isLoading
+              ? isReschedule ? "Rescheduling..." : "Scheduling..."
+              : isReschedule ? "Update Interview" : "Schedule"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -225,21 +246,64 @@ const ViewProfileModal = ({ application, onClose }: { application: any; onClose:
   );
 };
 
-const InterviewOutcomeButtons = ({ app, onReject, onExtendOffer }: { app: any; onReject: (appId: string) => void; onExtendOffer: (appId: string) => void; }) => {
-  const [isDecisionTime, setIsDecisionTime] = useState(false);
-  useEffect(() => { if (!app.interviewDetails?.scheduledOn) return; const checkTime = () => { const decisionTime = new Date(new Date(app.interviewDetails.scheduledOn).getTime() + 30 * 60000); if (new Date() >= decisionTime) { setIsDecisionTime(true); } }; checkTime(); const interval = setInterval(checkTime, 60000); return () => clearInterval(interval); }, [app.interviewDetails?.scheduledOn]);
-  if (!isDecisionTime) { return (<p className="text-xs text-center text-muted-foreground p-2 bg-muted rounded-md">Decision options will appear 30 mins after interview start.</p>); }
+const InterviewActions = ({ app, onReject, onExtendOffer, onReschedule }: { app: any; onReject: (appId: string) => void; onExtendOffer: (appId: string) => void; onReschedule: (app: any) => void; }) => {
+  const [timeState, setTimeState] = useState({ isPast: false, isDecisionTime: false });
+
+  useEffect(() => {
+    if (!app.interviewDetails?.scheduledOn) return;
+    const checkTime = () => {
+      const now = new Date();
+      const interviewTime = new Date(app.interviewDetails.scheduledOn);
+      const decisionTime = new Date(interviewTime.getTime() + 30 * 60000);
+      const isPastNow = now >= interviewTime;
+      const isDecisionTimeNow = now >= decisionTime;
+
+      setTimeState(currentState => {
+        if (currentState.isPast !== isPastNow || currentState.isDecisionTime !== isDecisionTimeNow) {
+          return { isPast: isPastNow, isDecisionTime: isDecisionTimeNow };
+        }
+        return currentState;
+      });
+    };
+
+    checkTime();
+    const interval = setInterval(checkTime, 60000);
+    return () => clearInterval(interval);
+  }, [app.interviewDetails?.scheduledOn]);
+
+  if (timeState.isDecisionTime) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Button size="sm" onClick={() => onExtendOffer(app._id)}>
+          <CheckCircle className="w-4 h-4 mr-2" />Extend Offer
+        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm">
+              <XCircle className="w-4 h-4 mr-2" />Reject
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This will permanently mark the candidate as not selected for this role.</AlertDialogDescription></AlertDialogHeader>
+            <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction className="bg-destructive hover:bg-destructive/90" onClick={() => onReject(app._id)}>Confirm Rejection</AlertDialogAction></AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    );
+  }
+
+  if (timeState.isPast) {
+    return (
+      <p className="text-xs text-center text-muted-foreground p-2 bg-muted rounded-md">
+        Decision options will appear 30 mins after interview start.
+      </p>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-2">
-      <Button size="sm" onClick={() => onExtendOffer(app._id)}><CheckCircle className="w-4 h-4 mr-2" />Extend Offer</Button>
-      <AlertDialog>
-        <AlertDialogTrigger asChild><Button variant="destructive" size="sm"><XCircle className="w-4 h-4 mr-2" />Reject</Button></AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This will permanently mark the candidate as not selected for this role.</AlertDialogDescription></AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction className="bg-destructive hover:bg-destructive/90" onClick={() => onReject(app._id)}>Confirm Rejection</AlertDialogAction></AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+    <Button variant="secondary" size="sm" onClick={() => onReschedule(app)}>
+      <Calendar className="w-4 h-4 mr-2" />Reschedule
+    </Button>
   );
 };
 
@@ -257,7 +321,7 @@ const CollegeShortlist = () => {
   const stats = useMemo(() => ({ total: candidates.length, scheduled: candidates.filter((c) => c.status === "interview_scheduled").length, hired: candidates.filter((c) => c.status === "hired").length, pending: candidates.filter((c) => c.status === "shortlisted").length, }), [candidates]);
   function maskEmail(email: string) { const [user, domain] = email.split("@"); const maskedUser = user.length <= 2 ? user[0] + "*" : user.slice(0, 2) + "*".repeat(user.length - 2); return `${maskedUser}@${domain}`; }
   function maskPhone(phone: string) { return phone.length >= 10 ? phone.slice(0, 2) + "*".repeat(phone.length - 5) + phone.slice(-3) : "N/A"; }
-  const handleSchedule = async (details: any) => { if (!schedulingApp) return; try { await scheduleInterview({ appId: schedulingApp._id, details }).unwrap(); toast.success("Interview scheduled and sent for admin approval!"); } catch (err) { toast.error("Failed to schedule interview."); } };
+  const handleSchedule = async (details: any) => { if (!schedulingApp) return; try { await scheduleInterview({ appId: schedulingApp._id, details }).unwrap(); toast.success("Interview details sent for admin approval!"); } catch (err) { toast.error("Failed to schedule interview."); } };
   const handleReject = async (appId: string) => { try { await updateStatus({ appId, status: "rejected" }).unwrap(); toast.success("Candidate has been rejected."); } catch (err) { toast.error("Failed to update status."); } };
   const handleExtendOffer = (appId: string) => navigate(`/dashboard/college/offer-letter?appId=${appId}`);
 
@@ -267,7 +331,7 @@ const CollegeShortlist = () => {
   return (
     <div className="space-y-6">
       <div><h1 className="text-3xl font-bold text-foreground">Shortlisted Candidates</h1><p className="text-muted-foreground">Manage interviews and hiring for top candidates.</p></div>
-      <Card><CardContent className="p-6"><div className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="Search by name or job title..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10"/></div></CardContent></Card>
+      <Card><CardContent className="p-6"><div className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="Search by name or job title..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" /></div></CardContent></Card>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card><CardContent className="p-4"><div className="text-2xl font-bold">{stats.total}</div><p className="text-sm text-muted-foreground">Shortlisted</p></CardContent></Card>
         <Card><CardContent className="p-4"><div className="text-2xl font-bold text-blue-600">{stats.scheduled}</div><p className="text-sm text-muted-foreground">Interviews</p></CardContent></Card>
@@ -275,35 +339,43 @@ const CollegeShortlist = () => {
         <Card><CardContent className="p-4"><div className="text-2xl font-bold text-yellow-600">{stats.pending}</div><p className="text-sm text-muted-foreground">Pending Action</p></CardContent></Card>
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {filteredCandidates.length > 0 ? (filteredCandidates.map((app) => { const profile = app.user.employerProfile; const status = getInterviewStatus(app);
-            return (
-              <Card key={app._id} className="hover:shadow-md transition-shadow flex flex-col">
-                <CardHeader className="flex flex-row items-start gap-4 space-y-0 p-4 pb-2"><div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0"><User className="w-6 h-6 text-primary-foreground" /></div><div className="flex-1"><CardTitle>{profile.name}</CardTitle><CardDescription>Applied for: {app.job.title}</CardDescription></div><Badge className={status.color}>{status.label}</Badge></CardHeader>
-                <CardContent className="p-4 pt-2 grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow">
-                  <div className="md:col-span-2 space-y-2">
-                    <div className="flex items-center gap-2 text-sm"><Mail className="w-4 h-4 text-muted-foreground" /><span className="text-muted-foreground">{maskEmail(app.user.email)}</span></div>
-                    <div className="flex items-center gap-2 text-sm"><Phone className="w-4 h-4 text-muted-foreground" /><span className="text-muted-foreground">{profile.phone ? maskPhone(profile.phone) : "N/A"}</span></div>
-                    {app.interviewDetails?.scheduledOn && (
-                      <div className="bg-muted/50 rounded-lg p-3 mt-2">
-                        <p className="text-sm font-medium">Interview Details:</p><p className="text-sm">Date:{" "}{new Date(app.interviewDetails.scheduledOn).toLocaleString()}</p><p className="text-sm">Type: {app.interviewDetails.interviewType}</p>
-                        {app.interviewDetails.meetingLink && (<div className="flex items-center gap-2 mt-1"><LinkIcon size={14} /><a href={app.interviewDetails.meetingLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline truncate">{app.interviewDetails.meetingLink}</a></div>)}
-                      </div>
-                    )}
-                  </div>
-                  <div className="md:col-span-1 flex flex-col justify-center gap-2">
-                    {app.status === "shortlisted" && (<Button size="sm" onClick={() => setSchedulingApp(app)}><Calendar className="w-4 h-4 mr-2" />Schedule Interview</Button>)}
-                    {app.status === "interview_scheduled" && app.interviewDetails.confirmedByAdmin && (<InterviewOutcomeButtons app={app} onReject={handleReject} onExtendOffer={handleExtendOffer}/>)}
-                    <Button variant="outline" size="sm" onClick={() => setViewingProfileApp(app)}><FileText className="w-4 h-4 mr-2" />View Profile</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })) : (<div className="col-span-full"><Card><CardContent className="p-10 text-center"><p className="text-muted-foreground">No shortlisted candidates found.</p></CardContent></Card></div>)}
+        {filteredCandidates.length > 0 ? (filteredCandidates.map((app) => {
+          const profile = app.user.employerProfile; const status = getInterviewStatus(app);
+          return (
+            <Card key={app._id} className="hover:shadow-md transition-shadow flex flex-col">
+              <CardHeader className="flex flex-row items-start gap-4 space-y-0 p-4 pb-2"><div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0"><User className="w-6 h-6 text-primary-foreground" /></div><div className="flex-1"><CardTitle>{profile.name}</CardTitle><CardDescription>Applied for: {app.job.title}</CardDescription></div><Badge className={status.color}>{status.label}</Badge></CardHeader>
+              <CardContent className="p-4 pt-2 grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow">
+                <div className="md:col-span-2 space-y-2">
+                  <div className="flex items-center gap-2 text-sm"><Mail className="w-4 h-4 text-muted-foreground" /><span className="text-muted-foreground">{maskEmail(app.user.email)}</span></div>
+                  <div className="flex items-center gap-2 text-sm"><Phone className="w-4 h-4 text-muted-foreground" /><span className="text-muted-foreground">{profile.phone ? maskPhone(profile.phone) : "N/A"}</span></div>
+                  {app.interviewDetails?.scheduledOn && (
+                    <div className="bg-muted/50 rounded-lg p-3 mt-2">
+                      <p className="text-sm font-medium">Interview Details:</p><p className="text-sm">Date:{" "}{new Date(app.interviewDetails.scheduledOn).toLocaleString()}</p><p className="text-sm">Type: {app.interviewDetails.interviewType}</p>
+                      {app.interviewDetails.meetingLink && (<div className="flex items-center gap-2 mt-1"><LinkIcon size={14} /><a href={app.interviewDetails.meetingLink} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline truncate">{app.interviewDetails.meetingLink}</a></div>)}
+                    </div>
+                  )}
+                </div>
+                <div className="md:col-span-1 flex flex-col justify-center items-end gap-2">
+                  {app.status === "shortlisted" && (<Button size="sm" onClick={() => setSchedulingApp(app)}><Calendar className="w-4 h-4 mr-2" />Schedule Interview</Button>)}
+                  {app.status === "interview_scheduled" && !app.interviewDetails.confirmedByAdmin && (
+                    <p className="text-xs text-center text-muted-foreground p-2 bg-muted rounded-md">
+                      Waiting for admin confirmation to manage interview.
+                    </p>
+                  )}
+                  {app.status === "interview_scheduled" && app.interviewDetails.confirmedByAdmin && (
+                    <InterviewActions app={app} onReject={handleReject} onExtendOffer={handleExtendOffer} onReschedule={setSchedulingApp} />
+                  )}
+                  <Button variant="outline" size="sm" onClick={() => setViewingProfileApp(app)}><FileText className="w-4 h-4 mr-2" />View Profile</Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })) : (<div className="col-span-full"><Card><CardContent className="p-10 text-center"><p className="text-muted-foreground">No shortlisted candidates found.</p></CardContent></Card></div>)}
       </div>
-      {viewingProfileApp && (<ViewProfileModal application={viewingProfileApp} onClose={() => setViewingProfileApp(null)}/>)}
-      {schedulingApp && (<ScheduleInterviewModal application={schedulingApp} onClose={() => setSchedulingApp(null)} onSchedule={handleSchedule}/>)}
+      {viewingProfileApp && (<ViewProfileModal application={viewingProfileApp} onClose={() => setViewingProfileApp(null)} />)}
+      {schedulingApp && (<ScheduleInterviewModal application={schedulingApp} onClose={() => setSchedulingApp(null)} onSchedule={handleSchedule} />)}
     </div>
   );
 };
- 
+
 export default CollegeShortlist;
