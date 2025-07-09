@@ -64,7 +64,6 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-// === YAHAN BADLAV KIYA GAYA HAI ===
 const ScheduleInterviewModal = ({
   application,
   onClose,
@@ -91,8 +90,17 @@ const ScheduleInterviewModal = ({
       toast.error("Please provide a meeting link for online interviews.");
       return;
     }
+
     setIsLoading(true);
-    await onSchedule(details);
+
+    // FIX: Convert local datetime string to a full ISO string (UTC) before sending
+    const scheduledDate = new Date(details.scheduledOn);
+    const payload = {
+      ...details,
+      scheduledOn: scheduledDate.toISOString(),
+    };
+
+    await onSchedule(payload);
     setIsLoading(false);
     onClose();
   };
@@ -131,7 +139,6 @@ const ScheduleInterviewModal = ({
               <SelectTrigger>
                 <SelectValue placeholder="Select a type..." />
               </SelectTrigger>
-              {/* [FIX] Is line mein className add kiya gaya hai */}
               <SelectContent className="bg-background">
                 <SelectItem value="Online">Online</SelectItem>
                 <SelectItem value="In-Person">In-Person</SelectItem>
@@ -180,7 +187,6 @@ const ScheduleInterviewModal = ({
   );
 };
 
-// Baaki ka code bilkul waisa hi rahega
 const ViewProfileModal = ({ application, onClose }: { application: any; onClose: () => void; }) => {
   function maskEmail(email: string) { const [user, domain] = email.split("@"); const maskedUser = user.length <= 2 ? user[0] + "*" : user.slice(0, 2) + "*".repeat(user.length - 2); return `${maskedUser}@${domain}`; }
   function maskPhone(phone: string) { return phone.length >= 10 ? phone.slice(0, 2) + "*".repeat(phone.length - 5) + phone.slice(-3) : "N/A"; }
@@ -218,6 +224,7 @@ const ViewProfileModal = ({ application, onClose }: { application: any; onClose:
     </Dialog>
   );
 };
+
 const InterviewOutcomeButtons = ({ app, onReject, onExtendOffer }: { app: any; onReject: (appId: string) => void; onExtendOffer: (appId: string) => void; }) => {
   const [isDecisionTime, setIsDecisionTime] = useState(false);
   useEffect(() => { if (!app.interviewDetails?.scheduledOn) return; const checkTime = () => { const decisionTime = new Date(new Date(app.interviewDetails.scheduledOn).getTime() + 30 * 60000); if (new Date() >= decisionTime) { setIsDecisionTime(true); } }; checkTime(); const interval = setInterval(checkTime, 60000); return () => clearInterval(interval); }, [app.interviewDetails?.scheduledOn]);
@@ -235,6 +242,7 @@ const InterviewOutcomeButtons = ({ app, onReject, onExtendOffer }: { app: any; o
     </div>
   );
 };
+
 const CollegeShortlist = () => {
   const navigate = useNavigate();
   const { data: candidates = [], isLoading, isError } = useGetShortlistedApplicationsQuery();
