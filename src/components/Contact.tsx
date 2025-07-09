@@ -9,7 +9,7 @@ const GlobalStyles = () => (
   <style>{`
     .contact-input::placeholder,
     .contact-textarea::placeholder {
-      color: #a0aec0; /* A slightly darker placeholder text */
+      color: #a0aec0;
       opacity: 1;
     }
     .social-icon {
@@ -23,7 +23,19 @@ const GlobalStyles = () => (
 );
 
 
-const SuccessModal = ({ onClose }: { onClose: () => void }) => {
+const FeedbackModal = ({
+  status,
+  title,
+  message,
+  onClose,
+}: {
+  status: 'success' | 'error';
+  title: string;
+  message: string;
+  onClose: () => void;
+}) => {
+  const isSuccess = status === 'success';
+
   const styles: { [key: string]: React.CSSProperties } = {
     overlay: {
       position: 'fixed',
@@ -49,7 +61,7 @@ const SuccessModal = ({ onClose }: { onClose: () => void }) => {
     title: {
       fontSize: '1.8rem',
       fontWeight: '600',
-      color: '#0f2027',
+      color: isSuccess ? '#0f2027' : '#c53030',
       marginBottom: '15px',
     },
     message: {
@@ -60,7 +72,7 @@ const SuccessModal = ({ onClose }: { onClose: () => void }) => {
     },
     button: {
       padding: '12px 30px',
-      backgroundColor: '#F97316',
+      backgroundColor: isSuccess ? '#F97316' : '#c53030',
       color: 'white',
       border: 'none',
       borderRadius: '8px',
@@ -70,16 +82,17 @@ const SuccessModal = ({ onClose }: { onClose: () => void }) => {
       transition: 'background-color 0.3s ease',
     },
   };
+
   return (
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <h2 style={styles.title}>Thank You!</h2>
-        <p style={styles.message}>Your message has been sent successfully. We'll reach out shortly.</p>
+        <h2 style={styles.title}>{title}</h2>
+        <p style={styles.message}>{message}</p>
         <button
           style={styles.button}
           onClick={onClose}
-          onMouseEnter={e => e.currentTarget.style.backgroundColor = '#EA580C'}
-          onMouseLeave={e => e.currentTarget.style.backgroundColor = '#F97316'}
+          onMouseEnter={e => e.currentTarget.style.backgroundColor = isSuccess ? '#EA580C' : '#a02323'}
+          onMouseLeave={e => e.currentTarget.style.backgroundColor = isSuccess ? '#F97316' : '#c53030'}
         >
           Close
         </button>
@@ -91,35 +104,74 @@ const SuccessModal = ({ onClose }: { onClose: () => void }) => {
 
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+  const [modalInfo, setModalInfo] = useState<{
+    isOpen: boolean;
+    status: 'success' | 'error';
+    title: string;
+    message: string;
+  } | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
-    const formData = new FormData(event.currentTarget);
+    setModalInfo(null);
 
-    formData.append("access_key", "5acc18f5-9498-4dfb-87bb-c8c85793258f");
+    const dataToSend = {
+      ...formData,
+      access_key: "5acc18f5-9498-4dfb-87bb-c8c85793258f"
+    };
 
     try {
-        const response = await fetch("https://api.web3forms.com/submit", {
-          method: "POST",
-          body: formData
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setModalInfo({
+          isOpen: true,
+          status: 'success',
+          title: 'Thank You!',
+          message: "Your message has been sent successfully. We'll reach out shortly."
         });
-
-        const data = await response.json();
-
-        if (data.success) {
-          setIsModalOpen(true);
-          event.currentTarget.reset();
-        } else {
-          console.error("Error from Web3Forms:", data);
-          alert(data.message || "An error occurred. Please try again.");
-        }
-    } catch(error) {
-        console.error("Submission Error:", error);
-        alert("An error occurred while submitting the form. Please check your network connection.");
+        setFormData({ name: '', email: '', message: '' }); // Reset form state
+      } else {
+        setModalInfo({
+          isOpen: true,
+          status: 'error',
+          title: 'Submission Failed',
+          message: result.message || "An unexpected error occurred. Please try again."
+        });
+      }
+    } catch (error) {
+      console.error("Submission Error:", error);
+      setModalInfo({
+        isOpen: true,
+        status: 'error',
+        title: 'Connection Error',
+        message: "Could not submit the form. Please check your network connection and try again."
+      });
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -282,7 +334,7 @@ const ContactPage = () => {
       fontSize: '1.1rem',
       cursor: 'pointer',
       fontWeight: '600',
-      transition: 'background-color 0.3s ease, transform 0.2s ease',
+      transition: 'background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -359,20 +411,17 @@ const ContactPage = () => {
               <div style={styles.formGroup}>
                 <label htmlFor="name" style={styles.label}>Full Name</label>
                 <input type="text" id="name" name="name" style={styles.input} className="contact-input" required placeholder="John Doe"
-                  onFocus={handleFocus}
-                  onBlur={handleBlur} />
+                  value={formData.name} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} />
               </div>
               <div style={styles.formGroup}>
                 <label htmlFor="email" style={styles.label}>Email Address</label>
                 <input type="email" id="email" name="email" style={styles.input} className="contact-input" required placeholder="you@example.com"
-                  onFocus={handleFocus}
-                  onBlur={handleBlur} />
+                  value={formData.email} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} />
               </div>
               <div style={styles.formGroup}>
                 <label htmlFor="message" style={styles.label}>Message</label>
                 <textarea id="message" name="message" style={styles.textarea} className="contact-textarea" required placeholder="How can we help you today?"
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}></textarea>
+                  value={formData.message} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur}></textarea>
               </div>
               <button type="submit" style={styles.button}
                 onMouseEnter={handleButtonEnter}
@@ -387,7 +436,14 @@ const ContactPage = () => {
         </div>
       </div>
       <Footer />
-      {isModalOpen && <SuccessModal onClose={() => setIsModalOpen(false)} />}
+      {modalInfo?.isOpen && (
+        <FeedbackModal
+            status={modalInfo.status}
+            title={modalInfo.title}
+            message={modalInfo.message}
+            onClose={() => setModalInfo(null)}
+        />
+      )}
     </div>
   );
 };
