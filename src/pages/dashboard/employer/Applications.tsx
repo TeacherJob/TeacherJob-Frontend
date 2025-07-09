@@ -14,8 +14,8 @@ import { Application } from '@/types/employer';
 
 type ApplicationCategory = 'applied' | 'interviews' | 'offers' | 'hired' | 'saved';
 
-const VERCEL_HOBBY_LIMIT_MB = 4.5;
-const MAX_FILE_SIZE_BYTES = VERCEL_HOBBY_LIMIT_MB * 1024 * 1024;
+const MAX_FILE_SIZE_KB = 200;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_KB * 1024;
 
 const getApplicationStatus = (app: Application) => {
     if (app.status === 'pending_admin_approval') return { text: "Pending Admin Approval", color: "bg-gray-100 text-gray-800", icon: <Loader2 className="w-3 h-3 animate-spin" /> };
@@ -125,10 +125,10 @@ const AcceptanceModal = ({ application, onClose, onSuccess }: { application: App
         if (!selectedFiles || selectedFiles.length === 0) return;
 
         const file = selectedFiles[0];
-        
+
         if (file.size > MAX_FILE_SIZE_BYTES) {
-            toast.error(`File size cannot exceed ${VERCEL_HOBBY_LIMIT_MB} MB.`);
-            e.target.value = ''; // Reset the file input
+            toast.error(`File size cannot exceed ${MAX_FILE_SIZE_KB} KB.`);
+            e.target.value = ''; // Reset the file input to allow re-selection
             return;
         }
 
@@ -179,9 +179,9 @@ const AcceptanceModal = ({ application, onClose, onSuccess }: { application: App
                     )}
                     <div className="p-4 bg-gray-50 rounded-lg border">
                         <div className="space-y-3">
-                            <div><Label htmlFor="signedAgreement" className="font-bold">Signed Agreement (Required, Max {VERCEL_HOBBY_LIMIT_MB}MB)</Label><Input id="signedAgreement" name="signedAgreement" type="file" onChange={handleFileChange} /></div>
+                            <div><Label htmlFor="signedAgreement" className="font-bold">Signed Agreement (Required, Max {MAX_FILE_SIZE_KB}KB)</Label><Input id="signedAgreement" name="signedAgreement" type="file" onChange={handleFileChange} /></div>
                             <hr className="my-2" />
-                            <h4 className="font-semibold text-sm text-muted-foreground">Optional Documents (Max {VERCEL_HOBBY_LIMIT_MB}MB each)</h4>
+                            <h4 className="font-semibold text-sm text-muted-foreground">Optional Documents (Max {MAX_FILE_SIZE_KB}KB each)</h4>
                             <div><Label htmlFor="aadhar">Aadhar Card</Label><Input id="aadhar" name="aadhar" type="file" onChange={handleFileChange} /></div>
                             <div><Label htmlFor="pan">PAN Card</Label><Input id="pan" name="pan" type="file" onChange={handleFileChange} /></div>
                             <div><Label htmlFor="result">Marksheet/Result</Label><Input id="result" name="result" type="file" onChange={handleFileChange} /></div>
