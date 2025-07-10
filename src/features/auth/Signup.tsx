@@ -13,19 +13,20 @@ import {
 } from "@/features/auth/authSlice";
 import { GoogleLogin } from "@react-oauth/google";
 
-// Interface for form data state
 interface FormData {
   fullName: string;
   email: string;
+  mobile: string;
   password: string;
   confirmPassword: string;
   role: string;
   termsAccepted: boolean;
 }
-// Interface for form errors
+
 interface FormErrors {
   fullName?: string;
   email?: string;
+  mobile?: string;
   password?: string;
   confirmPassword?: string;
   termsAccepted?: string;
@@ -35,7 +36,6 @@ const Signup: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Use distinct loading state names to avoid conflicts
   const [signup, { isLoading: isEmailLoading }] = useSignupMutation();
   const [googleLogin, { isLoading: isGoogleLoading }] =
     useGoogleLoginMutation();
@@ -43,6 +43,7 @@ const Signup: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
     email: "",
+    mobile: "",
     password: "",
     confirmPassword: "",
     role: "employer",
@@ -50,7 +51,6 @@ const Signup: React.FC = () => {
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // --- GOOGLE LOGIN LOGIC (from the first component) ---
   const handleSuccessfulGoogleLogin = (response: any) => {
     if (response.success && response.user) {
       dispatch(setCredentials({ user: response.user, token: response.token }));
@@ -64,7 +64,6 @@ const Signup: React.FC = () => {
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    // Logic adapted to use the formData state object
     if (!formData.role) {
       toast.error("Please select a role before signing up with Google.");
       return;
@@ -77,7 +76,7 @@ const Signup: React.FC = () => {
     try {
       const response = await googleLogin({
         token: credentialResponse.credential,
-        role: formData.role, // Use formData.role
+        role: formData.role,
       }).unwrap();
       toast.dismiss(toastId);
       handleSuccessfulGoogleLogin(response);
@@ -92,9 +91,7 @@ const Signup: React.FC = () => {
     toast.error("Google Sign-up failed. Please try again.");
   };
 
-  // --- DYNAMIC TERMS & CONDITIONS LINK (from the first component) ---
   const termsLink = useMemo(() => {
-    // Logic adapted to use the formData state object
     if (formData.role === "college") {
       return "https://teacher-job.s3.ap-south-1.amazonaws.com/agreements/Signup+Term+%26+Condition+for+School.pdf";
     }
@@ -104,20 +101,36 @@ const Signup: React.FC = () => {
     return "#";
   }, [formData.role]);
 
-  // --- FORM VALIDATION & SUBMISSION (from the second component) ---
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
-    else if (formData.fullName.trim().length < 3)
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
+    } else if (formData.fullName.trim().length < 3) {
       newErrors.fullName = "Full name must be at least 3 characters";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Valid email is required";
-    if (formData.password.length < 6)
+    }
+
+    if (!formData.mobile.trim()) {
+      newErrors.mobile = "Mobile number is required";
+    } else if (!/^\d{10}$/.test(formData.mobile.trim())) {
+      newErrors.mobile = "Please enter a valid 10-digit mobile number";
+    }
+
+    if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
-    if (formData.password !== formData.confirmPassword)
+    }
+
+    if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
-    if (!formData.termsAccepted)
+    }
+
+    if (!formData.termsAccepted) {
       newErrors.termsAccepted = "You must accept the terms and conditions";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -134,8 +147,9 @@ const Signup: React.FC = () => {
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, termsAccepted: e.target.checked }));
-    if (errors.termsAccepted)
+    if (errors.termsAccepted) {
       setErrors((prev) => ({ ...prev, termsAccepted: undefined }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,8 +162,9 @@ const Signup: React.FC = () => {
     const toastId = toast.loading("Creating your account...");
     try {
       const response = await signup(formData).unwrap();
-      if (!response.success)
+      if (!response.success) {
         throw new Error(response.message || "Signup failed");
+      }
 
       if (response.tempToken) {
         dispatch(setTempToken(response.tempToken));
@@ -209,7 +224,6 @@ const Signup: React.FC = () => {
             </p>
           </div>
           <div className="mt-8">
-            {/* --- GOOGLE LOGIN UI & DIVIDER --- */}
             <div>
               <div className="flex justify-center">
                 <GoogleLogin
@@ -234,10 +248,7 @@ const Signup: React.FC = () => {
                 </span>
               </div>
             </div>
-            {/* --- END OF GOOGLE LOGIN UI --- */}
-
             <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-              {/* Full Name */}
               <div>
                 <label
                   htmlFor="fullName"
@@ -251,18 +262,20 @@ const Signup: React.FC = () => {
                     name="fullName"
                     type="text"
                     required
-                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${errors.fullName ? "ring-red-500" : "ring-gray-300"} placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
+                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${
+                      errors.fullName ? "ring-red-500" : "ring-gray-300"
+                    } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
                     placeholder="John Doe"
                     value={formData.fullName}
                     onChange={handleChange}
                   />
                 </div>
                 {errors.fullName && (
-                  <p className="mt-2 text-sm text-red-600">{errors.fullName}</p>
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.fullName}
+                  </p>
                 )}
               </div>
-
-              {/* Email */}
               <div>
                 <label
                   htmlFor="email"
@@ -277,7 +290,9 @@ const Signup: React.FC = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${errors.email ? "ring-red-500" : "ring-gray-300"} placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
+                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${
+                      errors.email ? "ring-red-500" : "ring-gray-300"
+                    } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={handleChange}
@@ -287,8 +302,32 @@ const Signup: React.FC = () => {
                   <p className="mt-2 text-sm text-red-600">{errors.email}</p>
                 )}
               </div>
-
-              {/* Password */}
+              <div>
+                <label
+                  htmlFor="mobile"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Mobile Number
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="mobile"
+                    name="mobile"
+                    type="tel"
+                    autoComplete="tel"
+                    required
+                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${
+                      errors.mobile ? "ring-red-500" : "ring-gray-300"
+                    } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
+                    placeholder="10-digit mobile number"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                  />
+                </div>
+                {errors.mobile && (
+                  <p className="mt-2 text-sm text-red-600">{errors.mobile}</p>
+                )}
+              </div>
               <div>
                 <label
                   htmlFor="password"
@@ -303,18 +342,20 @@ const Signup: React.FC = () => {
                     type="password"
                     autoComplete="new-password"
                     required
-                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${errors.password ? "ring-red-500" : "ring-gray-300"} placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
+                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${
+                      errors.password ? "ring-red-500" : "ring-gray-300"
+                    } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
                     placeholder="Min. 6 characters"
                     value={formData.password}
                     onChange={handleChange}
                   />
                 </div>
                 {errors.password && (
-                  <p className="mt-2 text-sm text-red-600">{errors.password}</p>
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.password}
+                  </p>
                 )}
               </div>
-
-              {/* Confirm Password */}
               <div>
                 <label
                   htmlFor="confirmPassword"
@@ -329,7 +370,11 @@ const Signup: React.FC = () => {
                     type="password"
                     autoComplete="new-password"
                     required
-                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${errors.confirmPassword ? "ring-red-500" : "ring-gray-300"} placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
+                    className={`block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ${
+                      errors.confirmPassword
+                        ? "ring-red-500"
+                        : "ring-gray-300"
+                    } placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm`}
                     placeholder="Re-enter your password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
@@ -341,8 +386,6 @@ const Signup: React.FC = () => {
                   </p>
                 )}
               </div>
-
-              {/* Role */}
               <div>
                 <label
                   htmlFor="role"
@@ -363,8 +406,6 @@ const Signup: React.FC = () => {
                   </select>
                 </div>
               </div>
-
-              {/* --- DYNAMIC TERMS & CONDITIONS UI --- */}
               <div className="flex items-start pt-2">
                 <div className="flex h-6 items-center">
                   <input
@@ -373,7 +414,11 @@ const Signup: React.FC = () => {
                     type="checkbox"
                     checked={formData.termsAccepted}
                     onChange={handleCheckboxChange}
-                    className={`h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 ${errors.termsAccepted ? "ring-2 ring-red-500 ring-offset-1" : ""}`}
+                    className={`h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 ${
+                      errors.termsAccepted
+                        ? "ring-2 ring-red-500 ring-offset-1"
+                        : ""
+                    }`}
                   />
                 </div>
                 <div className="ml-3 text-sm leading-6">
@@ -383,11 +428,10 @@ const Signup: React.FC = () => {
                   >
                     I agree to the{" "}
                     <a
-                      href={termsLink} // Use dynamic link
+                      href={termsLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => {
-                        // Use adapted logic
                         if (!formData.role) {
                           e.preventDefault();
                           toast.error(
@@ -395,7 +439,11 @@ const Signup: React.FC = () => {
                           );
                         }
                       }}
-                      className={`text-indigo-600 hover:text-indigo-500 ${!formData.role ? "cursor-not-allowed opacity-50" : "underline"}`}
+                      className={`text-indigo-600 hover:text-indigo-500 ${
+                        !formData.role
+                          ? "cursor-not-allowed opacity-50"
+                          : "underline"
+                      }`}
                     >
                       Terms and Conditions
                     </a>
@@ -407,8 +455,6 @@ const Signup: React.FC = () => {
                   {errors.termsAccepted}
                 </p>
               )}
-
-              {/* Submit Button */}
               <div>
                 <button
                   type="submit"
@@ -425,4 +471,5 @@ const Signup: React.FC = () => {
     </div>
   );
 };
+
 export default Signup;
