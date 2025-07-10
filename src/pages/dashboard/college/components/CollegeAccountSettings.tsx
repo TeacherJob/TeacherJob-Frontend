@@ -38,7 +38,7 @@ const CollegeAccountSettings = ({ user }: AccountSettingsProps) => {
         <div className="space-y-2"><Label>Email Address</Label><Input value={user.email} disabled className="bg-muted" /><p className="text-sm text-muted-foreground">Your login email address cannot be changed.</p></div>
         {isLoading ? <Skeleton className="h-24 w-full"/> : (
             <>
-                <div className="space-y-2"><Label htmlFor="collegeName">College Name</Label><Input id="collegeName" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter college name"/></div>
+                <div className="space-y-2"><Label htmlFor="collegeName">Institution Name</Label><Input id="collegeName" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter college name"/></div>
                 <div className="space-y-2"><Label htmlFor="address">Address</Label><Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter college address"/></div>
                 <Button onClick={handleSave} disabled={isUpdating}>{isUpdating ? 'Saving...' : 'Save Changes'}</Button>
             </>
