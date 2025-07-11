@@ -379,7 +379,7 @@ const ContactPage = () => {
                 <div style={styles.contactIcon}><FiPhone /></div>
                 <div style={styles.contactTextContainer}>
                   <span style={styles.contactTitle}>Phone Support</span>
-                  <span style={styles.contactDetail}>+91-00000-00000</span>
+                  <span style={styles.contactDetail}>+91-9917587294</span>
                 </div>
               </a>
               {contactDetails.map((detail, index) => (
