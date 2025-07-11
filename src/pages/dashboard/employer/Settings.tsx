@@ -24,16 +24,16 @@ const Settings = () => {
     const sections = [
         { key: 'account' as const, label: 'Account', icon: User },
         { key: 'notifications' as const, label: 'Notifications', icon: Bell },
-        { key: 'privacy' as const, label: 'Privacy', icon: Shield },
-        { key: 'security' as const, label: 'Security', icon: Key }
+        // { key: 'privacy' as const, label: 'Privacy', icon: Shield },
+        // { key: 'security' as const, label: 'Security', icon: Key }
     ];
 
     const renderContent = () => {
         switch (activeSection) {
             case 'account': return <AccountSettingsSection user={user} />;
             case 'notifications': return <NotificationSettingsSection />;
-            case 'privacy': return <PrivacySettingsSection />;
-            case 'security': return <SecuritySettingsSection />;
+            // case 'privacy': return <PrivacySettingsSection />;
+            // case 'security': return <SecuritySettingsSection />;
             default: return null;
         }
     };
