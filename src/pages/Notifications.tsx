@@ -80,9 +80,9 @@ const Notifications = () => {
                   <div className={`p-2 rounded-full bg-muted text-primary`}><NotificationIcon message={notification.message} /></div>
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">
-                      <Link to={notification.link || '#'} className={`font-semibold hover:underline ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
+{/*                       <Link to={notification.link || '#'} className={`font-semibold hover:underline ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}> */}
                         {notification.message}
-                      </Link>
+{/*                       </Link> */}
                       <div className="flex items-center gap-2 flex-shrink-0 ml-4">
                         <span className="text-sm text-muted-foreground"><TimeAgo date={notification.createdAt} /></span>
                         {!notification.read && (<div className="w-3 h-3 bg-primary rounded-full" title="Unread"></div>)}
