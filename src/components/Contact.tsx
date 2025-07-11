@@ -375,7 +375,7 @@ const ContactPage = () => {
             <p style={styles.responseTime}>We typically respond within 24 hours.</p>
 
             <div style={styles.contactList}>
-              <a href="tel:+910000000000" style={styles.contactItem}>
+              <a href="tel:+9199175872940" style={styles.contactItem}>
                 <div style={styles.contactIcon}><FiPhone /></div>
                 <div style={styles.contactTextContainer}>
                   <span style={styles.contactTitle}>Phone Support</span>
