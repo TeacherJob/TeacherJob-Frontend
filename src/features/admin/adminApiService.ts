@@ -246,6 +246,13 @@ export const adminApi = apiService.injectEndpoints({
         { type: "User", id: "LIST" },
       ],
     }),
+    sendSystemAlert: builder.mutation<{ success: boolean; message: string }, { message: string }>({
+        query: (body) => ({
+            url: 'admin/system-alert',
+            method: 'POST',
+            body,
+        }),
+    }),
     getAllCareerArticles: builder.query<ApiResponse, string | void>({
       query: (category) =>
         category
@@ -483,6 +490,7 @@ export const {
   useUpdateCollegeProfileByAdminMutation,
   useUpdateEmployerProfileByAdminMutation,
   useDeleteUserByAdminMutation,
+  useSendSystemAlertMutation,
   useGetAllCareerArticlesQuery,
   useGetArticleBySlugQuery,
   useCreateArticleMutation,
