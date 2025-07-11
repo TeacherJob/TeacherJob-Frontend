@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShieldCheck, AlertTriangle, Users, Briefcase, TrendingUp, Mail, Rss, FileText } from 'lucide-react';
-import { useGetDashboardStatsQuery, useGetSystemActivityQuery } from '@/features/admin/adminApiService';
+import { useGetDashboardStatsQuery, useGetSystemActivityQuery, useSendSystemAlertMutation } from '@/features/admin/adminApiService';
 import { formatDistanceToNow } from 'date-fns';
+import toast from 'react-hot-toast';
 
 const StatCard = ({ title, value, icon, isLoading }: { title: string, value: string | number, icon: React.ReactNode, isLoading: boolean }) => (
     <Card>
@@ -28,10 +29,18 @@ const AdminControl = () => {
   const [systemAlert, setSystemAlert] = useState('');
   const { data: stats, isLoading: isLoadingStats } = useGetDashboardStatsQuery();
   const { data: activities, isLoading: isLoadingActivities } = useGetSystemActivityQuery(undefined, { pollingInterval: 30000 });
+  const [sendSystemAlert, { isLoading: isSending }] = useSendSystemAlertMutation();
 
-  const handleSendSystemAlert = () => {
-    console.log('Sending system alert:', systemAlert);
-    setSystemAlert('');
+  const handleSendSystemAlert = async () => {
+    if (!systemAlert.trim()) return;
+    const loadingToast = toast.loading('Sending alert to all users...');
+    try {
+        const response = await sendSystemAlert({ message: systemAlert }).unwrap();
+        toast.success(response.message || 'System alert sent successfully!', { id: loadingToast });
+        setSystemAlert('');
+    } catch (err) {
+        toast.error('Failed to send alert.', { id: loadingToast });
+    }
   };
 
   return (
@@ -87,9 +96,9 @@ const AdminControl = () => {
               <Label htmlFor="systemAlert">System-wide Alert</Label>
               <Textarea id="systemAlert" placeholder="Enter a message to broadcast..." value={systemAlert} onChange={(e) => setSystemAlert(e.target.value)} rows={4}/>
             </div>
-            <Button onClick={handleSendSystemAlert} disabled={!systemAlert.trim()} className="w-full">
+            <Button onClick={handleSendSystemAlert} disabled={!systemAlert.trim() || isSending} className="w-full">
               <Mail className="w-4 h-4 mr-2" />
-              Send Alert to All Users
+              {isSending ? 'Sending...' : 'Send Alert to All Users'}
             </Button>
           </CardContent>
         </Card>
