@@ -190,10 +190,10 @@ const CollegeProfile = () => {
                             <Label htmlFor="studentCount">Students Enrolled</Label>
                             <Input id="studentCount" type="number" value={formData.studentCount} onChange={handleInputChange} />
                         </div>
-                        <div>
+{/*                         <div>
                             <Label htmlFor="facultyCount">Faculty Members</Label>
                             <Input id="facultyCount" type="number" value={formData.facultyCount} onChange={handleInputChange} />
-                        </div>
+                        </div> */}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
