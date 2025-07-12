@@ -176,7 +176,7 @@ const Users = () => {
                       <h3 className="text-lg font-semibold truncate" title={name}>{name}</h3>
                       <p className="text-sm text-muted-foreground truncate" title={user.email}>{user.email}</p>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
-                        <div className="flex items-center gap-1.5">{roleInfo.icon}<span className="text-sm">{roleInfo.name}</span></div>
+                        <div className="flex items-center gap-1.5">{roleInfo.icon}<span className="text-sm">{roleInfo.name === 'College' ? "Institution": roleInfo.name}</span></div>
                         <StatusBadge status={user.status}><span className="capitalize">{user.status}</span></StatusBadge>
                       </div>
                     </div>
