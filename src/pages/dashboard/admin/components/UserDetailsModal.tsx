@@ -81,14 +81,14 @@ const UserDetailsModal = ({ userId, onClose }: UserDetailsModalProps) => {
                 {user.role === 'college' && profile && (
                     <div className="space-y-4">
                         <div className="p-4 border rounded-lg space-y-3">
-                            <h4 className="font-semibold text-md flex items-center gap-2 mb-2"><Building size={16} />College Details</h4>
+                            <h4 className="font-semibold text-md flex items-center gap-2 mb-2"><Building size={16} />Institution Details</h4>
                             <DetailItem icon={<MapPin size={14}/>} label="Address">{profile.address}</DetailItem>
                             <DetailItem icon={<Phone size={14}/>} label="Phone">{profile.phone}</DetailItem>
                             <DetailItem icon={<Globe size={14}/>} label="Website"><a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{profile.website}</a></DetailItem>
                         </div>
                         <div className="p-4 border rounded-lg">
                             <h4 className="font-semibold text-md flex items-center gap-2 mb-2"><Briefcase size={16} />Jobs Posted ({jobs?.length || 0})</h4>
-                            {jobs?.length > 0 ? <ul className="list-disc list-inside text-sm space-y-1">{jobs?.map((job: any) => <li key={job._id}>{job.title}</li>)}</ul> : <p className="text-sm text-muted-foreground">This college has not posted any jobs yet.</p>}
+                            {jobs?.length > 0 ? <ul className="list-disc list-inside text-sm space-y-1">{jobs?.map((job: any) => <li key={job._id}>{job.title}</li>)}</ul> : <p className="text-sm text-muted-foreground">This Institution has not posted any jobs yet.</p>}
                         </div>
                     </div>
                 )}
