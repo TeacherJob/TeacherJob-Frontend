@@ -744,7 +744,7 @@ const HowWeWork = () => (
               <p className="mt-1">
                 Every successful hire through our platform receives a custom
                 welcome gift, along with a 6-month job security period and
-                dedicated support from our team for up to 1 year (21x7).
+                dedicated support from our team for up to 1 year (24x7).
               </p>
             </div>
           </div>
@@ -802,7 +802,7 @@ const HowWeWork = () => (
                 <PhoneIcon className="h-6 w-6" />
               </div>
               <p className="text-sm font-semibold text-gray-800">
-                21x7 Dedicated Support
+                24x7 Dedicated Support
                 <br />
                 365 Days
               </p>
