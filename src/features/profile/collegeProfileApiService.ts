@@ -27,6 +27,6 @@ export const collegeProfileApi = apiService.injectEndpoints({
 
 export const { 
     useGetCollegeProfileQuery, 
-    useUpdateCollegeProfileDetailsMutation, 
-    useUpdateCollegeSettingsMutation // This was the missing export. It is now corrected.
+    useUpdateCollegeProfileDetailsMutation,
+    useUpdateCollegeSettingsMutation
 } = collegeProfileApi;
