@@ -40,7 +40,7 @@ const UserDetailsModal = ({ userId, onClose }: UserDetailsModalProps) => {
         if (isError || !userDetails) return <p className="py-8 text-center text-red-500">Could not load user details. Please try again.</p>;
 
         const { user, profile, jobs } = userDetails;
-        const roleName = user.role === "employer" || user.role === "employee" ? "Teacher" : user.role === "college" ? "College" : user.role;
+        const roleName = user.role === "employer" || user.role === "employee" ? "Teacher" : user.role === "college" ? "Institution" : user.role;
 
         return (
             <div className="space-y-6 max-h-[75vh] overflow-y-auto pr-4 -mr-4 pt-2">
