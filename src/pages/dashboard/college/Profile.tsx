@@ -88,7 +88,7 @@ const CollegeProfile = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">College Profile</h1>
+          <h1 className="text-3xl font-bold text-foreground">Institution Profile</h1>
           <p className="text-muted-foreground">Manage your institution's information and settings</p>
         </div>
         <div className='flex gap-2'>
