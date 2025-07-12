@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { GraduationCap, Mail, Phone, MapPin, Globe, Users, Award } from 'lucide-react';
+import { GraduationCap, Mail, Phone, MapPin, Globe, Users, Award, UserCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -27,6 +27,12 @@ const CollegeProfile = () => {
     facultyCount: '',
     departments: [] as string[],
     facilities: [] as string[],
+    contactPerson: {
+      name: '',
+      email: '',
+      phone: '',
+      position: '',
+    }
   });
 
   useEffect(() => {
@@ -43,6 +49,7 @@ const CollegeProfile = () => {
         facultyCount: profile.facultyCount || '0',
         departments: profile.departments || [],
         facilities: profile.facilities || [],
+        contactPerson: profile.contactPerson || { name: '', email: '', phone: '', position: '' },
       });
     }
   }, [profile]);
@@ -50,6 +57,16 @@ const CollegeProfile = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleContactPersonChange = (field: string, value: string) => {
+    setFormData(prev => ({
+        ...prev,
+        contactPerson: {
+            ...prev.contactPerson,
+            [field]: value
+        }
+    }));
   };
 
   const handleSave = async () => {
@@ -74,7 +91,11 @@ const CollegeProfile = () => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="lg:col-span-1"><CardContent className="p-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
-                <div className="lg:col-span-2 space-y-6"><Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card><Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-24 w-full" /></CardContent></Card></div>
+                <div className="lg:col-span-2 space-y-6">
+                    <Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-40 w-full" /></CardContent></Card>
+                    <Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-24 w-full" /></CardContent></Card>
+                    <Card><CardHeader><Skeleton className="h-6 w-48" /></CardHeader><CardContent><Skeleton className="h-32 w-full" /></CardContent></Card>
+                </div>
             </div>
         </div>
     );
@@ -141,6 +162,26 @@ const CollegeProfile = () => {
           </Card>
 
           <Card>
+            <CardHeader>
+                <div className='flex items-center gap-3'>
+                    <UserCircle className='w-6 h-6 text-muted-foreground'/>
+                    <div>
+                        <CardTitle>Contact Person Information</CardTitle>
+                        <CardDescription>Details of the person managing this account</CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><Label htmlFor="contactPersonName">Full Name</Label><Input id="contactPersonName" value={formData.contactPerson.name} onChange={(e) => handleContactPersonChange('name', e.target.value)} disabled={!isEditing} /></div>
+                <div><Label htmlFor="contactPersonPosition">Position / Designation</Label><Input id="contactPersonPosition" value={formData.contactPerson.position} onChange={(e) => handleContactPersonChange('position', e.target.value)} disabled={!isEditing} /></div>
+                <div><Label htmlFor="contactPersonEmail">Email</Label><Input id="contactPersonEmail" type="email" value={formData.contactPerson.email} onChange={(e) => handleContactPersonChange('email', e.target.value)} disabled={!isEditing} /></div>
+                <div><Label htmlFor="contactPersonPhone">Mobile Number</Label><Input id="contactPersonPhone" value={formData.contactPerson.phone} onChange={(e) => handleContactPersonChange('phone', e.target.value)} disabled={!isEditing} /></div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
             <CardHeader><CardTitle>Institution Statistics</CardTitle><CardDescription>Key numbers about your institution</CardDescription></CardHeader>
             <CardContent>
                 {isEditing ? (
@@ -149,10 +190,10 @@ const CollegeProfile = () => {
                             <Label htmlFor="studentCount">Students Enrolled</Label>
                             <Input id="studentCount" type="number" value={formData.studentCount} onChange={handleInputChange} />
                         </div>
-{/*                         <div>
+                        <div>
                             <Label htmlFor="facultyCount">Faculty Members</Label>
                             <Input id="facultyCount" type="number" value={formData.facultyCount} onChange={handleInputChange} />
-                        </div> */}
+                        </div>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -166,10 +207,10 @@ const CollegeProfile = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
-{/*                             <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
-                                <Award className="w-6 h-6 text-secondary" />
-                            </div> */}
-{/*                             <div>
+                            <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center">
+                                {/* <Award className="w-6 h-6 text-secondary" /> */}
+                            </div>
+                            {/* <div>
                                 <p className="text-2xl font-bold text-foreground">{formData.facultyCount || '0'}</p>
                                 <p className="text-sm text-muted-foreground">Faculty Members</p>
                             </div> */}
