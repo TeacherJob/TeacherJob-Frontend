@@ -115,7 +115,7 @@ const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const getRoleDisplayName = () => {
     switch (user.role.toLowerCase()) {
       case 'employer': return 'Teacher/Job Seeker';
-      case 'college': return 'College/Institution';
+      case 'college': return 'Institution';
       case 'admin': return 'Administrator';
       default: return user.role;
     }
