@@ -124,7 +124,7 @@ const Users = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
         <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold">{stats.total}</div><div className="text-sm text-muted-foreground">Total</div></CardContent></Card>
         <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-blue-600">{stats.employee}</div><div className="text-sm text-muted-foreground">Teachers</div></CardContent></Card>
-        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-green-600">{stats.college}</div><div className="text-sm text-muted-foreground">Colleges</div></CardContent></Card>
+        <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-green-600">{stats.college}</div><div className="text-sm text-muted-foreground">Institution</div></CardContent></Card>
         <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-purple-600">{stats.admin}</div><div className="text-sm text-muted-foreground">Admins</div></CardContent></Card>
         <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-green-600">{stats.active}</div><div className="text-sm text-muted-foreground">Active</div></CardContent></Card>
         <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-yellow-600">{stats.pending}</div><div className="text-sm text-muted-foreground">Pending</div></CardContent></Card>
@@ -141,7 +141,7 @@ const Users = () => {
             <div className="flex w-full flex-col sm:flex-row gap-4 lg:w-auto">
                 <Select value={roleFilter} onValueChange={setRoleFilter}>
                     <SelectTrigger className="w-full sm:w-[180px]"><Filter className="w-4 h-4 mr-2" /><SelectValue placeholder="Filter by role" /></SelectTrigger>
-                    <SelectContent><SelectItem value="all">All Roles</SelectItem><SelectItem value="employee">Teachers</SelectItem><SelectItem value="college">Colleges</SelectItem><SelectItem value="admin">Admins</SelectItem></SelectContent>
+                    <SelectContent><SelectItem value="all">All Roles</SelectItem><SelectItem value="employee">Teachers</SelectItem><SelectItem value="college">Institution</SelectItem><SelectItem value="admin">Admins</SelectItem></SelectContent>
                 </Select>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Filter by status" /></SelectTrigger>
