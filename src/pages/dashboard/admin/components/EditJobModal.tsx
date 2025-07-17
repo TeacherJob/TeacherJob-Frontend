@@ -18,8 +18,18 @@ const EditJobModal = ({ jobId, onClose }: EditJobModalProps) => {
   const [updateJob, { isLoading: isUpdating }] = useUpdateJobByAdminMutation();
   
   const [formData, setFormData] = useState({
-    title: '', schoolName: '', location: '', description: '',
-    salary: '', type: '', requirements: '', responsibilities: ''
+    title: '',
+    schoolName: '',
+    location: '',
+    description: '',
+    salary: '',
+    type: '',
+    requirements: '',
+    responsibilities: '',
+    department: '',
+    subjects: '',
+    applicationDeadline: '',
+    benefits: ''
   });
 
   useEffect(() => {
@@ -32,7 +42,11 @@ const EditJobModal = ({ jobId, onClose }: EditJobModalProps) => {
         salary: job.salary || '',
         type: job.type || '',
         requirements: job.requirements || '',
-        responsibilities: job.responsibilities || ''
+        responsibilities: job.responsibilities || '',
+        department: job.department || '',
+        subjects: (job.subjects || []).join(', '),
+        applicationDeadline: job.applicationDeadline ? job.applicationDeadline.split('T')[0] : '',
+        benefits: job.benefits || ''
       });
     }
   }, [job]);
@@ -44,7 +58,12 @@ const EditJobModal = ({ jobId, onClose }: EditJobModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await updateJob({ jobId, data: formData }).unwrap();
+      // If your backend expects subjects as an array, you should transform it back
+      const dataToSubmit = {
+        ...formData,
+        subjects: formData.subjects.split(',').map(s => s.trim()).filter(Boolean),
+      };
+      await updateJob({ jobId, data: dataToSubmit }).unwrap();
       toast.success('Job updated successfully!');
       onClose();
     } catch (err: any) {
@@ -57,7 +76,10 @@ const EditJobModal = ({ jobId, onClose }: EditJobModalProps) => {
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[650px]">
-        <DialogHeader><DialogTitle>Edit Job Post</DialogTitle><DialogDescription>Update the details for this job posting.</DialogDescription></DialogHeader>
+        <DialogHeader>
+            <DialogTitle>Edit Job Post</DialogTitle>
+            <DialogDescription>Update the details for this job posting.</DialogDescription>
+        </DialogHeader>
         {isLoadingJob ? (
             <div className="space-y-4 py-4">
                 <Skeleton className="h-10 w-full" />
@@ -72,9 +94,13 @@ const EditJobModal = ({ jobId, onClose }: EditJobModalProps) => {
            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="location" className="text-right">Location</Label><Input id="location" value={formData.location} onChange={handleChange} className="col-span-3"/></div>
            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="salary" className="text-right">Salary</Label><Input id="salary" value={formData.salary} onChange={handleChange} className="col-span-3"/></div>
            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="type" className="text-right">Job Type</Label><Input id="type" value={formData.type} onChange={handleChange} className="col-span-3"/></div>
+           <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="department" className="text-right">Department</Label><Input id="department" value={formData.department} onChange={handleChange} className="col-span-3" /></div>
+           <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="subjects" className="text-right">Subjects</Label><Input id="subjects" value={formData.subjects} onChange={handleChange} className="col-span-3" placeholder="Comma-separated, e.g. Physics, Maths"/></div>
+           <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="applicationDeadline" className="text-right">Deadline</Label><Input id="applicationDeadline" type="date" value={formData.applicationDeadline} onChange={handleChange} className="col-span-3"/></div>
            <div className="grid grid-cols-4 items-start gap-4"><Label htmlFor="description" className="text-right pt-2">Description</Label><Textarea id="description" value={formData.description} onChange={handleChange} className="col-span-3" rows={3}/></div>
            <div className="grid grid-cols-4 items-start gap-4"><Label htmlFor="requirements" className="text-right pt-2">Requirements</Label><Textarea id="requirements" value={formData.requirements} onChange={handleChange} className="col-span-3" rows={3}/></div>
            <div className="grid grid-cols-4 items-start gap-4"><Label htmlFor="responsibilities" className="text-right pt-2">Responsibilities</Label><Textarea id="responsibilities" value={formData.responsibilities} onChange={handleChange} className="col-span-3" rows={3}/></div>
+           <div className="grid grid-cols-4 items-start gap-4"><Label htmlFor="benefits" className="text-right pt-2">Benefits</Label><Textarea id="benefits" value={formData.benefits} onChange={handleChange} className="col-span-3" rows={3} /></div>
         <DialogFooter className="mt-4">
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
           <Button type="submit" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save Changes'}</Button>
