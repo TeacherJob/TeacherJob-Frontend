@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Plus, Edit, Trash2, Check, X, Building, MapPin, Clock, Users, ChevronDown, Briefcase, DollarSign, BookOpen } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Check, X, Building, MapPin, Clock, Users, ChevronDown, Briefcase, Coins, BookOpen, GraduationCap, CalendarDays, Gift } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useGetAllJobsForAdminQuery, useManageJobStatusMutation, useDeleteJobByAdminMutation } from '@/features/admin/adminApiService';
 import toast from 'react-hot-toast';
@@ -123,15 +123,32 @@ const AdminJobs = () => {
                     <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground border-t border-border pt-3 mt-3">
                         <div className="flex items-center gap-1.5" title="Applicants"><Users className="w-4 h-4" /><span>{job.applicantCount} Applicants</span></div>
                         <div className="flex items-center gap-1.5" title="Job Type"><Briefcase className="w-4 h-4" /><span>{job.type || 'N/A'}</span></div>
-                        <div className="flex items-center gap-1.5" title="Salary"><DollarSign className="w-4 h-4" /><span>{job.salary || 'Not Disclosed'}</span></div>
+                        <div className="flex items-center gap-1.5" title="Salary"><Coins className="w-4 h-4" /><span>{job.salary || 'Not Disclosed'}</span></div>
                         <div className="flex items-center gap-1.5" title="Date Posted"><Clock className="w-4 h-4" /><span>{new Date(job.createdAt).toLocaleDateString()}</span></div>
+                        <div className="flex items-center gap-1.5" title="Department"><GraduationCap className="w-4 h-4" /><span>{job.department || 'N/A'}</span></div>
                     </div>
                     
                     {isExpanded && (
                         <div className="mt-4 pt-4 border-t space-y-3 animate-in fade-in-50">
                             <div><h4 className="font-semibold text-sm flex items-center gap-2 mb-1"><BookOpen size={14}/>Description</h4><p className="text-sm text-muted-foreground">{job.description || 'No description provided.'}</p></div>
+                            <div>
+                                <h4 className="font-semibold text-sm flex items-center gap-2 mb-1"><GraduationCap size={14}/>Department</h4>
+                                <p className="text-sm text-muted-foreground">{job.department || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-sm flex items-center gap-2 mb-1"><BookOpen size={14}/>Subjects</h4>
+                                <p className="text-sm text-muted-foreground">{(job.subjects && job.subjects.length > 0) ? job.subjects.join(', ') : 'Not specified'}</p>
+                            </div>
                             <div><h4 className="font-semibold text-sm flex items-center gap-2 mb-1"><Check size={14}/>Requirements</h4><p className="text-sm text-muted-foreground whitespace-pre-wrap">{job.requirements || 'No requirements listed.'}</p></div>
                             <div><h4 className="font-semibold text-sm flex items-center gap-2 mb-1"><Users size={14}/>Responsibilities</h4><p className="text-sm text-muted-foreground whitespace-pre-wrap">{job.responsibilities || 'No responsibilities listed.'}</p></div>
+                            <div>
+                                <h4 className="font-semibold text-sm flex items-center gap-2 mb-1"><Gift size={14}/>Benefits</h4>
+                                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{job.benefits || 'No benefits listed.'}</p>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-sm flex items-center gap-2 mb-1"><CalendarDays size={14}/>Application Deadline</h4>
+                                <p className="text-sm text-muted-foreground">{job.applicationDeadline ? new Date(job.applicationDeadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not specified'}</p>
+                            </div>
                         </div>
                     )}
                   </div>
