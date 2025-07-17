@@ -28,6 +28,9 @@ import {
   Search,
   FilterX,
   ArrowLeft,
+  CalendarDays,
+  BookOpen,
+  GraduationCap,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -49,7 +52,6 @@ import {
   ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 
-// --- Interface Definitions (No changes here) ---
 interface Job {
   _id: string;
   title: string;
@@ -63,7 +65,12 @@ interface Job {
   responsibilities: string;
   requirements: string;
   tags: string[];
+  department: string;
+  subjects: string[];
+  applicationDeadline: string;
+  benefits: string;
 }
+
 interface CarouselSlide {
   _id: string;
   title: string;
@@ -78,6 +85,7 @@ interface CarouselSlide {
   gradient: string;
   backgroundImage?: string;
 }
+
 interface Testimonial {
   id: number;
   name: string;
@@ -88,7 +96,6 @@ interface Testimonial {
   avatar: string;
 }
 
-// --- Data & Components (No changes here) ---
 const testimonials: Testimonial[] = [
   {
     id: 1,
@@ -294,6 +301,19 @@ const NewJobDetails = ({
     typeof job.requirements === "string"
       ? job.requirements.split("\n").filter((line) => line.trim() !== "")
       : [];
+  const benefitsList =
+    typeof job.benefits === "string"
+      ? job.benefits.split("\n").filter((line) => line.trim() !== "")
+      : [];
+
+  const deadline = new Date(job.applicationDeadline).toLocaleDateString(
+    "en-GB",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }
+  );
 
   const renderActionButtons = () => {
     if (applicationStatus === "applied") {
@@ -328,6 +348,22 @@ const NewJobDetails = ({
                 {job.schoolName}
               </p>
             </div>
+            <div className="mt-3 space-y-2 text-gray-600">
+              <div className="flex items-center gap-2 text-sm">
+                <Briefcase size={16} className="text-gray-500" />
+                <span className="font-medium text-gray-800">
+                  {job.department}
+                </span>
+              </div>
+              {job.subjects && job.subjects.length > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <BookOpen size={16} className="text-gray-500" />
+                  <span className="font-medium text-gray-800">
+                    {job.subjects.join(", ")}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
@@ -351,6 +387,7 @@ const NewJobDetails = ({
           { icon: <MapPin size={16} />, label: job.location },
           { icon: <Briefcase size={16} />, label: job.type },
           { icon: <Clock size={16} />, label: job.experienceLevel },
+          { icon: <CalendarDays size={16} />, label: `Deadline ${deadline}` },
         ].map((item, index) => (
           <div
             key={index}
@@ -371,26 +408,42 @@ const NewJobDetails = ({
             <h4 className="font-semibold text-gray-800 mb-2">About the Role</h4>
             <p className="text-gray-600">{job.description}</p>
           </div>
-          <div>
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Key Responsibilities
-            </h4>
-            <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
-              {responsibilitiesList.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Required Skills and Qualifications
-            </h4>
-            <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
-              {requirementsList.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          {responsibilitiesList.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-2">
+                Key Responsibilities
+              </h4>
+              <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
+                {responsibilitiesList.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {requirementsList.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-2">
+                Required Skills and Qualifications
+              </h4>
+              <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
+                {requirementsList.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {benefitsList.length > 0 && (
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-2">
+                Benefits and Perks
+              </h4>
+              <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
+                {benefitsList.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -470,7 +523,8 @@ const parseAndCompareSalary = (
 };
 
 const JobSearchSection = () => {
-  const { data: jobs = [], isLoading, isError } = useGetPublicJobsQuery();
+  const { data: jobsResponse, isLoading, isError } = useGetPublicJobsQuery();
+  const jobs = jobsResponse || [];
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const { data: myApplications = [] } = useGetMyApplicationsQuery("applied", {
     skip: !isAuthenticated,
@@ -703,13 +757,11 @@ const HowWeWork = () => (
     <div className="container mx-auto px-4 py-16 sm:py-24">
       <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-12 lg:items-center lg:gap-x-16">
         <div className="text-left lg:col-span-7">
-          {/* --- MODIFICATION START: Slogan added here --- */}
           <div className="mb-6">
             <p className="text-2xl lg:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-indigo-500 to-green-500">
               School, Coaching, Ya Ho Teacher, Sabke Liye Hai Yahan Future..
             </p>
           </div>
-          {/* --- MODIFICATION END --- */}
 
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
             How We Empower Your Career
@@ -1076,6 +1128,7 @@ const StatsSection = () => (
     </div>
   </div>
 );
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-main text-main">
