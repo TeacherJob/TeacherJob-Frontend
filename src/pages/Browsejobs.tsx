@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/app/hooks";
-import { selectIsAuthenticated } from "@/features/auth/authSlice";
+import { selectIsAuthenticated, selectCurrentUser } from "@/features/auth/authSlice";
 import { useGetPublicJobsQuery } from "@/features/api/publicJobApiService";
 import {
   useApplyToJobMutation,
@@ -22,6 +22,10 @@ import {
   Search,
   ArrowLeft,
   FilterX,
+  CalendarDays,
+  BookOpen,
+  GraduationCap,
+  Gift,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +41,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 
-// Interfaces and other components are unchanged
+// --- INTERFACE UPDATE ---
 interface Job {
   _id: string;
   title: string;
@@ -50,7 +54,14 @@ interface Job {
   responsibilities: string;
   requirements: string;
   tags: string[];
+  // Added Fields
+  department: string;
+  subjects: string[];
+  applicationDeadline: string;
+  benefits: string;
 }
+
+// --- COMPONENT UPDATE ---
 const NewJobDetails = ({
   job,
   applicationStatus,
@@ -60,14 +71,22 @@ const NewJobDetails = ({
 }) => {
   const navigate = useNavigate();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const currentUser = useAppSelector(selectCurrentUser);
   const [applyToJob, { isLoading: isApplying }] = useApplyToJobMutation();
   const [saveJob, { isLoading: isSaving }] = useSaveJobMutation();
 
   const handleAction = async (action: "apply" | "save") => {
     if (!isAuthenticated) {
+      toast.error("Please log in to perform this action.");
       navigate("/login");
       return;
     }
+
+    if (currentUser?.role === "college") {
+       toast.error(`Colleges cannot ${action} for jobs.`);
+       return;
+    }
+
     const mutation = action === "apply" ? applyToJob : saveJob;
     const successMessage =
       action === "apply" ? "Successfully applied!" : "Job saved!";
@@ -92,6 +111,17 @@ const NewJobDetails = ({
     typeof job.requirements === "string"
       ? job.requirements.split("\n").filter(Boolean)
       : [];
+  const benefitsList =
+    typeof job.benefits === "string"
+      ? job.benefits.split("\n").filter(Boolean)
+      : [];
+  const deadline = job.applicationDeadline
+    ? new Date(job.applicationDeadline).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "Not specified";
 
   const renderActionButtons = () => {
     if (applicationStatus === "applied")
@@ -120,6 +150,7 @@ const NewJobDetails = ({
         size="lg"
         className="w-full bg-primary text-white hover:bg-primary/90 transition-colors font-bold text-base"
       >
+        {isApplying ? <Loader2 className="animate-spin mr-2" /> : null}
         Apply Now
       </Button>
     );
@@ -137,16 +168,31 @@ const NewJobDetails = ({
                 {job.schoolName}
               </p>
             </div>
+             <div className="mt-3 space-y-2 text-gray-600">
+              {job.department && (
+                <div className="flex items-center gap-2 text-sm">
+                  <GraduationCap size={16} className="text-gray-500" />
+                  <span className="font-medium text-gray-800">{job.department}</span>
+                </div>
+              )}
+              {job.subjects && job.subjects.length > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <BookOpen size={16} className="text-gray-500" />
+                  <span className="font-medium text-gray-800">{job.subjects.join(", ")}</span>
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => handleAction("save")}
               disabled={isSaving || isApplying || applicationStatus !== null}
               className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+              title="Save Job"
             >
               <Bookmark size={20} />
             </button>
-            <button className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary/10 hover:text-primary">
+            <button className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary/10 hover:text-primary" title="Share Job">
               <Share2 size={20} />
             </button>
           </div>
@@ -159,6 +205,7 @@ const NewJobDetails = ({
           { icon: <MapPin size={18} />, label: job.location },
           { icon: <Briefcase size={18} />, label: job.type },
           { icon: <Clock size={18} />, label: job.experienceLevel },
+          { icon: <CalendarDays size={18} />, label: `Deadline: ${deadline}` },
         ].map((item, index) => (
           <div
             key={index}
@@ -178,31 +225,48 @@ const NewJobDetails = ({
             <h4 className="font-bold text-gray-800 mb-2">About the Role</h4>
             <p className="text-gray-600">{job.description}</p>
           </div>
-          <div>
-            <h4 className="font-bold text-gray-800 mb-2">
-              Key Responsibilities
-            </h4>
-            <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
-              {responsibilitiesList.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-gray-800 mb-2">
-              Required Skills and Qualifications
-            </h4>
-            <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
-              {requirementsList.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          {responsibilitiesList.length > 0 && (
+            <div>
+              <h4 className="font-bold text-gray-800 mb-2">
+                Key Responsibilities
+              </h4>
+              <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
+                {responsibilitiesList.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {requirementsList.length > 0 && (
+            <div>
+              <h4 className="font-bold text-gray-800 mb-2">
+                Required Skills and Qualifications
+              </h4>
+              <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
+                {requirementsList.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {benefitsList.length > 0 && (
+             <div>
+              <h4 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <Gift size={18} /> Benefits & Perks
+              </h4>
+              <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
+                {benefitsList.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
 const JobListItem = ({
   job,
   isSelected,
@@ -251,7 +315,6 @@ const JobListItem = ({
   </div>
 );
 
-// --- YAHAN BADLAV KIYA GAYA HAI ---
 const salaryRanges = [
   { value: "0-500000", label: "₹0 - ₹5,00,000" },
   { value: "500001-1000000", label: "₹5,00,001 - ₹10,00,000" },
@@ -273,7 +336,6 @@ const parseAndCompareSalary = (
 
   return jobAvgSalary >= min && jobAvgSalary <= max;
 };
-// --- END OF CHANGE ---
 
 const BrowseJobsPage = () => {
   const { data: jobs = [], isLoading, isError } = useGetPublicJobsQuery();
@@ -331,13 +393,11 @@ const BrowseJobsPage = () => {
       );
     }
 
-    // --- YAHAN BADLAV KIYA GAYA HAI ---
     if (salaryFilter && salaryFilter !== "all") {
       tempJobs = tempJobs.filter((job) =>
         parseAndCompareSalary(job.salary, salaryFilter)
       );
     }
-    // --- END OF CHANGE ---
 
     if (roleFilter && roleFilter !== "all") {
       tempJobs = tempJobs.filter((job) => job.type === roleFilter);
@@ -357,7 +417,7 @@ const BrowseJobsPage = () => {
     } else {
       setSelectedJob(null);
     }
-  }, [filteredJobs]);
+  }, [filteredJobs, selectedJob]);
 
   const getJobApplicationStatus = (jobId: string) =>
     applicationStatusMap.get(jobId) || null;
@@ -411,7 +471,6 @@ const BrowseJobsPage = () => {
                     <SelectTrigger className="w-full h-11 bg-white">
                       <SelectValue placeholder="All Locations" />
                     </SelectTrigger>
-                    {/* --- YAHAN BADLAV KIYA GAYA HAI --- */}
                     <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
                       <SelectItem value="all">All Locations</SelectItem>
                       {uniqueLocations.map((location) => (
@@ -426,7 +485,6 @@ const BrowseJobsPage = () => {
                     <SelectTrigger className="w-full h-11 bg-white">
                       <SelectValue placeholder="Any Salary" />
                     </SelectTrigger>
-                    {/* --- YAHAN BHI BADLAV KIYA GAYA HAI --- */}
                     <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
                       <SelectItem value="all">Any Salary</SelectItem>
                       {salaryRanges.map((range) => (
@@ -441,7 +499,6 @@ const BrowseJobsPage = () => {
                     <SelectTrigger className="w-full h-11 bg-white">
                       <SelectValue placeholder="All Roles" />
                     </SelectTrigger>
-                    {/* --- AUR YAHAN BHI BADLAV KIYA GAYA HAI --- */}
                     <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
                       <SelectItem value="all">All Roles</SelectItem>
                       {uniqueRoles.map((role) => (
