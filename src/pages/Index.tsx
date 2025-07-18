@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import CountUp from "react-countup";
 import { useAppSelector } from "@/app/hooks";
 import {
@@ -22,7 +22,6 @@ import {
   Share2,
   Wallet,
   Building,
-  ShieldCheck,
   Loader2,
   AlertTriangle,
   Search,
@@ -36,7 +35,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -293,6 +291,25 @@ const NewJobDetails = ({
     }
   };
 
+  const handleShare = async () => {
+    const jobUrl = `${window.location.origin}${window.location.pathname}?jobId=${job._id}`;
+    const shareData = {
+      title: job.title,
+      text: `Check out this job: ${job.title} at ${job.schoolName}`,
+      url: jobUrl,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        toast.error("Could not share job.");
+      }
+    } else {
+      navigator.clipboard.writeText(shareData.url);
+      toast.success("Job link copied to clipboard!");
+    }
+  };
+
   const responsibilitiesList =
     typeof job.responsibilities === "string"
       ? job.responsibilities.split("\n").filter((line) => line.trim() !== "")
@@ -331,7 +348,7 @@ const NewJobDetails = ({
         size="lg"
         className="w-full bg-orange-500 text-white hover:bg-orange-600 transition-colors text-base font-semibold rounded-lg disabled:bg-orange-300"
       >
-        {isApplying ? "Applying..." : "Apply Now"}
+        {isApplying ? <Loader2 className="animate-spin mr-2" /> : "Apply Now"}
       </Button>
     );
   };
@@ -350,7 +367,7 @@ const NewJobDetails = ({
             </div>
             <div className="mt-3 space-y-2 text-gray-600">
               <div className="flex items-center gap-2 text-sm">
-                <Briefcase size={16} className="text-gray-500" />
+                <GraduationCap size={16} className="text-gray-500" />
                 <span className="font-medium text-gray-800">
                   {job.department}
                 </span>
@@ -370,10 +387,15 @@ const NewJobDetails = ({
               onClick={() => handleAction("save")}
               disabled={isSaving || isApplying || applicationStatus !== null}
               className="p-2.5 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
+              title="Save Job"
             >
               <Bookmark size={20} />
             </button>
-            <button className="p-2.5 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors">
+            <button
+              onClick={handleShare}
+              className="p-2.5 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              title="Share Job"
+            >
               <Share2 size={20} />
             </button>
           </div>
@@ -381,13 +403,13 @@ const NewJobDetails = ({
         <div className="mt-6">{renderActionButtons()}</div>
       </div>
 
-      <div className="px-6 py-5 border-y border-gray-200 flex flex-wrap gap-x-8 gap-y-4">
+      <div className="px-6 py-5 border-y border-gray-200 bg-gray-50/50 flex flex-wrap gap-x-8 gap-y-4">
         {[
           { icon: <Wallet size={16} />, label: job.salary },
           { icon: <MapPin size={16} />, label: job.location },
           { icon: <Briefcase size={16} />, label: job.type },
           { icon: <Clock size={16} />, label: job.experienceLevel },
-          { icon: <CalendarDays size={16} />, label: `Deadline ${deadline}` },
+          { icon: <CalendarDays size={16} />, label: `Deadline: ${deadline}` },
         ].map((item, index) => (
           <div
             key={index}
@@ -434,8 +456,8 @@ const NewJobDetails = ({
           )}
           {benefitsList.length > 0 && (
             <div>
-              <h4 className="font-semibold text-gray-800 mb-2">
-                Benefits and Perks
+              <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                <GiftIcon className="h-5 w-5 text-gray-500" /> Benefits & Perks
               </h4>
               <ul className="space-y-2 list-disc list-outside pl-5 text-gray-600">
                 {benefitsList.map((item, i) => (
@@ -460,17 +482,17 @@ const JobListItem = (props: {
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-lg border cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md hover:border-gray-300 ${
+      className={`bg-white rounded-lg border cursor-pointer transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1 ${
         isSelected
-          ? "border-orange-500 ring-2 ring-orange-500/20"
+          ? "border-primary ring-2 ring-primary/30"
           : "border-gray-200"
       }`}
     >
       <div className="p-5 relative">
         <div className="flex justify-between items-start gap-3">
           <div className="flex-1">
-            <h3 className="text-md font-bold text-gray-800">{job.title}</h3>
-            <p className="text-sm font-medium text-gray-600 mt-1">
+            <h3 className="text-lg font-bold text-gray-900">{job.title}</h3>
+            <p className="text-sm font-semibold text-gray-600 mt-1">
               {job.schoolName}
             </p>
           </div>
@@ -485,7 +507,7 @@ const JobListItem = (props: {
             </Badge>
           )}
         </div>
-        <div className="mt-4 space-y-2 text-sm text-gray-500">
+        <div className="mt-4 space-y-3 text-sm text-gray-500">
           <div className="flex items-center gap-2">
             <MapPin size={16} />
             <span>{job.location}</span>
@@ -537,6 +559,7 @@ const JobSearchSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({ location: "", salaryRange: "" });
   const [mobileView, setMobileView] = useState<"list" | "details">("list");
+  const [searchParams] = useSearchParams();
 
   const applicationStatusMap = useMemo(() => {
     const map = new Map();
@@ -547,12 +570,19 @@ const JobSearchSection = () => {
 
   const uniqueLocations = useMemo(() => {
     if (!jobs) return [];
-    const locations = jobs.map((job) => job.location);
-    return [...new Set(locations)].sort();
+    const allLocations = jobs.flatMap((job) =>
+      job.location.split(",").map((loc) => loc.trim())
+    );
+    return [...new Set(allLocations)].filter(Boolean).sort();
+  }, [jobs]);
+
+  const uniqueRoles = useMemo(() => {
+    if (!jobs) return [];
+    return [...new Set(jobs.map((job) => job.type))].filter(Boolean).sort();
   }, [jobs]);
 
   const handleFilterChange = (filterType: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [filterType]: value }));
+    setFilters((prev) => ({ ...prev, [filterType]: value === "all" ? "" : value }));
   };
 
   const resetFilters = () => {
@@ -572,7 +602,9 @@ const JobSearchSection = () => {
       );
     }
     if (filters.location) {
-      tempJobs = tempJobs.filter((job) => job.location === filters.location);
+      tempJobs = tempJobs.filter((job) =>
+        job.location.includes(filters.location)
+      );
     }
     if (filters.salaryRange) {
       tempJobs = tempJobs.filter((job) =>
@@ -584,16 +616,20 @@ const JobSearchSection = () => {
 
   useEffect(() => {
     if (filteredJobs.length > 0) {
-      if (
-        !selectedJob ||
-        !filteredJobs.find((j) => j._id === selectedJob._id)
-      ) {
-        setSelectedJob(filteredJobs[0]);
+      if (!selectedJob || !filteredJobs.find((j) => j._id === selectedJob._id)) {
+        const jobIdFromUrl = searchParams.get("jobId");
+        const jobFromUrl = filteredJobs.find((j) => j._id === jobIdFromUrl);
+        if (jobFromUrl) {
+          setSelectedJob(jobFromUrl);
+          setMobileView("details");
+        } else {
+          setSelectedJob(filteredJobs[0]);
+        }
       }
     } else {
       setSelectedJob(null);
     }
-  }, [filteredJobs, selectedJob]);
+  }, [filteredJobs, selectedJob, searchParams]);
 
   const getJobApplicationStatus = (jobId: string) =>
     applicationStatusMap.get(jobId) || null;
@@ -610,7 +646,7 @@ const JobSearchSection = () => {
   if (isLoading)
     return (
       <div className="flex flex-col items-center justify-center py-24 text-lg font-semibold text-gray-600 gap-3">
-        <Loader2 className="animate-spin w-8 h-8 text-indigo-500" />
+        <Loader2 className="animate-spin w-8 h-8 text-primary" />
         Loading Jobs...
       </div>
     );
@@ -623,40 +659,41 @@ const JobSearchSection = () => {
     );
 
   return (
-    <section id="jobs" className="bg-slate-50 flex-grow">
+    <section id="jobs" className="bg-gray-50 flex-grow">
       <div className="max-w-screen-2xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
             Find Your Next Opportunity
           </h2>
-          <p className="mt-3 text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
             Explore thousands of teaching jobs from top institutions.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto mb-10 space-y-4">
+        <div className="max-w-5xl mx-auto mb-10 space-y-4">
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search job title or school..."
+                placeholder="Search by job title, school, or location..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-12 pl-12 pr-4 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                className="w-full h-14 pl-14 pr-6 rounded-full border-2 border-gray-200 bg-white focus:ring-2 focus:ring-primary focus:border-primary transition"
               />
             </div>
           </form>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Select
               value={filters.location}
               onValueChange={(value) => handleFilterChange("location", value)}
             >
-              <SelectTrigger className="h-12 rounded-lg text-gray-700 bg-white border-gray-300">
-                <SelectValue placeholder="Filter by Location" />
+              <SelectTrigger className="w-full h-11 bg-white rounded-lg">
+                <SelectValue placeholder="All Locations" />
               </SelectTrigger>
-              <SelectContent className="bg-white z-50 max-h-60 overflow-y-auto custom-scrollbar">
+              <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
+                <SelectItem value="all">All Locations</SelectItem>
                 {uniqueLocations.map((location) => (
                   <SelectItem key={location} value={location}>
                     {location}
@@ -667,14 +704,13 @@ const JobSearchSection = () => {
 
             <Select
               value={filters.salaryRange}
-              onValueChange={(value) =>
-                handleFilterChange("salaryRange", value)
-              }
+              onValueChange={(value) => handleFilterChange("salaryRange", value)}
             >
-              <SelectTrigger className="h-12 rounded-lg text-gray-700 bg-white border-gray-300">
-                <SelectValue placeholder="Filter by Salary" />
+              <SelectTrigger className="w-full h-11 bg-white rounded-lg">
+                <SelectValue placeholder="Any Salary" />
               </SelectTrigger>
-              <SelectContent className="bg-white z-50 max-h-60 overflow-y-auto custom-scrollbar">
+              <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
+                <SelectItem value="all">Any Salary</SelectItem>
                 {salaryRanges.map((range) => (
                   <SelectItem key={range.value} value={range.value}>
                     {range.label}
@@ -682,13 +718,27 @@ const JobSearchSection = () => {
                 ))}
               </SelectContent>
             </Select>
+            
+            <Select onValueChange={(value) => handleFilterChange("role", value)}>
+              <SelectTrigger className="w-full h-11 bg-white rounded-lg">
+                <SelectValue placeholder="All Roles" />
+              </SelectTrigger>
+              <SelectContent className="bg-white z-50 max-h-72 overflow-y-auto custom-scrollbar">
+                <SelectItem value="all">All Roles</SelectItem>
+                {uniqueRoles.map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {role}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <Button
+              variant="ghost"
               onClick={resetFilters}
-              variant="outline"
-              className="h-12 rounded-lg font-semibold text-gray-700 w-full border-gray-300 bg-white hover:bg-gray-100"
+              className="w-full h-11 flex items-center gap-2 text-gray-600 hover:text-primary rounded-lg"
             >
-              <FilterX className="h-4 w-4 mr-2" />
+              <FilterX size={16} />
               Reset Filters
             </Button>
           </div>
@@ -696,38 +746,48 @@ const JobSearchSection = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
           <div
-            className={`lg:col-span-5 xl:col-span-4 space-y-3 h-[70vh] overflow-y-auto pr-2 custom-scrollbar ${
+            className={`lg:col-span-5 xl:col-span-4 space-y-4 lg:max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar p-1 ${
               mobileView === "list" ? "block" : "hidden"
             } lg:block`}
           >
             {filteredJobs.length > 0 ? (
-              filteredJobs.map((job) => (
-                <JobListItem
-                  key={job._id}
-                  job={job}
-                  isSelected={selectedJob?._id === job._id}
-                  onClick={() => handleJobSelect(job)}
-                  applicationStatus={getJobApplicationStatus(job._id)}
-                />
-              ))
-            ) : (
-              <div className="text-center py-10 px-4 text-gray-500 bg-white rounded-lg border border-dashed">
-                <h3 className="text-lg font-semibold">No Jobs Found</h3>
-                <p className="mt-1">
-                  Try adjusting your search or filter criteria.
+              <>
+                <p className="text-sm font-medium text-gray-600 px-2">
+                  Showing {filteredJobs.length} jobs
                 </p>
+                {filteredJobs.map((job) => (
+                  <JobListItem
+                    key={job._id}
+                    job={job}
+                    isSelected={selectedJob?._id === job._id}
+                    onClick={() => handleJobSelect(job)}
+                    applicationStatus={getJobApplicationStatus(job._id)}
+                  />
+                ))}
+              </>
+            ) : (
+              <div className="text-center py-20 px-4 bg-white rounded-lg border">
+                <h3 className="text-xl font-semibold text-gray-800">
+                  No jobs found
+                </h3>
+                <p className="text-gray-500 mt-2">
+                  Try adjusting your search or filters.
+                </p>
+                <Button onClick={resetFilters} className="mt-4">
+                  Clear All Filters
+                </Button>
               </div>
             )}
           </div>
           <div
-            className={`lg:col-span-7 xl:col-span-8 h-[70vh] overflow-y-auto pr-2 custom-scrollbar ${
+            className={`lg:col-span-7 xl:col-span-8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar ${
               mobileView === "details" ? "block" : "hidden"
             } lg:block`}
           >
             <Button
               variant="outline"
               onClick={handleBackToList}
-              className="mb-4 lg:hidden flex items-center sticky top-0 bg-slate-50 z-10"
+              className="mb-4 lg:hidden flex items-center w-full sticky top-0 bg-gray-50 z-10"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Job List
@@ -739,11 +799,13 @@ const JobSearchSection = () => {
                 applicationStatus={getJobApplicationStatus(selectedJob._id)}
               />
             ) : (
-              <div className="hidden lg:flex items-center justify-center h-full bg-white rounded-xl border-2 border-dashed border-gray-300">
+              !isLoading && (
+              <div className="hidden lg:flex items-center justify-center h-full bg-white rounded-xl border-2 border-dashed border-gray-300 py-40">
                 <p className="text-gray-500 text-lg">
                   Select a job to see details
                 </p>
               </div>
+              )
             )}
           </div>
         </div>
@@ -903,56 +965,13 @@ const ForEmployers = () => (
 
           <div className="mt-8">
             <h3 className="font-semibold text-gray-800">Here’s how we work:</h3>
-            <ul className="mt-4 space-y-3 text-gray-600 list-none">
-              <li className="flex items-start">
-                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
-                  ✓
-                </span>
-                <span>
-                  We take care of your vacancy and qualification requirements.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
-                  ✓
-                </span>
-                <span>
-                  We filter candidates based on qualification, experience &
-                  salary fit and shortlist only the most suitable candidates.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
-                  ✓
-                </span>
-                <span>
-                  We conduct initial resume screening and first-round
-                  interviews.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
-                  ✓
-                </span>
-                <span>
-                  We handle communication, follow-ups, and interview scheduling.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
-                  ✓
-                </span>
-                <span>We ensure the candidate joins after selection.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-green-500 font-bold">
-                  ✓
-                </span>
-                <span>
-                  We guide candidates through onboarding document preparation
-                  and ticket booking (if relocation is involved).
-                </span>
-              </li>
+            <ul className="mt-4 space-y-3 text-gray-600 list-disc list-inside">
+              <li>We take care of your vacancy and qualification requirements.</li>
+              <li>We filter candidates based on qualification, experience & salary fit and shortlist only the most suitable candidates.</li>
+              <li>We conduct initial resume screening and first-round interviews.</li>
+              <li>We handle communication, follow-ups, and interview scheduling.</li>
+              <li>We ensure the candidate joins after selection.</li>
+              <li>We guide candidates through onboarding document preparation and ticket booking (if relocation is involved).</li>
             </ul>
           </div>
 
@@ -977,6 +996,7 @@ const ForEmployers = () => (
     </div>
   </section>
 );
+
 const TestimonialsSection = () => {
   const [current, setCurrent] = useState(0);
   const total = Math.ceil(testimonials.length / 3);
@@ -1058,7 +1078,7 @@ const TestimonialsSection = () => {
 };
 
 const StatsSection = () => (
-  <div className="bg-indigo-600 py-16 sm:py-20">
+  <div className="bg-primary py-16 sm:py-20">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center">
         <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
@@ -1137,7 +1157,7 @@ const Index = () => {
       <HowWeWork />
       <ForEmployers />
       <JobSearchSection />
-      {/* <TestimonialsSection /> */}
+      <TestimonialsSection />
       <StatsSection />
       <Footer />
     </div>
