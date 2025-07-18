@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppSelector } from "@/app/hooks";
 import { selectIsAuthenticated, selectCurrentUser } from "@/features/auth/authSlice";
 import { useGetPublicJobsQuery } from "@/features/api/publicJobApiService";
@@ -41,7 +41,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AnimatePresence, motion } from "framer-motion";
 
-// --- INTERFACE UPDATE ---
 interface Job {
   _id: string;
   title: string;
@@ -54,14 +53,12 @@ interface Job {
   responsibilities: string;
   requirements: string;
   tags: string[];
-  // Added Fields
   department: string;
   subjects: string[];
   applicationDeadline: string;
   benefits: string;
 }
 
-// --- COMPONENT UPDATE ---
 const NewJobDetails = ({
   job,
   applicationStatus,
@@ -102,6 +99,26 @@ const NewJobDetails = ({
       });
     }
   };
+
+  const handleShare = async () => {
+    const jobUrl = `${window.location.origin}${window.location.pathname}?jobId=${job._id}`;
+    const shareData = {
+      title: job.title,
+      text: `Check out this job: ${job.title} at ${job.schoolName}`,
+      url: jobUrl,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        toast.error("Could not share job.");
+      }
+    } else {
+        navigator.clipboard.writeText(shareData.url);
+        toast.success("Job link copied to clipboard!");
+    }
+  };
+
 
   const responsibilitiesList =
     typeof job.responsibilities === "string"
@@ -192,7 +209,7 @@ const NewJobDetails = ({
             >
               <Bookmark size={20} />
             </button>
-            <button className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary/10 hover:text-primary" title="Share Job">
+            <button onClick={handleShare} className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-primary/10 hover:text-primary" title="Share Job">
               <Share2 size={20} />
             </button>
           </div>
@@ -354,6 +371,19 @@ const BrowseJobsPage = () => {
   const [locationFilter, setLocationFilter] = useState("");
   const [salaryFilter, setSalaryFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const jobIdFromUrl = searchParams.get("jobId");
+    if (jobIdFromUrl && jobs.length > 0) {
+      const jobToSelect = jobs.find(job => job._id === jobIdFromUrl);
+      if (jobToSelect) {
+        setSelectedJob(jobToSelect);
+        setMobileView("details");
+      }
+    }
+  }, [jobs, searchParams]);
+
 
   const applicationStatusMap = useMemo(() => {
     const map = new Map();
@@ -412,12 +442,18 @@ const BrowseJobsPage = () => {
         !selectedJob ||
         !filteredJobs.find((j) => j._id === selectedJob._id)
       ) {
-        setSelectedJob(filteredJobs[0]);
+        const jobIdFromUrl = searchParams.get("jobId");
+        const jobFromUrl = filteredJobs.find(j => j._id === jobIdFromUrl);
+        if (jobFromUrl) {
+           setSelectedJob(jobFromUrl);
+        } else {
+           setSelectedJob(filteredJobs[0]);
+        }
       }
     } else {
       setSelectedJob(null);
     }
-  }, [filteredJobs, selectedJob]);
+  }, [filteredJobs, selectedJob, searchParams]);
 
   const getJobApplicationStatus = (jobId: string) =>
     applicationStatusMap.get(jobId) || null;
