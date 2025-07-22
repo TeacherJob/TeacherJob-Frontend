@@ -178,9 +178,11 @@ export const AIResumePreviewModal: React.FC<{ isOpen: boolean; onClose: () => vo
         const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', hotfixes: ["px_scaling"] });
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
+        
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const ratio = canvasWidth / canvasHeight;
+
         const imgWidth = pdfWidth;
         const imgHeight = imgWidth / ratio;
         let heightLeft = imgHeight;
@@ -212,7 +214,7 @@ export const AIResumePreviewModal: React.FC<{ isOpen: boolean; onClose: () => vo
             const h = rect.height * scaleFactor;
 
             const pageNum = Math.floor(y / pdfHeight) + 1;
-            const yOnPage = y - ((pageNum - 1) * pdfHeight);
+            const yOnPage = y % pdfHeight;
 
             pdf.setPage(pageNum);
             pdf.link(x, yOnPage, w, h, { url });
