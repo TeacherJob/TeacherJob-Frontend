@@ -519,7 +519,15 @@ const ApplicationDetailsModal = ({ application }) => (
               {application?.user?.employerProfile?.location || "N/A"}
             </p>
             <p>
-              <strong>Headline:</strong>{" "}
+              <strong>Current Salary:</strong>{" "}
+              {application?.user?.employerProfile?.currentSalary || "N/A"}
+            </p>
+            <p>
+              <strong>Expected Salary:</strong>{" "}
+              {application?.user?.employerProfile?.expectedSalary || "N/A"}
+            </p>
+            <p>
+              <strong>Subject:</strong>{" "}
               {application?.user?.employerProfile?.headline || "N/A"}
             </p>
             <div className="pt-2">
