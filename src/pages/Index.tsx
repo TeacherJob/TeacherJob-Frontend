@@ -369,14 +369,14 @@ const NewJobDetails = ({
               <div className="flex items-center gap-2 text-sm">
                 <GraduationCap size={16} className="text-gray-500" />
                 <span className="font-medium text-gray-800">
-                  {job.department}
+                  Department: {job.department}
                 </span>
               </div>
               {job.subjects && job.subjects.length > 0 && (
                 <div className="flex items-center gap-2 text-sm">
                   <BookOpen size={16} className="text-gray-500" />
                   <span className="font-medium text-gray-800">
-                    {job.subjects.join(", ")}
+                    Subjects: {job.subjects.join(", ")}
                   </span>
                 </div>
               )}
