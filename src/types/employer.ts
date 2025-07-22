@@ -13,6 +13,7 @@ export interface WorkExperience {
   company: string;
   location?: string;
   duration?: string;
+  description?: string[];
 }
 
 export interface Education {
@@ -41,6 +42,12 @@ export interface NotificationSettings {
   messagesFromSchools: boolean;
 }
 
+export interface CategorizedSkills {
+  technical: string[];
+  teaching: string[];
+  subjectExpertise: string[];
+}
+
 export interface EmployerProfile {
   _id: string;
   user: string;
@@ -55,9 +62,10 @@ export interface EmployerProfile {
   isVisible: boolean;
   currentSalary?: string;
   expectedSalary?: string;
+  summary?: string;
   workExperience: WorkExperience[];
   education: Education[];
-  skills: Skill[];
+  skills: Skill[] | CategorizedSkills;
   jobPreferences: JobPreferences;
   settings: {
     notifications: NotificationSettings;
