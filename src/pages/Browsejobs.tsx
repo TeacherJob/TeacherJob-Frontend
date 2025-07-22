@@ -189,7 +189,7 @@ const NewJobDetails = ({
               {job.department && (
                 <div className="flex items-center gap-2 text-sm">
                   <GraduationCap size={16} className="text-gray-500" />
-                  <span className="font-medium text-gray-800">Departments: {job.department}</span>
+                  <span className="font-medium text-gray-800">Department: {job.department}</span>
                 </div>
               )}
               {job.subjects && job.subjects.length > 0 && (
