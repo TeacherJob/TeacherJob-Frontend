@@ -1,12 +1,13 @@
 import React, { useState, useRef } from "react";
-import { Camera, Download, Edit, Plus, Upload, MapPin, Loader2, Trash2 } from "lucide-react";
-import { useGetEmployerProfileQuery, useDeleteExperienceMutation, useDeleteEducationMutation, useUploadProfilePictureMutation, useUpdateProfileVisibilityMutation, useUploadDocumentMutation } from "../../../features/profile/employerProfileApiService";
+import { Camera, Download, Edit, Plus, Upload, MapPin, Loader2, Trash2, Sparkles } from "lucide-react";
+import { useGetEmployerProfileQuery, useDeleteExperienceMutation, useDeleteEducationMutation, useUploadProfilePictureMutation, useUpdateProfileVisibilityMutation, useUploadDocumentMutation, useGenerateAiResumeMutation } from "../../../features/profile/employerProfileApiService";
 import toast from "react-hot-toast";
-import { WorkExperience, Education, EmployerProfile as EmployerProfileType } from "@/types/employer";
+import { WorkExperience, Education, EmployerProfile as EmployerProfileType, Skill } from "@/types/employer";
 import { ContactModal } from "./components/ContactModal";
 import { ExperienceModal } from "./components/ExperienceModal";
 import { EducationModal } from "./components/EducationModal";
 import { SkillsModal } from "./components/SkillsModal";
+import { AIResumePreviewModal } from "./components/AIResumePreviewModal";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -30,7 +31,7 @@ const ResumeTemplate = React.forwardRef<HTMLDivElement, { profile: EmployerProfi
     <div>
         <h2 className="text-xl font-bold text-indigo-700 border-b-2 border-indigo-200 pb-2 mb-4">Work Experience</h2>
         <div className="space-y-6">
-            {profile.workExperience.map((exp) => (
+            {profile.workExperience && profile.workExperience.map((exp) => (
             <div key={exp._id}>
                 <div className="flex justify-between items-baseline">
                 <h3 className="text-lg font-semibold text-gray-800">{exp.title}</h3>
@@ -44,7 +45,7 @@ const ResumeTemplate = React.forwardRef<HTMLDivElement, { profile: EmployerProfi
     <div className="mt-8">
         <h2 className="text-xl font-bold text-indigo-700 border-b-2 border-indigo-200 pb-2 mb-4">Education</h2>
         <div className="space-y-4">
-            {profile.education.map((edu) => (
+            {profile.education && profile.education.map((edu) => (
             <div key={edu._id}>
                 <div className="flex justify-between items-baseline">
                 <h3 className="text-lg font-semibold text-gray-800">{edu.degree}</h3>
@@ -58,8 +59,8 @@ const ResumeTemplate = React.forwardRef<HTMLDivElement, { profile: EmployerProfi
     <div className="mt-8">
         <h2 className="text-xl font-bold text-indigo-700 border-b-2 border-indigo-200 pb-2 mb-4">Skills</h2>
         <div className="flex flex-wrap gap-2">
-            {profile.skills.map((skill) => (
-            <span key={skill._id} className="bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1 rounded-full">{skill.name}</span>
+            {profile.skills && Array.isArray(profile.skills) && profile.skills.map((skill) => (
+                <span key={skill._id} className="bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1 rounded-full">{skill.name}</span>
             ))}
         </div>
     </div>
@@ -74,12 +75,15 @@ const MyProfile = () => {
     const [isEducationModalOpen, setEducationModalOpen] = useState(false);
     const [editingEducation, setEditingEducation] = useState<Education | null>(null);
     const [isSkillsModalOpen, setSkillsModalOpen] = useState(false);
+    const [isAiResumeModalOpen, setAiResumeModalOpen] = useState(false);
+    const [aiEnhancedProfile, setAiEnhancedProfile] = useState<EmployerProfileType | null>(null);
 
     const [deleteExperience] = useDeleteExperienceMutation();
     const [deleteEducation] = useDeleteEducationMutation();
     const [uploadProfilePicture, { isLoading: isUploadingPicture }] = useUploadProfilePictureMutation();
     const [uploadDocument, { isLoading: isUploadingDoc }] = useUploadDocumentMutation();
     const [updateVisibility, { isLoading: isUpdatingVisibility }] = useUpdateProfileVisibilityMutation();
+    const [generateAiResume, { isLoading: isGeneratingResume }] = useGenerateAiResumeMutation();
 
     const resumeRef = useRef<HTMLDivElement>(null);
     const profilePictureInputRef = useRef<HTMLInputElement>(null);
@@ -120,6 +124,24 @@ const MyProfile = () => {
             pdf.save(`${profile.name}-Resume.pdf`);
             toast.success("Resume downloaded!", { id: loadingToast });
         });
+    };
+
+    const handleGenerateAndShowAiResume = async () => {
+        if (!profile) {
+            toast.error("Profile data is not available.");
+            return;
+        }
+        const loadingToast = toast.loading("Our AI is crafting your resume...");
+        try {
+            const enhancedData = await generateAiResume(profile).unwrap();
+            const mergedProfile = { ...profile, ...enhancedData };
+            setAiEnhancedProfile(mergedProfile);
+            setAiResumeModalOpen(true);
+            toast.success("Your AI-enhanced resume is ready!", { id: loadingToast });
+        } catch (error) {
+            const errorMessage = (error as any)?.data?.error || "Could not generate AI resume. Please try again.";
+            toast.error(errorMessage, { id: loadingToast });
+        }
     };
 
     const handleDeleteExperience = async (id: string) => {
@@ -193,9 +215,13 @@ const MyProfile = () => {
                                 {profile.location && (<div className="flex items-center text-gray-600 mb-2"><MapPin className="w-4 h-4 mr-1" /><span>{profile.location}</span></div>)}
                                 <p className="text-lg text-gray-700">{profile.headline || "Your Professional Headline"}</p>
                             </div>
-                            <div className="flex-shrink-0">
-                                <button onClick={handleDownloadResume} className="inline-flex items-center px-4 py-2 border border-primary text-primary text-sm font-medium rounded-md shadow-sm hover:bg-primary/5">
-                                    <Download className="w-4 h-4 mr-2" /> Download Resume
+                            <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2">
+                                <button onClick={handleDownloadResume} className="inline-flex items-center justify-center px-4 py-2 border border-primary text-primary text-sm font-medium rounded-md shadow-sm hover:bg-primary/5">
+                                    <Download className="w-4 h-4 mr-2" /> Basic Resume
+                                </button>
+                                <button onClick={handleGenerateAndShowAiResume} disabled={isGeneratingResume} className="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-sm font-medium rounded-md shadow-sm hover:opacity-90 disabled:opacity-50">
+                                    {isGeneratingResume ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                                    AI Enhanced Resume
                                 </button>
                             </div>
                         </div>
@@ -298,8 +324,11 @@ const MyProfile = () => {
                                     </button>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {profile.skills.map((skill) => (<span key={skill._id} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">{skill.name}</span>))}
-                                    {profile.skills.length === 0 && <p className="text-center text-gray-500 py-4">No skills added yet.</p>}
+                                    {Array.isArray(profile.skills) && profile.skills.map((skill) => (
+                                        <span key={skill._id} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">{skill.name}</span>
+                                    ))}
+                                    {Array.isArray(profile.skills) && profile.skills.length === 0 && <p className="text-center text-gray-500 py-4 w-full">No skills added yet.</p>}
+                                    {!Array.isArray(profile.skills) && <p className="text-gray-500 text-sm">Skills are categorized in the AI-enhanced resume.</p>}
                                 </div>
                             </div>
                         </div>
@@ -333,7 +362,14 @@ const MyProfile = () => {
             {isContactModalOpen && <ContactModal isOpen={isContactModalOpen} onClose={() => setContactModalOpen(false)} profile={profile}/>}
             {isExperienceModalOpen && <ExperienceModal isOpen={isExperienceModalOpen} onClose={() => { setExperienceModalOpen(false); setEditingExperience(null); }} experience={editingExperience}/>}
             {isEducationModalOpen && <EducationModal isOpen={isEducationModalOpen} onClose={() => { setEducationModalOpen(false); setEditingEducation(null); }} education={editingEducation}/>}
-            {isSkillsModalOpen && <SkillsModal isOpen={isSkillsModalOpen} onClose={() => setSkillsModalOpen(false)} currentSkills={profile.skills}/>}
+            {isSkillsModalOpen && Array.isArray(profile.skills) && (
+                <SkillsModal 
+                    isOpen={isSkillsModalOpen} 
+                    onClose={() => setSkillsModalOpen(false)} 
+                    currentSkills={profile.skills}
+                />
+            )}
+            {isAiResumeModalOpen && <AIResumePreviewModal isOpen={isAiResumeModalOpen} onClose={() => setAiResumeModalOpen(false)} profile={aiEnhancedProfile} />}
         </>
     );
 };
