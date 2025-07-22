@@ -91,6 +91,14 @@ export const employerProfileApi = apiService.injectEndpoints({
         }),
         invalidatesTags: (result, error, { appId }) => [{ type: 'Application', id: appId }, { type: 'Application', id: 'LIST' }],
     }),
+    generateAiResume: builder.mutation<EmployerProfile, EmployerProfile>({
+      query: (profile) => ({
+        // CORRECTED: Use a relative URL. It will be prefixed with your baseUrl (http://localhost:8000)
+        url: '/generate-resume',
+        method: 'POST',
+        body: { profile },
+      }),
+    }),
   }),
 });
 
@@ -101,5 +109,5 @@ export const {
   useUpdateSkillsMutation, useUpdateEmployerNotificationSettingsMutation,
   useGetMyApplicationsQuery, useUpdateApplicationMutation, useApplyToJobMutation, useSaveJobMutation, useUnsaveJobMutation,
   useWithdrawApplicationMutation, useUploadProfilePictureMutation, useUploadDocumentMutation,
-  useSubmitAcceptanceMutation,
+  useSubmitAcceptanceMutation, useGenerateAiResumeMutation,
 } = employerProfileApi;
