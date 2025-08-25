@@ -15,16 +15,29 @@ import {
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
 import EmployerHeader from "@/components/EmployerHeader";
-import { Helmet } from "react-helmet-async"; // Import Helmet
+import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "@/app/hooks";
+import { selectCurrentUser } from "@/features/auth/authSlice";
+import toast from "react-hot-toast";
 
-// --- Job Post Modal Component ---
-// This remains unchanged as it's a core feature
 const JobPostModal = ({ onClose }: { onClose: () => void }) => {
+  const navigate = useNavigate();
+  const user = useAppSelector(selectCurrentUser);
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!user) {
+      toast.error("Please log in to post a job.");
+      navigate("/login");
+      return;
+    }
+
     alert("Job submitted successfully! (This is a demo)");
     onClose();
   };
+
   const handleModalContentClick = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
@@ -134,7 +147,6 @@ const JobPostModal = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-// --- FeatureCard Component ---
 const FeatureCard = ({
   icon,
   title,
@@ -153,7 +165,6 @@ const FeatureCard = ({
   </div>
 );
 
-// --- NEW STATIC UI SECTION ---
 const WhyHireWithUsSection = () => {
   const benefits = [
     {
@@ -186,7 +197,6 @@ const WhyHireWithUsSection = () => {
     <section className="py-20 sm:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left side: Content */}
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               The Smartest Way to Build Your Dream Team
@@ -212,7 +222,6 @@ const WhyHireWithUsSection = () => {
               ))}
             </div>
           </div>
-          {/* Right side: Image */}
           <div className="relative h-full w-full min-h-[450px] hidden lg:block">
             <img
               src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop"
@@ -227,7 +236,6 @@ const WhyHireWithUsSection = () => {
   );
 };
 
-// --- Main Page Component ---
 const PostJob = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -242,7 +250,6 @@ const PostJob = () => {
       </Helmet>
       <EmployerHeader />
 
-      {/* --- HERO SECTION --- */}
       <section
         className="relative text-white bg-cover bg-center"
         style={{
@@ -253,7 +260,6 @@ const PostJob = () => {
         <div className="absolute inset-0 bg-gray-900 bg-opacity-60"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Left side content */}
             <div>
               <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight mb-6 drop-shadow-md">
                 Let's hire your next great teacher. Fast.
@@ -280,7 +286,6 @@ const PostJob = () => {
                 </div>
               </div>
             </div>
-            {/* Right side card */}
             <div className="hidden lg:flex items-center justify-center">
               <div className="relative w-full max-w-sm">
                 <div className="absolute top-0 left-0 w-full h-full bg-white/5 rounded-3xl transform -rotate-6 translate-x-3 translate-y-3"></div>
@@ -314,7 +319,6 @@ const PostJob = () => {
         </div>
       </section>
 
-      {/* --- "HOW IT WORKS" SECTION --- */}
       <section className="py-20 sm:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -346,40 +350,8 @@ const PostJob = () => {
         </div>
       </section>
 
-      {/* --- REPLACEMENT SECTION CALL --- */}
       <WhyHireWithUsSection />
 
-      {/* --- TESTIMONIALS SECTION --- */}
-{/*       <section className="py-20 sm:py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Trusted by Schools Across India
-            </h2>
-          </div>
-          <div className="relative max-w-3xl mx-auto">
-            <div className="relative bg-white rounded-2xl p-8 sm:p-10 text-center border-t-4 border-primary shadow-2xl">
-              <Quote className="absolute top-4 right-4 w-16 h-16 text-gray-100" />
-              <img
-                className="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-4 border-4 border-white"
-                src="https://via.placeholder.com/150"
-                alt="avatar"
-              />
-              <blockquote className="text-xl text-gray-700 my-4 italic">
-                "TeacherJob helped us find a qualified Physics PGT in just two
-                weeks. The process was seamless and the quality of candidates
-                was exceptional."
-              </blockquote>
-              <div>
-                <p className="font-semibold text-gray-900">Dr. Rajesh Kumar</p>
-                <p className="text-gray-600">Principal, Delhi Public School</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
- */}
-      {/* --- FINAL CTA SECTION --- */}
       <section className="relative py-20 bg-primary text-white overflow-hidden">
         <div className="absolute -left-16 -top-16 w-48 h-48 border-[16px] border-white/5 rounded-full"></div>
         <div className="absolute -right-16 -bottom-16 w-48 h-48 border-[16px] border-white/5 rounded-full"></div>
