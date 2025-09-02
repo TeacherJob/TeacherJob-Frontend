@@ -1,12 +1,11 @@
 // src/pages/PostJob.tsx
 
-import React, { useState } from "react";
+import React from "react";
 import {
   CheckCircle,
   Users,
   Search,
   Briefcase,
-  Quote,
   X,
   Award,
   Target,
@@ -20,132 +19,6 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@/app/hooks";
 import { selectCurrentUser } from "@/features/auth/authSlice";
 import toast from "react-hot-toast";
-
-const JobPostModal = ({ onClose }: { onClose: () => void }) => {
-  const navigate = useNavigate();
-  const user = useAppSelector(selectCurrentUser);
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!user) {
-      toast.error("Please log in to post a job.");
-      navigate("/login");
-      return;
-    }
-
-    alert("Job submitted successfully! (This is a demo)");
-    onClose();
-  };
-
-  const handleModalContentClick = (e: React.MouseEvent) => e.stopPropagation();
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-        onClick={handleModalContentClick}
-      >
-        <div className="p-8">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Post a New Job
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Fill out the details below to find your next great hire.
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X size={24} />
-            </button>
-          </div>
-          <form onSubmit={handleFormSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="jobTitle"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Job Title
-              </label>
-              <input
-                type="text"
-                id="jobTitle"
-                name="jobTitle"
-                placeholder="e.g., Senior Physics Teacher"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="location"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Location
-              </label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                placeholder="e.g., New Delhi, India"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="jobType"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Job Type
-              </label>
-              <select
-                id="jobType"
-                name="jobType"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              >
-                <option>Full-time</option>
-                <option>Part-time</option>
-                <option>Contract</option>
-                <option>Temporary</option>
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Job Description
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                rows={6}
-                placeholder="Describe the responsibilities, qualifications, and benefits..."
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              ></textarea>
-            </div>
-            <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit">Post Job</Button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const FeatureCard = ({
   icon,
@@ -237,7 +110,23 @@ const WhyHireWithUsSection = () => {
 };
 
 const PostJob = () => {
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const navigate = useNavigate();
+  const user = useAppSelector(selectCurrentUser);
+
+  const handlePostJobClick = () => {
+    if (!user) {
+      toast.error("Please log in to post a job.");
+      navigate("/login");
+      return;
+    }
+
+    if (user.role === "employer") {
+      toast.success("Redirecting to your dashboard...");
+      navigate("/employer/dashboard");
+    } else {
+      toast.error("Login as an employer first.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -271,7 +160,7 @@ const PostJob = () => {
               <Button
                 size="lg"
                 className="px-8 py-3 bg-white text-orange-600 font-bold rounded-lg hover:bg-gray-100 transition-colors text-lg shadow-lg"
-                onClick={() => setIsFormOpen(true)}
+                onClick={handlePostJobClick}
               >
                 Post a Job — It’s Free
               </Button>
@@ -366,7 +255,7 @@ const PostJob = () => {
           <Button
             size="lg"
             className="px-10 py-4 bg-white text-orange-600 font-bold rounded-lg hover:bg-gray-100 transition-colors text-lg shadow-lg"
-            onClick={() => setIsFormOpen(true)}
+            onClick={handlePostJobClick}
           >
             Post a Job — It’s Free
           </Button>
@@ -374,8 +263,6 @@ const PostJob = () => {
       </section>
 
       <Footer />
-
-      {isFormOpen && <JobPostModal onClose={() => setIsFormOpen(false)} />}
     </div>
   );
 };
