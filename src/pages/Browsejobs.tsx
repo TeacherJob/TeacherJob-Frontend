@@ -57,6 +57,7 @@ interface Job {
   subjects: string[];
   applicationDeadline: string;
   benefits: string;
+  status: string;
 }
 
 const NewJobDetails = ({
@@ -118,7 +119,6 @@ const NewJobDetails = ({
         toast.success("Job link copied to clipboard!");
     }
   };
-
 
   const responsibilitiesList =
     typeof job.responsibilities === "string"
@@ -393,19 +393,20 @@ const BrowseJobsPage = () => {
   }, [myApplications, savedApplications]);
 
   const uniqueLocations = useMemo(() => {
-    const allLocations = jobs.flatMap((job) =>
+    const activeJobs = jobs.filter(job => job.status === "active");
+    const allLocations = activeJobs.flatMap((job) =>
       job.location.split(",").map((loc) => loc.trim())
     );
     return [...new Set(allLocations)].filter(Boolean);
   }, [jobs]);
 
   const uniqueRoles = useMemo(
-    () => [...new Set(jobs.map((job) => job.type))],
+    () => [...new Set(jobs.filter(job => job.status === "active").map((job) => job.type))],
     [jobs]
   );
 
   const filteredJobs = useMemo(() => {
-    let tempJobs = [...jobs];
+    let tempJobs = jobs.filter((job) => job.status === "active");
 
     if (searchQuery) {
       const lowercasedQuery = searchQuery.toLowerCase();
