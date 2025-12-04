@@ -67,6 +67,7 @@ interface Job {
   subjects: string[];
   applicationDeadline: string;
   benefits: string;
+  status: string;
 }
 
 interface CarouselSlide {
@@ -570,7 +571,8 @@ const JobSearchSection = () => {
 
   const uniqueLocations = useMemo(() => {
     if (!jobs) return [];
-    const allLocations = jobs.flatMap((job) =>
+    const activeJobs = jobs.filter(job => job.status === "active");
+    const allLocations = activeJobs.flatMap((job) =>
       job.location.split(",").map((loc) => loc.trim())
     );
     return [...new Set(allLocations)].filter(Boolean).sort();
@@ -578,7 +580,8 @@ const JobSearchSection = () => {
 
   const uniqueRoles = useMemo(() => {
     if (!jobs) return [];
-    return [...new Set(jobs.map((job) => job.type))].filter(Boolean).sort();
+    const activeJobs = jobs.filter(job => job.status === "active");
+    return [...new Set(activeJobs.map((job) => job.type))].filter(Boolean).sort();
   }, [jobs]);
 
   const handleFilterChange = (filterType: string, value: string) => {
@@ -591,7 +594,7 @@ const JobSearchSection = () => {
   };
 
   const filteredJobs = useMemo(() => {
-    let tempJobs = jobs;
+    let tempJobs = jobs.filter(job => job.status === "active");
     if (searchQuery) {
       const lowercasedQuery = searchQuery.toLowerCase();
       tempJobs = tempJobs.filter(
