@@ -96,7 +96,7 @@ const Signup: React.FC = () => {
       return "https://teacher-job.s3.ap-south-1.amazonaws.com/agreements/Signup+Term+%26+Condition+for+School.pdf";
     }
     if (formData.role === "employer") {
-      return "https://teacher-job.s3.ap-south-1.amazonaws.com/agreements/Signup+Term+%26+Condition+for+Teacher.pdf";
+      return "https://teacher-job.s3.ap-south-1.amazonaws.com/agreements/TEACHER+JOB+SAMPLE+AGREEMENT.pdf";
     }
     return "#";
   }, [formData.role]);
